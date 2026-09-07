@@ -44,7 +44,7 @@ export function ProductCsvMenu() {
         onClick={() => setOpen((value) => !value)}
       >
         <span>CSV</span>
-        <ChevronDown size={14} strokeWidth={2} aria-hidden />
+        <ChevronDown size={11} strokeWidth={2} aria-hidden />
       </button>
 
       {open ? (
@@ -58,7 +58,7 @@ export function ProductCsvMenu() {
               fileRef.current?.click();
             }}
           >
-            <FileUp size={15} strokeWidth={2} aria-hidden />
+            <FileUp size={12} strokeWidth={2} aria-hidden />
             Import CSV
           </button>
           <a
@@ -67,7 +67,7 @@ export function ProductCsvMenu() {
             role="menuitem"
             onClick={() => setOpen(false)}
           >
-            <FileDown size={15} strokeWidth={2} aria-hidden />
+            <FileDown size={12} strokeWidth={2} aria-hidden />
             Export CSV
           </a>
           <a
@@ -76,7 +76,7 @@ export function ProductCsvMenu() {
             role="menuitem"
             onClick={() => setOpen(false)}
           >
-            <Download size={15} strokeWidth={2} aria-hidden />
+            <Download size={12} strokeWidth={2} aria-hidden />
             Download template
           </a>
         </div>

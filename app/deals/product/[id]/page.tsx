@@ -46,24 +46,24 @@ export default async function DealProductPage({ params }: PageProps) {
             ) : null}
             <div className={styles.metaRow}>
               <span className={styles.metaItem}>
-                <Tag size={14} strokeWidth={2} aria-hidden />
+                <Tag size={11} strokeWidth={2} aria-hidden />
                 {product.category.name}
               </span>
               {product.storeArea ? (
                 <span className={styles.metaItem}>
-                  <MapPin size={14} strokeWidth={2} aria-hidden />
+                  <MapPin size={11} strokeWidth={2} aria-hidden />
                   {product.storeArea}
                 </span>
               ) : null}
               {product.shopName ? (
                 <span className={styles.metaItem}>
-                  <Store size={14} strokeWidth={2} aria-hidden />
+                  <Store size={11} strokeWidth={2} aria-hidden />
                   {product.shopName}
                 </span>
               ) : null}
             </div>
             <Link href={`/go/${product.id}`} className="btn btn-block">
-              <ExternalLink size={16} strokeWidth={2} aria-hidden />
+              <ExternalLink size={13} strokeWidth={2} aria-hidden />
               Ambil deal
             </Link>
           </div>

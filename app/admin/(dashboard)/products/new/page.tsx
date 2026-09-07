@@ -10,7 +10,7 @@ export default async function NewProductPage() {
   return (
     <>
       <Link href="/admin/products" className="admin-back">
-        <ArrowLeft size={15} strokeWidth={2} aria-hidden />
+        <ArrowLeft size={12} strokeWidth={2} aria-hidden />
         Produk
       </Link>
       <h1 className="admin-title">Tambah produk</h1>

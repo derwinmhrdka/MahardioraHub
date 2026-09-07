@@ -33,9 +33,9 @@ export function ProductRowActions({
           }
         >
           {isActive ? (
-            <EyeOff size={15} strokeWidth={2} />
+            <EyeOff size={12} strokeWidth={2} />
           ) : (
-            <Eye size={15} strokeWidth={2} />
+            <Eye size={12} strokeWidth={2} />
           )}
         </button>
       </form>
@@ -56,7 +56,7 @@ export function ProductRowActions({
           title="Hapus permanen"
           aria-label={`Hapus ${title}`}
         >
-          <Trash2 size={15} strokeWidth={2} />
+          <Trash2 size={12} strokeWidth={2} />
         </button>
       </form>
     </>

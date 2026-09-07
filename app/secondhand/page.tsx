@@ -1,8 +1,6 @@
-import { Recycle } from "lucide-react";
 import { ProductKind } from "@prisma/client";
-import { CategoryFilterBar } from "@/components/CategoryFilterBar";
 import { Header } from "@/components/Header";
-import { ProductCatalog } from "@/components/ProductCatalog";
+import { ProductBrowse } from "@/components/ProductBrowse";
 import { listCategories } from "@/lib/categories";
 import {
   listActiveSecondhand,
@@ -51,8 +49,10 @@ export default async function SecondhandPage({ searchParams }: PageProps) {
       <Header active="secondhand" />
       <main className="container">
         <h1 className="page-title">Secondhand</h1>
-        <CategoryFilterBar
+        <ProductBrowse
           mode="secondhand"
+          label="Secondhand"
+          items={items}
           categories={categories}
           areas={areas}
           platforms={platforms}
@@ -60,15 +60,8 @@ export default async function SecondhandPage({ searchParams }: PageProps) {
           activeArea={area}
           activePlatform={platform}
           basePath="/secondhand"
+          emptyText="Belum ada item"
         />
-        {products.length === 0 ? (
-          <div className="empty">
-            <Recycle size={36} strokeWidth={1.5} aria-hidden />
-            <p>Belum ada item</p>
-          </div>
-        ) : (
-          <ProductCatalog label="Secondhand" items={items} />
-        )}
       </main>
     </div>
   );

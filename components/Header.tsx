@@ -22,14 +22,14 @@ export function Header({ active = "deals" }: HeaderProps) {
             href="/"
             aria-current={active === "deals" ? "page" : undefined}
           >
-            <Package size={15} strokeWidth={2} aria-hidden />
+            <Package size={12} strokeWidth={2} aria-hidden />
             Deals
           </Link>
           <Link
             href="/secondhand"
             aria-current={active === "secondhand" ? "page" : undefined}
           >
-            <Recycle size={15} strokeWidth={2} aria-hidden />
+            <Recycle size={12} strokeWidth={2} aria-hidden />
             Used
           </Link>
         </nav>

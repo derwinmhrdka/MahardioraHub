@@ -1,6 +1,19 @@
 import type { Metadata, Viewport } from "next";
+import { Caveat, Nunito } from "next/font/google";
 import { getSettings } from "@/lib/settings";
 import "./globals.css";
+
+const caveat = Caveat({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+});
+
+const nunito = Nunito({
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
+});
 
 export const dynamic = "force-dynamic";
 
@@ -36,7 +49,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${caveat.variable} ${nunito.variable}`}>
       <body>{children}</body>
     </html>
   );

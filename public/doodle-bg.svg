@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480" fill="none">
+  <g stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.35">
+    <path d="M58 46l6.5 19.8 20.8.2-16.7 12.3 6.3 19.9-16.9-12.4-16.9 12.4 6.3-19.9-16.7-12.3 20.8-.2z"/>
+    <path d="M150 54c18 0 28 14 20 26-7 11-24 8-28-4-3-10 8-18 18-14"/>
+    <path d="M250 28l-18 42h18l-14 46 42-58h-20l16-30z" fill="#111111" stroke="none"/>
+    <circle cx="360" cy="64" r="26" stroke-dasharray="6 7"/>
+    <circle cx="360" cy="64" r="8"/>
+    <path d="M420 120l-36-8 10-14"/>
+    <path d="M384 112c28 18 18 48-10 52"/>
+    <path d="M48 150c0-18 16-32 40-32h36c24 0 40 14 40 32s-16 32-40 32h-18l-16 16v-16c-24 0-42-14-42-32z"/>
+    <path d="M78 144h40M78 158h28"/>
+    <path d="M210 138h70l-8 78H218l-8-78z"/>
+    <path d="M228 138c0-16 12-28 26-28s26 12 26 28"/>
+    <path d="M320 150l48-18 18 48-48 18z"/>
+    <circle cx="348" cy="168" r="5" fill="#111111" stroke="none"/>
+    <path d="M30 250c20-22 40 22 60 0s40 22 60 0 40 22 60 0"/>
+    <ellipse cx="300" cy="250" rx="16" ry="20"/>
+    <ellipse cx="340" cy="250" rx="16" ry="20"/>
+    <circle cx="304" cy="254" r="5" fill="#111111" stroke="none"/>
+    <circle cx="344" cy="254" r="5" fill="#111111" stroke="none"/>
+    <path d="M308 278c8 12 24 12 32 0"/>
+    <path d="M410 220v28M396 234h28"/>
+    <path d="M440 280l8 8M448 280l-8 8"/>
+    <path d="M70 320c-14 0-24 10-24 22s10 22 24 22h78c16 0 28-12 28-26s-12-26-28-26c-2-16-16-28-32-28-14 0-26 8-30 20-4-6-10-10-18-10z"/>
+    <path d="M220 330l16 22 16-22 16 22 16-22 16 22"/>
+    <path d="M360 330l14 46h52l14-46-26 18-14-28-14 28z"/>
+    <path d="M70 410c0-14 12-24 26-24 8 0 16 4 20 12 4-8 12-12 20-12 14 0 26 10 26 24 0 28-46 48-46 48s-46-20-46-48z"/>
+    <circle cx="210" cy="420" r="8" fill="#111111" stroke="none"/>
+    <circle cx="210" cy="400" r="10"/>
+    <circle cx="190" cy="412" r="10"/>
+    <circle cx="230" cy="412" r="10"/>
+    <circle cx="196" cy="434" r="10"/>
+    <circle cx="224" cy="434" r="10"/>
+    <circle cx="300" cy="400" r="3" fill="#111111" stroke="none"/>
+    <circle cx="316" cy="408" r="3" fill="#111111" stroke="none"/>
+    <circle cx="308" cy="424" r="3" fill="#111111" stroke="none"/>
+    <circle cx="328" cy="396" r="2.5" fill="#111111" stroke="none"/>
+    <path d="M360 420c28-24 56-8 70 18"/>
+    <path d="M430 390l24-20 24 20v42H430z"/>
+    <path d="M446 412h16v20h-16z"/>
+    <path d="M120 80l12 4M400 180l-4 12M180 300l10-8M40 380l8 10"/>
+  </g>
+</svg>

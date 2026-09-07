@@ -17,7 +17,7 @@ export function WhatsAppButton({
       target="_blank"
       rel="noopener noreferrer"
     >
-      <MessageCircle size={18} strokeWidth={2} aria-hidden />
+      <MessageCircle size={14} strokeWidth={2} aria-hidden />
       {label}
     </a>
   );

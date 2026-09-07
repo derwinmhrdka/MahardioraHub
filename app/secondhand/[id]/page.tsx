@@ -48,17 +48,17 @@ export default async function SecondhandItemPage({ params }: PageProps) {
             ) : null}
             <div className={styles.metaRow}>
               <span className={styles.metaItem}>
-                <Tag size={14} strokeWidth={2} aria-hidden />
+                <Tag size={11} strokeWidth={2} aria-hidden />
                 {product.category.name}
               </span>
               {product.storeArea ? (
                 <span className={styles.metaItem}>
-                  <MapPin size={14} strokeWidth={2} aria-hidden />
+                  <MapPin size={11} strokeWidth={2} aria-hidden />
                   {product.storeArea}
                 </span>
               ) : null}
               <span className={styles.metaItem}>
-                <CheckCircle2 size={14} strokeWidth={2} aria-hidden />
+                <CheckCircle2 size={11} strokeWidth={2} aria-hidden />
                 Tersedia
               </span>
             </div>

@@ -62,7 +62,7 @@ export function AdminProductList({
                   <img src={product.imageUrl} alt="" />
                 ) : (
                   <span className={styles.thumbEmpty} aria-hidden>
-                    <ImageOff size={14} strokeWidth={1.75} />
+                    <ImageOff size={11} strokeWidth={1.75} />
                   </span>
                 )}
               </div>
@@ -97,7 +97,7 @@ export function AdminProductList({
                   title="Edit"
                   aria-label={`Edit ${product.title}`}
                 >
-                  <Pencil size={15} strokeWidth={2} />
+                  <Pencil size={12} strokeWidth={2} />
                 </Link>
                 <ProductRowActions
                   productId={product.id}
@@ -118,7 +118,7 @@ export function AdminProductList({
         className={styles.fab}
         aria-label="Tambah produk"
       >
-        <Plus size={18} strokeWidth={2} />
+        <Plus size={14} strokeWidth={2} />
       </Link>
     </div>
   );

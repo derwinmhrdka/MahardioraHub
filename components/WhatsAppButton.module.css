@@ -5,16 +5,19 @@
   gap: 0.4rem;
   width: 100%;
   padding: 0.7rem 1rem;
-  border: 1px solid transparent;
-  border-radius: var(--radius);
-  background: var(--color-success);
+  border: var(--stroke) solid var(--color-border);
+  border-radius: 999px;
+  background: #111;
   color: #fff;
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-family: var(--font-body-stack);
+  font-size: var(--text-nav);
+  font-weight: 700;
+  box-shadow: var(--shadow-doodle-sm);
 }
 
 .btn:hover {
-  filter: brightness(0.95);
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-doodle);
 }
 
 .btn svg {

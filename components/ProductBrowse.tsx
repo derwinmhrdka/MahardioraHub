@@ -5,14 +5,24 @@ import Link from "next/link";
 import clsx from "clsx";
 import {
   FolderTree,
+  LayoutGrid,
+  List,
   MapPin,
+  Package,
+  Recycle,
   SlidersHorizontal,
   Store,
   X,
 } from "lucide-react";
 import { CategoryChips } from "@/components/CategoryChips";
+import {
+  ProductCatalog,
+  type CatalogItem,
+} from "@/components/ProductCatalog";
 import { withFilters } from "@/lib/urls";
-import styles from "./CategoryFilterBar.module.css";
+import styles from "./ProductBrowse.module.css";
+
+const STORAGE_KEY = "dealhub-catalog-view";
 
 type Category = {
   id: number;
@@ -20,8 +30,12 @@ type Category = {
   slug: string;
 };
 
-type CategoryFilterBarProps = {
+type ViewMode = "card" | "list";
+
+type ProductBrowseProps = {
   mode: "deals" | "secondhand";
+  label: string;
+  items: CatalogItem[];
   categories: Category[];
   areas: string[];
   platforms: string[];
@@ -29,10 +43,13 @@ type CategoryFilterBarProps = {
   activeArea?: string | null;
   activePlatform?: string | null;
   basePath: string;
+  emptyText: string;
 };
 
-export function CategoryFilterBar({
+export function ProductBrowse({
   mode,
+  label,
+  items,
   categories,
   areas,
   platforms,
@@ -40,14 +57,21 @@ export function CategoryFilterBar({
   activeArea = null,
   activePlatform = null,
   basePath,
-}: CategoryFilterBarProps) {
-  const [open, setOpen] = useState(false);
+  emptyText,
+}: ProductBrowseProps) {
+  const [view, setView] = useState<ViewMode>("card");
+  const [filterOpen, setFilterOpen] = useState(false);
   const filterActive = Boolean(activeArea || activePlatform);
 
   useEffect(() => {
-    if (!open) return;
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+    if (saved === "card" || saved === "list") setView(saved);
+  }, []);
+
+  useEffect(() => {
+    if (!filterOpen) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") setFilterOpen(false);
     };
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
@@ -55,7 +79,12 @@ export function CategoryFilterBar({
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
-  }, [open]);
+  }, [filterOpen]);
+
+  function chooseView(next: ViewMode) {
+    setView(next);
+    window.localStorage.setItem(STORAGE_KEY, next);
+  }
 
   function categoryHref(slug: string | null) {
     if (mode === "secondhand") {
@@ -93,42 +122,69 @@ export function CategoryFilterBar({
     });
   }
 
+  const EmptyIcon = mode === "secondhand" ? Recycle : Package;
+
   return (
-    <>
-      <div className={styles.bar}>
-        <div className={styles.chips}>
-          <CategoryChips
-            categories={categories}
-            activeSlug={activeCategory}
-            mode={mode}
-            area={activeArea}
-            platform={activePlatform}
-          />
-        </div>
-        <button
-          type="button"
-          className={clsx(styles.trigger, filterActive && styles.triggerActive)}
-          aria-label="Buka Filter"
-          aria-expanded={open}
-          title="Filter"
-          onClick={() => setOpen(true)}
-        >
-          <SlidersHorizontal size={16} strokeWidth={2} />
-        </button>
+    <div className={styles.wrap}>
+      <div className={styles.chips}>
+        <CategoryChips
+          categories={categories}
+          activeSlug={activeCategory}
+          mode={mode}
+          area={activeArea}
+          platform={activePlatform}
+        />
       </div>
 
-      {open ? (
+      {items.length === 0 ? (
+        <div className="empty">
+          <EmptyIcon size={24} strokeWidth={1.5} aria-hidden />
+          <p>{emptyText}</p>
+        </div>
+      ) : (
+        <ProductCatalog label={label} items={items} view={view} />
+      )}
+
+      <nav className={styles.dock} aria-label="Catalog tools">
+        <button
+          type="button"
+          className={clsx(styles.dockBtn, filterActive && styles.dockBtnOn)}
+          aria-label="Filter"
+          aria-expanded={filterOpen}
+          title="Filter"
+          onClick={() => setFilterOpen(true)}
+        >
+          <SlidersHorizontal size={14} strokeWidth={2} aria-hidden />
+          <span>Filter</span>
+        </button>
+        <button
+          type="button"
+          className={styles.dockBtn}
+          aria-label={view === "card" ? "List" : "Card"}
+          title={view === "card" ? "List" : "Card"}
+          onClick={() => chooseView(view === "card" ? "list" : "card")}
+        >
+          {view === "card" ? (
+            <List size={14} strokeWidth={2} aria-hidden />
+          ) : (
+            <LayoutGrid size={14} strokeWidth={2} aria-hidden />
+          )}
+          <span>{view === "card" ? "List" : "Card"}</span>
+        </button>
+      </nav>
+
+      {filterOpen ? (
         <button
           type="button"
           className={styles.backdrop}
           aria-label="Tutup Filter"
-          onClick={() => setOpen(false)}
+          onClick={() => setFilterOpen(false)}
         />
       ) : null}
 
       <aside
-        className={clsx(styles.drawer, open && styles.drawerOpen)}
-        aria-hidden={!open}
+        className={clsx(styles.drawer, filterOpen && styles.drawerOpen)}
+        aria-hidden={!filterOpen}
         aria-label="Filter"
       >
         <div className={styles.drawerTop}>
@@ -137,26 +193,26 @@ export function CategoryFilterBar({
             type="button"
             className={styles.close}
             aria-label="Tutup"
-            onClick={() => setOpen(false)}
+            onClick={() => setFilterOpen(false)}
           >
-            <X size={16} strokeWidth={2} />
+            <X size={13} strokeWidth={2} />
           </button>
         </div>
 
         <div className={styles.drawerBody}>
           <section className={styles.section}>
             <h2 className={styles.sectionLabel}>
-              <FolderTree size={12} strokeWidth={2} aria-hidden />
+              <FolderTree size={10} strokeWidth={2} aria-hidden />
               Kategori
             </h2>
-            <div className={styles.list}>
+            <div className={styles.filterList}>
               <Link
                 href={categoryHref(null)}
                 className={clsx(
                   styles.link,
                   activeCategory == null && styles.active
                 )}
-                onClick={() => setOpen(false)}
+                onClick={() => setFilterOpen(false)}
               >
                 Semua
               </Link>
@@ -168,7 +224,7 @@ export function CategoryFilterBar({
                     styles.link,
                     activeCategory === category.slug && styles.active
                   )}
-                  onClick={() => setOpen(false)}
+                  onClick={() => setFilterOpen(false)}
                 >
                   {category.name}
                 </Link>
@@ -178,22 +234,19 @@ export function CategoryFilterBar({
 
           <section className={styles.section}>
             <h2 className={styles.sectionLabel}>
-              <MapPin size={12} strokeWidth={2} aria-hidden />
+              <MapPin size={10} strokeWidth={2} aria-hidden />
               Area
             </h2>
-            <div className={styles.list}>
+            <div className={styles.filterList}>
               <Link
                 href={areaHref(null)}
-                className={clsx(
-                  styles.link,
-                  activeArea == null && styles.active
-                )}
-                onClick={() => setOpen(false)}
+                className={clsx(styles.link, activeArea == null && styles.active)}
+                onClick={() => setFilterOpen(false)}
               >
                 Semua
               </Link>
               {areas.length === 0 ? (
-                <p className={styles.empty}>Belum ada area</p>
+                <p className={styles.emptyText}>Belum ada area</p>
               ) : (
                 areas.map((area) => (
                   <Link
@@ -203,7 +256,7 @@ export function CategoryFilterBar({
                       styles.link,
                       activeArea === area && styles.active
                     )}
-                    onClick={() => setOpen(false)}
+                    onClick={() => setFilterOpen(false)}
                   >
                     {area}
                   </Link>
@@ -214,22 +267,22 @@ export function CategoryFilterBar({
 
           <section className={styles.section}>
             <h2 className={styles.sectionLabel}>
-              <Store size={12} strokeWidth={2} aria-hidden />
+              <Store size={10} strokeWidth={2} aria-hidden />
               Platform
             </h2>
-            <div className={styles.list}>
+            <div className={styles.filterList}>
               <Link
                 href={platformHref(null)}
                 className={clsx(
                   styles.link,
                   activePlatform == null && styles.active
                 )}
-                onClick={() => setOpen(false)}
+                onClick={() => setFilterOpen(false)}
               >
                 Semua
               </Link>
               {platforms.length === 0 ? (
-                <p className={styles.empty}>Belum ada platform</p>
+                <p className={styles.emptyText}>Belum ada platform</p>
               ) : (
                 platforms.map((platform) => (
                   <Link
@@ -239,7 +292,7 @@ export function CategoryFilterBar({
                       styles.link,
                       activePlatform === platform && styles.active
                     )}
-                    onClick={() => setOpen(false)}
+                    onClick={() => setFilterOpen(false)}
                   >
                     {platform}
                   </Link>
@@ -249,6 +302,6 @@ export function CategoryFilterBar({
           </section>
         </div>
       </aside>
-    </>
+    </div>
   );
 }

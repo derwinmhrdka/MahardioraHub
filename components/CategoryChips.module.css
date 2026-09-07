@@ -24,27 +24,30 @@
   scroll-snap-align: start;
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  padding: 0.4rem 0.8rem;
-  border: none;
+  gap: 0.2rem;
+  padding: 0.2rem 0.55rem;
+  border: var(--stroke) solid var(--color-border);
   border-radius: 999px;
-  background: #f3eee7;
-  font-size: 0.8rem;
+  background: var(--color-surface);
+  font-family: var(--font-body-stack);
+  font-size: 0.75rem;
   font-weight: 600;
-  color: var(--color-text-muted);
+  color: var(--color-text);
   white-space: nowrap;
+  box-shadow: 1px 1px 0 #111;
 }
 
 .chip svg {
   flex-shrink: 0;
-  color: var(--color-text-muted);
+  color: var(--color-text);
 }
 
 .active {
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
+  background: #111;
+  color: #fff;
+  border-color: #111;
 }
 
 .active svg {
-  color: var(--color-accent);
+  color: #fff;
 }

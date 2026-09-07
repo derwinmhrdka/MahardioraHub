@@ -43,13 +43,13 @@ export function ProductCard({
           <div className={styles.meta}>
             {categoryName ? (
               <span className={styles.metaItem}>
-                <Tag size={12} strokeWidth={2} aria-hidden />
+                <Tag size={10} strokeWidth={2} aria-hidden />
                 <span>{categoryName}</span>
               </span>
             ) : null}
             {storeArea ? (
               <span className={styles.metaItem}>
-                <MapPin size={12} strokeWidth={2} aria-hidden />
+                <MapPin size={10} strokeWidth={2} aria-hidden />
                 <span>{storeArea}</span>
               </span>
             ) : null}

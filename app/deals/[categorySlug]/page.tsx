@@ -1,9 +1,7 @@
 import { notFound } from "next/navigation";
-import { Package } from "lucide-react";
 import { ProductKind } from "@prisma/client";
-import { CategoryFilterBar } from "@/components/CategoryFilterBar";
 import { Header } from "@/components/Header";
-import { ProductCatalog } from "@/components/ProductCatalog";
+import { ProductBrowse } from "@/components/ProductBrowse";
 import { getCategoryBySlug, listCategories } from "@/lib/categories";
 import {
   listDealsByCategory,
@@ -53,8 +51,10 @@ export default async function CategoryDealsPage({
       <Header active="deals" />
       <main className="container">
         <h1 className="page-title">{category.name}</h1>
-        <CategoryFilterBar
+        <ProductBrowse
           mode="deals"
+          label={category.name}
+          items={items}
           categories={categories}
           areas={areas}
           platforms={platforms}
@@ -62,15 +62,8 @@ export default async function CategoryDealsPage({
           activeArea={area}
           activePlatform={platform}
           basePath={basePath}
+          emptyText="Belum ada deals di sini"
         />
-        {products.length === 0 ? (
-          <div className="empty">
-            <Package size={36} strokeWidth={1.5} aria-hidden />
-            <p>Belum ada deals di sini</p>
-          </div>
-        ) : (
-          <ProductCatalog label={category.name} items={items} />
-        )}
       </main>
     </div>
   );

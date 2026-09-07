@@ -47,7 +47,7 @@ export function AdminNav({ siteName }: AdminNavProps) {
             title="Logout"
             aria-label="Logout"
           >
-            <LogOut size={15} strokeWidth={2} aria-hidden />
+            <LogOut size={12} strokeWidth={2} aria-hidden />
             <span>Logout</span>
           </button>
         </form>
@@ -60,7 +60,7 @@ export function AdminNav({ siteName }: AdminNavProps) {
           aria-current={active === "products" ? "page" : undefined}
         >
           <Package
-            size={15}
+            size={12}
             strokeWidth={iconStroke(active === "products")}
             aria-hidden
           />
@@ -72,7 +72,7 @@ export function AdminNav({ siteName }: AdminNavProps) {
           aria-current={active === "categories" ? "page" : undefined}
         >
           <FolderTree
-            size={15}
+            size={12}
             strokeWidth={iconStroke(active === "categories")}
             aria-hidden
           />
@@ -84,14 +84,14 @@ export function AdminNav({ siteName }: AdminNavProps) {
           aria-current={active === "settings" ? "page" : undefined}
         >
           <Settings
-            size={15}
+            size={12}
             strokeWidth={iconStroke(active === "settings")}
             aria-hidden
           />
           <span>Settings</span>
         </Link>
         <Link href="/" className={styles.tab} target="_blank" rel="noreferrer">
-          <ExternalLink size={15} strokeWidth={1.75} aria-hidden />
+          <ExternalLink size={12} strokeWidth={1.75} aria-hidden />
           <span>Site</span>
         </Link>
       </nav>

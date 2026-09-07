@@ -53,7 +53,7 @@ export function CategoryChips({
           href={allHref}
           className={clsx(styles.chip, activeSlug == null && styles.active)}
         >
-          <LayoutGrid size={14} strokeWidth={2} aria-hidden />
+          <LayoutGrid size={10} strokeWidth={2} aria-hidden />
           Semua
         </Link>
         {categories.map((category) => {
@@ -77,7 +77,7 @@ export function CategoryChips({
                 activeSlug === category.slug && styles.active
               )}
             >
-              <Icon size={14} strokeWidth={2} aria-hidden />
+              <Icon size={10} strokeWidth={2} aria-hidden />
               {label}
             </Link>
           );
