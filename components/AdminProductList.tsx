@@ -37,13 +37,7 @@ export function AdminProductList({
     <div className={styles.wrap}>
       <div className={styles.toolbar}>
         <h1 className={styles.title}>Produk</h1>
-        <div className={styles.actions}>
-          <ProductCsvMenu />
-          <Link href="/admin/products/new" className={styles.addBtn}>
-            <Plus size={15} strokeWidth={2} aria-hidden />
-            Tambah
-          </Link>
-        </div>
+        <ProductCsvMenu />
       </div>
 
       {notice ? (
@@ -57,9 +51,7 @@ export function AdminProductList({
       ) : null}
 
       {products.length === 0 ? (
-        <p className={styles.empty}>
-          Belum ada produk. Ketuk Tambah untuk membuat.
-        </p>
+        <p className={styles.empty}>Belum ada produk</p>
       ) : (
         <ul className={styles.list}>
           {products.map((product) => (

@@ -1,83 +1,40 @@
 ---
-description: Bahasa Indonesia UI copy — keep familiar English terms
+description: Bahasa UI hybrid + short labels only (no long descriptions)
 alwaysApply: true
 ---
 
-# Bahasa UI (hybrid)
+# Bahasa UI + copy singkat
 
-Write user-facing copy in **Bahasa Indonesia**, but keep **familiar English UI terms** when Indonesians already use them. Never invent awkward calques.
+## Copy length (hard rule)
 
-## Principle
-
-- Sentence/instruction prose → Bahasa (`Simpan perubahan`, `Tidak ada produk`)
-- Standard UI nouns/actions from the list below → keep English (or the allowed bilingual pair)
-- Prefer the English label in compact buttons/nav when it matches this glossary
-
-## Keep these (do not “translate hard”)
-
-### Navigasi & layout
-- **Menu** (bukan Arah Pilih)
-- **Dashboard** (bukan Panel Instrumen)
-- **Home / Beranda** (bukan Rumah)
-- **Sidebar** (bukan Bilah Samping)
-- **Footer** (bukan Catatan Kaki)
-
-### Aksi & tombol
-- **Login / Masuk** (bukan Log Masuk)
-- **Logout / Keluar** (bukan Log Keluar)
-- **Sign Up / Daftar** (bukan Mendaftar)
-- **Save / Simpan** (bukan Tabung)
-- **Checkout** (bukan Kasir)
-- **Download** (bukan Unduh)
-- **Upload** (bukan Unggah)
-- **Search / Cari**
-
-### Data
-- **Export** (bukan Ekspor)
-- **Import** (bukan Impor)
-- **Filter** (bukan Penyaring)
-- **Sort / Urutkan** (bukan Pemilahan)
-- **Draft** (bukan Konsep)
-- **Preview** (bukan Pratinjau)
-- **Reset** (bukan Atur Ulang)
-
-### Akun & pengaturan
-- **Profile / Profil**
-- **Setting / Pengaturan** (bukan Setelan)
-- **Password** (boleh juga Kata Sandi)
-- **Account / Akun**
-- **Role / Akses** (bukan Peran)
-
-### E-commerce
-- **Cart / Keranjang** (bukan Troli)
-- **Pricing / Harga**
-- **Invoice** (bukan Faktur)
-- **Payment Method** (bukan Cara Pembayaran)
-- **Voucher / Kupon**
-
-### Status
-- **Pending** (bukan Menunggu)
-- **Success** (bukan Berhasil) — OK in badges; prose may say “berhasil”
-- **Failed** (bukan Gagal) — OK in badges; prose may say “gagal”
-- **Feedback** (bukan Umpan Balik)
-
-## Examples
+- **No long descriptions** under fields, tools, or empty states.
+- Labels = **1–3 words** max (`Harga`, `Platform`, `Affiliate link`).
+- No parentheticals like `(Rp, bilangan bulat)`, `(deal saja)`, `(opsional)` in labels.
+- Hints/helper paragraphs: **avoid**. Use `placeholder` if needed.
+- Success/error: one short line.
 
 ```tsx
 // ❌ BAD
-<button>Unduh template</button>
-<button>Impor CSV</button>
-<span>Penyaring</span>
+<label>Harga (Rp, bilangan bulat)</label>
+<label>Platform (deal saja)</label>
+<p>Tempel link produk lalu ketuk Ambil data. Mengisi judul...</p>
 
 // ✅ GOOD
-<button>Download template</button>
-<button>Import CSV</button>
-<span>Filter</span>
-<p>Belum ada produk. Ketuk Add untuk menambah.</p>
+<label>Harga</label>
+<label>Platform</label>
+<input placeholder="https://shopee.co.id/..." />
 ```
 
-## When adding UI
+## Bahasa (hybrid)
 
-1. Default new labels to this glossary.
-2. Do not mass-rename product-domain English already in use (`Deals`, `Secondhand`, `Admin`) unless asked.
-3. Confirm dialogs and errors: Bahasa sentences + glossary terms inside them.
+Write in Bahasa for short sentences, but keep familiar English UI terms:
+
+- Menu, Dashboard, Home/Beranda, Sidebar, Footer
+- Login/Masuk, Logout/Keluar, Sign Up/Daftar, Save/Simpan, Checkout
+- Download (bukan Unduh), Upload (bukan Unggah), Search/Cari
+- Export, Import, Filter, Sort/Urutkan, Draft, Preview, Reset
+- Profile/Profil, Setting/Pengaturan, Password, Account/Akun, Role/Akses
+- Cart/Keranjang, Pricing/Harga, Invoice, Payment Method, Voucher/Kupon
+- Pending, Success, Failed, Feedback (badges OK in English)
+
+Never use awkward calques (Arah Pilih, Panel Instrumen, Unduh, Impor, Penyaring, dll).

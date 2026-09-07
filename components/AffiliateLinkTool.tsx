@@ -22,7 +22,7 @@ export function AffiliateLinkTool({
     setError(null);
     setOk(false);
     if (!affiliateId) {
-      setError("Isi Shopee Affiliate ID di Settings dulu.");
+      setError("Isi Affiliate ID di Settings");
       return;
     }
     try {
@@ -35,32 +35,21 @@ export function AffiliateLinkTool({
         targetInputId
       ) as HTMLInputElement | null;
       if (!field) {
-        setError("Field affiliate link tidak ditemukan.");
+        setError("Field tidak ada");
         return;
       }
       field.value = link;
       field.dispatchEvent(new Event("input", { bubbles: true }));
       setOk(true);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Gagal membuat link");
+      setError(e instanceof Error ? e.message : "Gagal");
     }
   }
 
   return (
     <div className={styles.tool}>
-      <div className={styles.title}>Opsional: generate dari URL produk</div>
-      <p className={styles.hint}>
-        Tempel link produk Shopee. Pakai Affiliate ID dari Settings untuk
-        membuat URL <code>an_redir</code> ke field di bawah.
-      </p>
-      {!affiliateId ? (
-        <p className="error">
-          Shopee Affiliate ID masih kosong — isi di{" "}
-          <a href="/admin/settings">Settings</a>.
-        </p>
-      ) : null}
       <div className="form-row">
-        <label htmlFor="shopeeProductUrl">URL produk Shopee</label>
+        <label htmlFor="shopeeProductUrl">Link Shopee</label>
         <input
           id="shopeeProductUrl"
           type="url"
@@ -71,12 +60,11 @@ export function AffiliateLinkTool({
         />
       </div>
       <div className="form-row">
-        <label htmlFor="shopeeSubId">Sub ID (opsional)</label>
+        <label htmlFor="shopeeSubId">Sub ID</label>
         <input
           id="shopeeSubId"
           value={subId}
           onChange={(e) => setSubId(e.target.value)}
-          placeholder="campaign-tag"
           disabled={!affiliateId}
         />
       </div>
@@ -86,10 +74,10 @@ export function AffiliateLinkTool({
         onClick={onGenerate}
         disabled={!affiliateId}
       >
-        Generate affiliate link
+        Generate
       </button>
       {error ? <p className="error">{error}</p> : null}
-      {ok ? <p className="success">Sudah diisi ke Affiliate link.</p> : null}
+      {ok ? <p className="success">OK</p> : null}
     </div>
   );
 }

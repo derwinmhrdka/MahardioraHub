@@ -11,14 +11,8 @@ export default async function AdminCategoriesPage() {
 
       <form action={createCategoryAction} className={`form ${styles.create}`}>
         <div className="form-row">
-          <label htmlFor="name">Kategori baru</label>
-          <input
-            id="name"
-            name="name"
-            required
-            placeholder="contoh: Electronics"
-            autoComplete="off"
-          />
+          <label htmlFor="name">Nama</label>
+          <input id="name" name="name" required autoComplete="off" />
         </div>
         <button type="submit" className="btn btn-block">
           Tambah
@@ -38,7 +32,7 @@ export default async function AdminCategoriesPage() {
                 name="name"
                 defaultValue={category.name}
                 required
-                aria-label={`Ubah nama ${category.name}`}
+                aria-label={`Edit ${category.name}`}
               />
               <button type="submit" className="btn btn-secondary">
                 Simpan

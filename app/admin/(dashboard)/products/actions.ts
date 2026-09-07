@@ -11,12 +11,14 @@ import {
   updateProduct,
 } from "@/lib/products";
 import { parseProductCsv } from "@/lib/products-csv";
+import { fetchProductLinkMeta } from "@/lib/link-meta";
 
 function parseProductForm(formData: FormData) {
   const kind = String(formData.get("kind") ?? "") as ProductKind;
   const title = String(formData.get("title") ?? "").trim();
   const categoryId = Number(formData.get("categoryId"));
-  const price = Number(formData.get("price"));
+  const priceRaw = String(formData.get("price") ?? "").trim();
+  const price = priceRaw === "" ? 0 : Number(priceRaw);
   const imageUrl = String(formData.get("imageUrl") ?? "").trim();
   const shortNote = String(formData.get("shortNote") ?? "").trim();
   const storeArea = String(formData.get("storeArea") ?? "").trim();
@@ -31,6 +33,10 @@ function parseProductForm(formData: FormData) {
     !Number.isFinite(price)
   ) {
     throw new Error("Invalid product form");
+  }
+
+  if (kind === ProductKind.deal && !affiliateLink) {
+    throw new Error("Link required for deal");
   }
 
   return {
@@ -122,4 +128,8 @@ export async function importProductsCsvAction(formData: FormData) {
     params.set("failed", String(allErrors.length));
   }
   redirect(`/admin/products?${params.toString()}`);
+}
+
+export async function fetchProductLinkMetaAction(url: string) {
+  return fetchProductLinkMeta(url);
 }

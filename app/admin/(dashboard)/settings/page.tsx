@@ -12,10 +12,10 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
   return (
     <>
       <h1 className="admin-title">Settings</h1>
-      {params.saved ? <p className="success">Tersimpan.</p> : null}
+      {params.saved ? <p className="success">OK</p> : null}
       <form action={updateSettingsAction} className="form admin-form">
         <div className="form-row">
-          <label htmlFor="siteName">Nama Site</label>
+          <label htmlFor="siteName">Site</label>
           <input
             id="siteName"
             name="siteName"
@@ -24,9 +24,7 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
           />
         </div>
         <div className="form-row">
-          <label htmlFor="whatsappNumber">
-            Nomor WhatsApp (internasional, angka saja)
-          </label>
+          <label htmlFor="whatsappNumber">WhatsApp</label>
           <input
             id="whatsappNumber"
             name="whatsappNumber"
@@ -36,7 +34,7 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
           />
         </div>
         <div className="form-row">
-          <label htmlFor="contactEmail">Email kontak</label>
+          <label htmlFor="contactEmail">Email</label>
           <input
             id="contactEmail"
             name="contactEmail"
@@ -45,13 +43,12 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
           />
         </div>
         <div className="form-row">
-          <label htmlFor="shopeeAffiliateId">Shopee Affiliate ID</label>
+          <label htmlFor="shopeeAffiliateId">Affiliate ID</label>
           <input
             id="shopeeAffiliateId"
             name="shopeeAffiliateId"
             defaultValue={settings.shopeeAffiliateId ?? ""}
             inputMode="numeric"
-            placeholder="Dari dashboard Shopee Affiliate"
           />
         </div>
         <div className="form-actions">

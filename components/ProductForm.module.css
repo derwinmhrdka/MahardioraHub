@@ -1,0 +1,47 @@
+.linkRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.4rem;
+  align-items: stretch;
+}
+
+.linkRow input {
+  min-width: 0;
+}
+
+.linkRow .btn {
+  min-height: 2.1rem;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.75rem;
+}
+
+.preview {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr;
+  gap: 0.55rem;
+  align-items: start;
+  padding: 0.5rem;
+  border-radius: 10px;
+  background: #f3eee7;
+}
+
+.preview img {
+  width: 4.5rem;
+  height: 4.5rem;
+  object-fit: cover;
+  border-radius: 8px;
+  background: var(--color-surface);
+}
+
+.preview p {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 480px) {
+  .linkRow {
+    grid-template-columns: 1fr;
+  }
+}
