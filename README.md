@@ -16,8 +16,7 @@ cd /apps/MahardioraHub
 cp .env.example .env
 # Edit .env: ADMIN_USER, ADMIN_PASS, DOMAIN, APP_HOST_PORT (default 13000)
 docker compose up -d --build
-docker compose exec app node node_modules/prisma/build/index.js migrate deploy
-docker compose exec app node prisma/seed.js   # first time only
+docker compose run --rm migrate npx prisma db seed   # first time only
 ```
 
 Point DNS at the VPS, then install host nginx + SSL:
@@ -73,11 +72,10 @@ Set `ADMIN_USER` / `ADMIN_PASS` in a local `.env` next to `docker-compose.yml`. 
 cp .env.example .env
 # set ADMIN_USER / ADMIN_PASS
 docker compose up -d --build
-docker compose exec app node node_modules/prisma/build/index.js migrate deploy
-docker compose exec app node prisma/seed.js
+docker compose run --rm migrate npx prisma db seed   # first time only
 ```
 
-App is on http://127.0.0.1:13000 (change with `APP_HOST_PORT`). On a VPS, put nginx in front — see `deploy/nginx-mahardiorahub.conf.example`.
+App is on http://127.0.0.1:13000 (change with `APP_HOST_PORT`). Migrations run via the `migrate` service on compose up. On a VPS, put nginx in front — see `deploy/nginx-mahardiorahub.conf.example`.
 
 ## Local development (without Docker for the app)
 

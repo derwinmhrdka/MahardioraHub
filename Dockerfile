@@ -17,6 +17,15 @@ ENV DATABASE_URL="postgresql://dealhub:dealhub@db:5432/dealhub"
 RUN npx prisma generate
 RUN npm run build
 
+# One-shot image for migrate / seed (full Prisma CLI + deps)
+FROM node:20-alpine AS migrate
+WORKDIR /app
+RUN apk add --no-cache libc6-compat openssl
+COPY package.json package-lock.json* ./
+COPY prisma ./prisma
+RUN npm ci
+CMD ["npx", "prisma", "migrate", "deploy"]
+
 FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
@@ -34,16 +43,11 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-# Full Prisma client + CLI from the build (for runtime + migrate/seed)
+# Runtime Prisma client + query engine (not the full CLI)
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
 
-RUN mkdir -p node_modules/.bin \
-  && ln -sf ../prisma/build/index.js node_modules/.bin/prisma \
-  && chown -R nextjs:nodejs /app
-
-ENV PATH="/app/node_modules/.bin:${PATH}"
+RUN chown -R nextjs:nodejs /app
 
 USER nextjs
 EXPOSE 3000
