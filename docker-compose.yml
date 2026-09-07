@@ -24,25 +24,12 @@ services:
       DATABASE_URL: postgresql://dealhub:dealhub@db:5432/dealhub
       ADMIN_USER: ${ADMIN_USER:-admin}
       ADMIN_PASS: ${ADMIN_PASS:-changeme}
+      # Inside the container only — does not use host :3000 / :3001
       PORT: "3000"
       NODE_ENV: production
-    expose:
-      - "3000"
-
-  caddy:
-    image: caddy:2-alpine
-    restart: unless-stopped
-    depends_on:
-      - app
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
+      # Host nginx proxies here (default 13000). Change APP_HOST_PORT in .env if taken.
+      - "127.0.0.1:${APP_HOST_PORT:-13000}:3000"
 
 volumes:
   pgdata:
-  caddy_data:
-  caddy_config:
