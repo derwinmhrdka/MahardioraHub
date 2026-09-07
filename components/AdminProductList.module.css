@@ -83,10 +83,10 @@
 .thumb img {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  max-height: none;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
   object-fit: cover;
   object-position: center;
   display: block;

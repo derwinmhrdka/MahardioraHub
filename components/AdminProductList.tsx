@@ -3,6 +3,7 @@ import { ImageOff, Pencil, Plus } from "lucide-react";
 import { ProductCsvMenu } from "@/components/ProductCsvMenu";
 import { ProductRowActions } from "@/components/ProductRowActions";
 import { formatRupiah } from "@/lib/format";
+import { productImageUrl } from "@/lib/image-url";
 import styles from "./AdminProductList.module.css";
 
 type ProductRow = {
@@ -59,7 +60,12 @@ export function AdminProductList({
               <div className={styles.thumb}>
                 {product.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={product.imageUrl} alt="" />
+                  <img
+                    src={productImageUrl(product.imageUrl, 120) ?? product.imageUrl}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  />
                 ) : (
                   <span className={styles.thumbEmpty} aria-hidden>
                     <ImageOff size={11} strokeWidth={1.75} />

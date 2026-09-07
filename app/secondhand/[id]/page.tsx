@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import styles from "@/components/ProductDetail.module.css";
 import { formatRupiah } from "@/lib/format";
+import { productImageUrl } from "@/lib/image-url";
 import { getProduct } from "@/lib/products";
 import { buildWhatsAppLink, getSettings } from "@/lib/settings";
 
@@ -26,6 +27,7 @@ export default async function SecondhandItemPage({ params }: PageProps) {
     settings.whatsappNumber,
     product.title
   );
+  const imageSrc = productImageUrl(product.imageUrl, 600);
 
   return (
     <div className="section-secondhand">
@@ -33,9 +35,15 @@ export default async function SecondhandItemPage({ params }: PageProps) {
       <main className="container">
         <article className={styles.detail}>
           <div className={styles.imageWrap}>
-            {product.imageUrl ? (
+            {imageSrc ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={product.imageUrl} alt="" className={styles.image} />
+              <img
+                src={imageSrc}
+                alt=""
+                className={styles.image}
+                loading="eager"
+                decoding="async"
+              />
             ) : (
               <div className={styles.placeholder}>Tidak ada gambar</div>
             )}

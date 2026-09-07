@@ -1,6 +1,9 @@
 .detail {
   display: grid;
   gap: 0.9rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 @media (min-width: 720px) {
@@ -13,8 +16,8 @@
 
 .imageWrap {
   position: relative;
-  width: min(100%, 420px);
-  max-height: min(70vw, 420px);
+  width: 100%;
+  max-width: min(100%, 320px);
   margin-inline: auto;
   border: var(--stroke) solid var(--color-border);
   border-radius: var(--radius);
@@ -33,9 +36,7 @@
 
 @media (min-width: 720px) {
   .imageWrap {
-    width: 100%;
-    max-width: 480px;
-    max-height: 480px;
+    max-width: min(100%, 420px);
     margin-inline: 0;
   }
 }
@@ -43,10 +44,10 @@
 .image {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  max-height: none;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
   object-fit: cover;
   object-position: center;
   filter: contrast(1.05) grayscale(0.08);
@@ -67,6 +68,8 @@
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .price {
@@ -85,6 +88,8 @@
   font-family: var(--font-body-stack);
   font-size: var(--text-title);
   font-weight: 700;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .note {
@@ -118,6 +123,9 @@
 
 .related {
   margin-top: 1.5rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .relatedTitle {

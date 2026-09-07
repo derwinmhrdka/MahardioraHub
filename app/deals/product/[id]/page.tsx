@@ -5,6 +5,7 @@ import { Header } from "@/components/Header";
 import { ProductCard } from "@/components/ProductCard";
 import styles from "@/components/ProductDetail.module.css";
 import { formatRupiah } from "@/lib/format";
+import { productImageUrl } from "@/lib/image-url";
 import { getProduct, getRelatedDeals } from "@/lib/products";
 import { getSettings } from "@/lib/settings";
 
@@ -24,6 +25,7 @@ export default async function DealProductPage({ params }: PageProps) {
     getSettings(),
     getRelatedDeals(product.id, product.categoryId),
   ]);
+  const imageSrc = productImageUrl(product.imageUrl, 600);
 
   return (
     <div className="section-deals">
@@ -31,9 +33,15 @@ export default async function DealProductPage({ params }: PageProps) {
       <main className="container">
         <article className={styles.detail}>
           <div className={styles.imageWrap}>
-            {product.imageUrl ? (
+            {imageSrc ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={product.imageUrl} alt="" className={styles.image} />
+              <img
+                src={imageSrc}
+                alt=""
+                className={styles.image}
+                loading="eager"
+                decoding="async"
+              />
             ) : (
               <div className={styles.placeholder}>Tidak ada gambar</div>
             )}

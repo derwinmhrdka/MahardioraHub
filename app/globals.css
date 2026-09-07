@@ -48,11 +48,15 @@
 html {
   -webkit-text-size-adjust: 100%;
   touch-action: manipulation;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
+  max-width: 100%;
+  overflow-x: hidden;
   font-family: var(--font-body-stack);
   font-size: 15px;
   line-height: 1.5;
@@ -91,6 +95,26 @@ img {
   display: block;
   max-width: 100%;
   height: auto;
+}
+
+/* Product media: always fill a fixed box, never expand the page */
+.media-box {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+}
+
+.media-box > img {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: cover;
+  object-position: center;
 }
 
 button,
@@ -135,9 +159,11 @@ p {
 
 .container {
   width: 100%;
-  max-width: 980px;
+  max-width: min(980px, 100%);
   margin: 0 auto;
   padding: 0.6rem 0.75rem 1.75rem;
+  box-sizing: border-box;
+  overflow-x: clip;
 }
 
 .page-title {
@@ -244,11 +270,15 @@ p {
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(140px, 100%), 1fr));
   gap: 0.75rem;
+  width: 100%;
+  max-width: 100%;
 }
 
 .product-grid > * {
+  min-width: 0;
+  max-width: 100%;
   animation: catalogIn 0.34s ease both;
 }
 
@@ -290,7 +320,7 @@ p {
 
 @media (min-width: 640px) {
   .product-grid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 1fr));
     gap: 0.9rem;
   }
 }

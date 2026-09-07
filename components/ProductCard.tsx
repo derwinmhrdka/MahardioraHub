@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { MapPin, Tag } from "lucide-react";
 import { formatRupiah } from "@/lib/format";
+import { productImageUrl } from "@/lib/image-url";
 import styles from "./ProductCard.module.css";
 
 type ProductCardProps = {
@@ -24,13 +25,20 @@ export function ProductCard({
   storeArea,
 }: ProductCardProps) {
   const hasMeta = Boolean(categoryName || storeArea);
+  const src = productImageUrl(imageUrl, 400);
 
   return (
     <Link href={href} className={styles.card}>
       <div className={styles.imageWrap}>
-        {imageUrl ? (
+        {src ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={imageUrl} alt="" className={styles.image} />
+          <img
+            src={src}
+            alt=""
+            className={styles.image}
+            loading="lazy"
+            decoding="async"
+          />
         ) : (
           <div className={styles.placeholder}>Tidak ada gambar</div>
         )}

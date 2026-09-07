@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { MapPin, Tag } from "lucide-react";
 import { formatRupiah } from "@/lib/format";
+import { productImageUrl } from "@/lib/image-url";
 import { ProductCard } from "@/components/ProductCard";
 import styles from "./ProductCatalog.module.css";
 
@@ -52,45 +53,50 @@ export function ProductCatalog({
         </div>
       ) : (
         <div key="list" className={styles.list}>
-          {items.map((item) => (
-            <Link key={item.id} href={item.href} className={styles.row}>
-              <div className={styles.thumb}>
-                {item.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={item.imageUrl}
-                    alt=""
-                    className={styles.thumbImg}
-                  />
-                ) : (
-                  <div className={styles.thumbPlaceholder}>Tanpa gambar</div>
-                )}
-              </div>
-              <div className={styles.rowBody}>
-                <div className={styles.rowTitle}>{item.title}</div>
-                {item.shortNote ? (
-                  <p className={styles.rowNote}>{item.shortNote}</p>
-                ) : null}
-                {item.categoryName || item.storeArea ? (
-                  <div className={styles.rowMeta}>
-                    {item.categoryName ? (
-                      <span className={styles.metaItem}>
-                        <Tag size={10} strokeWidth={2} aria-hidden />
-                        {item.categoryName}
-                      </span>
-                    ) : null}
-                    {item.storeArea ? (
-                      <span className={styles.metaItem}>
-                        <MapPin size={10} strokeWidth={2} aria-hidden />
-                        {item.storeArea}
-                      </span>
-                    ) : null}
-                  </div>
-                ) : null}
-              </div>
-              <div className={styles.rowPrice}>{formatRupiah(item.price)}</div>
-            </Link>
-          ))}
+          {items.map((item) => {
+            const thumb = productImageUrl(item.imageUrl, 120);
+            return (
+              <Link key={item.id} href={item.href} className={styles.row}>
+                <div className={styles.thumb}>
+                  {thumb ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={thumb}
+                      alt=""
+                      className={styles.thumbImg}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <div className={styles.thumbPlaceholder}>Tanpa gambar</div>
+                  )}
+                </div>
+                <div className={styles.rowBody}>
+                  <div className={styles.rowTitle}>{item.title}</div>
+                  {item.shortNote ? (
+                    <p className={styles.rowNote}>{item.shortNote}</p>
+                  ) : null}
+                  {item.categoryName || item.storeArea ? (
+                    <div className={styles.rowMeta}>
+                      {item.categoryName ? (
+                        <span className={styles.metaItem}>
+                          <Tag size={10} strokeWidth={2} aria-hidden />
+                          {item.categoryName}
+                        </span>
+                      ) : null}
+                      {item.storeArea ? (
+                        <span className={styles.metaItem}>
+                          <MapPin size={10} strokeWidth={2} aria-hidden />
+                          {item.storeArea}
+                        </span>
+                      ) : null}
+                    </div>
+                  ) : null}
+                </div>
+                <div className={styles.rowPrice}>{formatRupiah(item.price)}</div>
+              </Link>
+            );
+          })}
         </div>
       )}
     </>
