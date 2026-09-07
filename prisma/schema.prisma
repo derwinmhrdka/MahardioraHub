@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String
+  slug     String    @unique
+  products Product[]
+}
+
+enum ProductKind {
+  deal
+  secondhand
+}
+
+model Product {
+  id            Int         @id @default(autoincrement())
+  kind          ProductKind
+  title         String
+  categoryId    Int
+  category      Category    @relation(fields: [categoryId], references: [id])
+  price         Int
+  imageUrl      String?
+  shortNote     String?
+  storeArea     String?
+  shopName      String?
+  affiliateLink String?
+  isActive      Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+  clicks        Click[]
+}
+
+model Click {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  clickedAt DateTime @default(now())
+}
+
+model Setting {
+  id                Int     @id
+  whatsappNumber    String
+  siteName          String
+  contactEmail      String?
+  shopeeAffiliateId String? // used by admin optional an_redir link helper
+}
+
+// Future: InboxLink model (rawLink, telegramChatId, status) for Telegram bot product intake.

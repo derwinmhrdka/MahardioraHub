@@ -1,0 +1,16 @@
+Dockerfile
+docker-compose.yml
+Caddyfile
+.dockerignore
+.git
+.gitignore
+.next
+node_modules
+npm-debug.log
+README.md
+requirements.md
+cursor-prompt.md
+.env
+.env.*
+!.env.example
+*.md
