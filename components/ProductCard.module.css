@@ -21,7 +21,10 @@
 }
 
 .imageWrap {
+  position: relative;
   aspect-ratio: 1 / 1;
+  width: 100%;
+  max-width: 100%;
   background:
     repeating-linear-gradient(
       -45deg,
@@ -35,9 +38,14 @@
 }
 
 .image {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
+  max-width: none;
+  max-height: none;
   object-fit: cover;
+  object-position: center;
   transition: transform 0.3s ease;
   filter: contrast(1.05) grayscale(0.08);
 }
@@ -60,8 +68,8 @@
 }
 
 .placeholder {
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
   display: grid;
   place-items: center;
   color: var(--color-text-muted);

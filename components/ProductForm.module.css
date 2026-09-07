@@ -29,7 +29,10 @@
 .preview img {
   width: 4.5rem;
   height: 4.5rem;
+  max-width: 4.5rem;
+  max-height: 4.5rem;
   object-fit: cover;
+  object-position: center;
   border-radius: 8px;
   background: var(--color-surface);
 }
