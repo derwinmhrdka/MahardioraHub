@@ -37,7 +37,7 @@ if ! $COMPOSE exec -T db pg_isready -U dealhub -d dealhub >/dev/null 2>&1; then
 fi
 
 echo "==> Applying Prisma migrations..."
-$COMPOSE exec -T app npx prisma migrate deploy
+$COMPOSE exec -T app node node_modules/prisma/build/index.js migrate deploy
 
 echo "==> Container status:"
 $COMPOSE ps

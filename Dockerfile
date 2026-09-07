@@ -39,7 +39,11 @@ COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 
-RUN chown -R nextjs:nodejs /app
+RUN mkdir -p node_modules/.bin \
+  && ln -sf ../prisma/build/index.js node_modules/.bin/prisma \
+  && chown -R nextjs:nodejs /app
+
+ENV PATH="/app/node_modules/.bin:${PATH}"
 
 USER nextjs
 EXPOSE 3000
