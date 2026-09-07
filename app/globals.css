@@ -37,6 +37,7 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
 }
 
 body {
@@ -111,6 +112,14 @@ p {
   border: 0;
 }
 
+.admin-title {
+  margin: 0 0 0.55rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--color-text);
+}
+
 .section-label {
   margin: 0 0 0.65rem;
   font-size: clamp(1rem, 2.5vw, 1.15rem);
@@ -131,7 +140,7 @@ p {
   gap: 0.4rem;
   padding: 0.65rem 0.95rem;
   border: 1px solid transparent;
-  border-radius: var(--radius);
+  border-radius: 999px;
   background: var(--color-accent);
   color: #fff;
   font-weight: 600;
@@ -240,10 +249,27 @@ p {
   max-width: 28rem;
 }
 
+.admin-form {
+  max-width: none;
+  width: 100%;
+  gap: 0.55rem;
+}
+
+.admin-form .btn.btn-secondary,
+.admin-form .btn.btn-block {
+  min-height: 2.25rem;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.8125rem;
+}
+
 .form-row {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+}
+
+.admin-form .form-row {
+  gap: 0.18rem;
 }
 
 .form-row label {
@@ -252,13 +278,30 @@ p {
   color: var(--color-text-muted);
 }
 
+.admin-form .form-row label {
+  font-size: 0.7rem;
+  letter-spacing: 0.01em;
+}
+
 .form-row input,
 .form-row select,
 .form-row textarea {
-  padding: 0.55rem 0.65rem;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.75rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   background: var(--color-surface);
+  font-size: 1rem;
+}
+
+.admin-form .form-row input,
+.admin-form .form-row select,
+.admin-form .form-row textarea {
+  min-height: 2.1rem;
+  padding: 0.35rem 0.55rem;
+  font-size: 0.8125rem;
+  line-height: 1.3;
 }
 
 .form-row input:focus,
@@ -269,8 +312,111 @@ p {
 }
 
 .form-row textarea {
-  min-height: 4rem;
+  min-height: 4.5rem;
   resize: vertical;
+}
+
+.admin-form .form-row textarea {
+  min-height: 3.25rem;
+}
+
+.form-actions {
+  position: sticky;
+  bottom: calc(4.5rem + env(safe-area-inset-bottom));
+  z-index: 20;
+  margin: 0.35rem -0.75rem -0.25rem;
+  padding: 0.55rem 0.75rem;
+  background: var(--color-bg);
+  border-top: 1px solid var(--color-border);
+}
+
+.form-actions .btn {
+  min-height: 2.5rem;
+  font-size: 0.85rem;
+}
+
+.admin-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-bottom: 0.35rem;
+  min-height: 1.85rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.admin-back:hover {
+  color: var(--color-accent);
+}
+
+.admin-check {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2rem;
+  font-size: 0.8125rem !important;
+  color: var(--color-text) !important;
+}
+
+.admin-check input {
+  width: 1rem;
+  height: 1rem;
+  min-height: 0;
+  accent-color: var(--color-accent);
+}
+
+.admin-toggle-form {
+  display: flex;
+  width: 100%;
+}
+
+.admin-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-toggle-off {
+  color: var(--color-danger);
+  border-color: #efc4c4;
+  background: #fdf2f2;
+}
+
+.admin-toggle-on {
+  color: var(--color-success);
+  border-color: #c9d8c2;
+  background: #f3f7f1;
+}
+
+@media (min-width: 768px) {
+  .admin-form {
+    max-width: 32rem;
+  }
+
+  .form-actions {
+    position: static;
+    margin: 0;
+    padding: 0;
+    background: none;
+  }
+
+  .form-actions .btn {
+    width: auto;
+    min-width: 10rem;
+  }
 }
 
 .table-wrap {

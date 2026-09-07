@@ -5,9 +5,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
   createProduct,
+  deleteProduct,
+  importProductsFromCsvRows,
   setProductActive,
   updateProduct,
 } from "@/lib/products";
+import { parseProductCsv } from "@/lib/products-csv";
 
 function parseProductForm(formData: FormData) {
   const kind = String(formData.get("kind") ?? "") as ProductKind;
@@ -66,7 +69,7 @@ export async function updateProductAction(formData: FormData) {
   redirect("/admin/products");
 }
 
-export async function deactivateProductAction(formData: FormData) {
+export async function hideProductAction(formData: FormData) {
   const id = Number(formData.get("id"));
   if (!Number.isFinite(id)) throw new Error("Invalid product id");
   await setProductActive(id, false);
@@ -75,11 +78,48 @@ export async function deactivateProductAction(formData: FormData) {
   revalidatePath("/admin/products");
 }
 
-export async function activateProductAction(formData: FormData) {
+export async function showProductAction(formData: FormData) {
   const id = Number(formData.get("id"));
   if (!Number.isFinite(id)) throw new Error("Invalid product id");
   await setProductActive(id, true);
   revalidatePath("/");
   revalidatePath("/secondhand");
   revalidatePath("/admin/products");
+}
+
+export async function deleteProductAction(formData: FormData) {
+  const id = Number(formData.get("id"));
+  if (!Number.isFinite(id)) throw new Error("Invalid product id");
+  await deleteProduct(id);
+  revalidatePath("/");
+  revalidatePath("/secondhand");
+  revalidatePath("/admin/products");
+}
+
+export async function importProductsCsvAction(formData: FormData) {
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) {
+    redirect("/admin/products?importError=empty");
+  }
+
+  const text = await file.text();
+  const parsed = parseProductCsv(text);
+  if (parsed.rows.length === 0 && parsed.errors.length > 0) {
+    redirect(
+      `/admin/products?importError=${encodeURIComponent(parsed.errors[0])}`
+    );
+  }
+
+  const result = await importProductsFromCsvRows(parsed.rows);
+  const allErrors = [...parsed.errors, ...result.errors];
+  revalidatePath("/");
+  revalidatePath("/secondhand");
+  revalidatePath("/admin/products");
+
+  const params = new URLSearchParams();
+  params.set("imported", String(result.created));
+  if (allErrors.length > 0) {
+    params.set("failed", String(allErrors.length));
+  }
+  redirect(`/admin/products?${params.toString()}`);
 }

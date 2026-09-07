@@ -66,7 +66,7 @@ export default async function CategoryDealsPage({
         {products.length === 0 ? (
           <div className="empty">
             <Package size={36} strokeWidth={1.5} aria-hidden />
-            <p>No deals here</p>
+            <p>Belum ada deals di sini</p>
           </div>
         ) : (
           <ProductCatalog label={category.name} items={items} />

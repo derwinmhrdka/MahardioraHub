@@ -97,7 +97,7 @@ export function ProductCatalog({ label, items }: ProductCatalogProps) {
                     className={styles.thumbImg}
                   />
                 ) : (
-                  <div className={styles.thumbPlaceholder}>No img</div>
+                  <div className={styles.thumbPlaceholder}>Tanpa gambar</div>
                 )}
               </div>
               <div className={styles.rowBody}>

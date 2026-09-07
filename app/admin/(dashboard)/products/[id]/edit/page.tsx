@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { ProductKind } from "@prisma/client";
-import { AdminNav } from "@/components/AdminNav";
+import { ArrowLeft } from "lucide-react";
 import { AffiliateLinkTool } from "@/components/AffiliateLinkTool";
 import { listCategories } from "@/lib/categories";
 import { getProduct } from "@/lib/products";
@@ -26,23 +27,26 @@ export default async function EditProductPage({ params }: PageProps) {
 
   return (
     <>
-      <AdminNav siteName={settings.siteName} active="products" />
-      <h1 className="page-title">Edit product</h1>
-      <form action={updateProductAction} className="form">
+      <Link href="/admin/products" className="admin-back">
+        <ArrowLeft size={15} strokeWidth={2} aria-hidden />
+        Produk
+      </Link>
+      <h1 className="admin-title">Edit produk</h1>
+      <form action={updateProductAction} className="form admin-form">
         <input type="hidden" name="id" value={product.id} />
         <div className="form-row">
-          <label htmlFor="kind">Kind</label>
+          <label htmlFor="kind">Jenis</label>
           <select id="kind" name="kind" defaultValue={product.kind} required>
             <option value={ProductKind.deal}>Deal</option>
             <option value={ProductKind.secondhand}>Secondhand</option>
           </select>
         </div>
         <div className="form-row">
-          <label htmlFor="title">Title</label>
+          <label htmlFor="title">Judul</label>
           <input id="title" name="title" defaultValue={product.title} required />
         </div>
         <div className="form-row">
-          <label htmlFor="categoryId">Category</label>
+          <label htmlFor="categoryId">Kategori</label>
           <select
             id="categoryId"
             name="categoryId"
@@ -57,19 +61,20 @@ export default async function EditProductPage({ params }: PageProps) {
           </select>
         </div>
         <div className="form-row">
-          <label htmlFor="price">Price (Rp, whole number)</label>
+          <label htmlFor="price">Harga (Rp, bilangan bulat)</label>
           <input
             id="price"
             name="price"
             type="number"
             min="0"
             step="1"
+            inputMode="numeric"
             defaultValue={product.price}
             required
           />
         </div>
         <div className="form-row">
-          <label htmlFor="imageUrl">Image URL</label>
+          <label htmlFor="imageUrl">URL gambar</label>
           <input
             id="imageUrl"
             name="imageUrl"
@@ -78,7 +83,7 @@ export default async function EditProductPage({ params }: PageProps) {
           />
         </div>
         <div className="form-row">
-          <label htmlFor="shortNote">Short note</label>
+          <label htmlFor="shortNote">Catatan singkat</label>
           <input
             id="shortNote"
             name="shortNote"
@@ -87,7 +92,7 @@ export default async function EditProductPage({ params }: PageProps) {
           />
         </div>
         <div className="form-row">
-          <label htmlFor="storeArea">Store area</label>
+          <label htmlFor="storeArea">Area toko</label>
           <input
             id="storeArea"
             name="storeArea"
@@ -96,7 +101,7 @@ export default async function EditProductPage({ params }: PageProps) {
           />
         </div>
         <div className="form-row">
-          <label htmlFor="shopName">Platform (deals only)</label>
+          <label htmlFor="shopName">Platform (deal saja)</label>
           <input
             id="shopName"
             name="shopName"
@@ -106,7 +111,7 @@ export default async function EditProductPage({ params }: PageProps) {
         </div>
         <AffiliateLinkTool affiliateId={settings.shopeeAffiliateId} />
         <div className="form-row">
-          <label htmlFor="affiliateLink">Affiliate link (deals only)</label>
+          <label htmlFor="affiliateLink">Affiliate link (deal saja)</label>
           <input
             id="affiliateLink"
             name="affiliateLink"
@@ -115,18 +120,20 @@ export default async function EditProductPage({ params }: PageProps) {
           />
         </div>
         <div className="form-row">
-          <label>
+          <label className="admin-check">
             <input
               type="checkbox"
               name="isActive"
               defaultChecked={product.isActive}
-            />{" "}
-            Active
+            />
+            Tampilkan di Site
           </label>
         </div>
-        <button type="submit" className="btn">
-          Save
-        </button>
+        <div className="form-actions">
+          <button type="submit" className="btn btn-block">
+            Simpan
+          </button>
+        </div>
       </form>
     </>
   );

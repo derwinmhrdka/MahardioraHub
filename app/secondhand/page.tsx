@@ -64,7 +64,7 @@ export default async function SecondhandPage({ searchParams }: PageProps) {
         {products.length === 0 ? (
           <div className="empty">
             <Recycle size={36} strokeWidth={1.5} aria-hidden />
-            <p>No items listed</p>
+            <p>Belum ada item</p>
           </div>
         ) : (
           <ProductCatalog label="Secondhand" items={items} />

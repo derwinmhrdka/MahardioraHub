@@ -32,7 +32,7 @@ export function ProductCard({
           // eslint-disable-next-line @next/next/no-img-element
           <img src={imageUrl} alt="" className={styles.image} />
         ) : (
-          <div className={styles.placeholder}>No image</div>
+          <div className={styles.placeholder}>Tidak ada gambar</div>
         )}
       </div>
       <div className={styles.body}>

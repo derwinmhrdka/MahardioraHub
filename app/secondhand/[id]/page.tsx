@@ -37,7 +37,7 @@ export default async function SecondhandItemPage({ params }: PageProps) {
               // eslint-disable-next-line @next/next/no-img-element
               <img src={product.imageUrl} alt="" className={styles.image} />
             ) : (
-              <div className={styles.placeholder}>No image</div>
+              <div className={styles.placeholder}>Tidak ada gambar</div>
             )}
           </div>
           <div className={styles.meta}>
@@ -59,7 +59,7 @@ export default async function SecondhandItemPage({ params }: PageProps) {
               ) : null}
               <span className={styles.metaItem}>
                 <CheckCircle2 size={14} strokeWidth={2} aria-hidden />
-                Available
+                Tersedia
               </span>
             </div>
             <WhatsAppButton href={whatsappHref} label="Chat" />

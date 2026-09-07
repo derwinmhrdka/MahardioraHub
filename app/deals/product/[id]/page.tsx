@@ -35,7 +35,7 @@ export default async function DealProductPage({ params }: PageProps) {
               // eslint-disable-next-line @next/next/no-img-element
               <img src={product.imageUrl} alt="" className={styles.image} />
             ) : (
-              <div className={styles.placeholder}>No image</div>
+              <div className={styles.placeholder}>Tidak ada gambar</div>
             )}
           </div>
           <div className={styles.meta}>
@@ -64,14 +64,14 @@ export default async function DealProductPage({ params }: PageProps) {
             </div>
             <Link href={`/go/${product.id}`} className="btn btn-block">
               <ExternalLink size={16} strokeWidth={2} aria-hidden />
-              Get deal
+              Ambil deal
             </Link>
           </div>
         </article>
 
         {related.length > 0 ? (
           <section className={styles.related}>
-            <h2 className={styles.relatedTitle}>Related</h2>
+            <h2 className={styles.relatedTitle}>Mirip</h2>
             <div className="product-grid">
               {related.map((item) => (
                 <ProductCard

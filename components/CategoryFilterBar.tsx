@@ -108,9 +108,9 @@ export function CategoryFilterBar({
         <button
           type="button"
           className={clsx(styles.trigger, filterActive && styles.triggerActive)}
-          aria-label="Open filters"
+          aria-label="Buka Filter"
           aria-expanded={open}
-          title="Filters"
+          title="Filter"
           onClick={() => setOpen(true)}
         >
           <SlidersHorizontal size={16} strokeWidth={2} />
@@ -121,7 +121,7 @@ export function CategoryFilterBar({
         <button
           type="button"
           className={styles.backdrop}
-          aria-label="Close filters"
+          aria-label="Tutup Filter"
           onClick={() => setOpen(false)}
         />
       ) : null}
@@ -129,14 +129,14 @@ export function CategoryFilterBar({
       <aside
         className={clsx(styles.drawer, open && styles.drawerOpen)}
         aria-hidden={!open}
-        aria-label="Filters"
+        aria-label="Filter"
       >
         <div className={styles.drawerTop}>
-          <p className={styles.drawerTitle}>Filters</p>
+          <p className={styles.drawerTitle}>Filter</p>
           <button
             type="button"
             className={styles.close}
-            aria-label="Close"
+            aria-label="Tutup"
             onClick={() => setOpen(false)}
           >
             <X size={16} strokeWidth={2} />
@@ -147,7 +147,7 @@ export function CategoryFilterBar({
           <section className={styles.section}>
             <h2 className={styles.sectionLabel}>
               <FolderTree size={12} strokeWidth={2} aria-hidden />
-              Category
+              Kategori
             </h2>
             <div className={styles.list}>
               <Link
@@ -158,7 +158,7 @@ export function CategoryFilterBar({
                 )}
                 onClick={() => setOpen(false)}
               >
-                All
+                Semua
               </Link>
               {categories.map((category) => (
                 <Link
@@ -190,10 +190,10 @@ export function CategoryFilterBar({
                 )}
                 onClick={() => setOpen(false)}
               >
-                All
+                Semua
               </Link>
               {areas.length === 0 ? (
-                <p className={styles.empty}>No areas</p>
+                <p className={styles.empty}>Belum ada area</p>
               ) : (
                 areas.map((area) => (
                   <Link
@@ -226,10 +226,10 @@ export function CategoryFilterBar({
                 )}
                 onClick={() => setOpen(false)}
               >
-                All
+                Semua
               </Link>
               {platforms.length === 0 ? (
-                <p className={styles.empty}>No platforms</p>
+                <p className={styles.empty}>Belum ada platform</p>
               ) : (
                 platforms.map((platform) => (
                   <Link

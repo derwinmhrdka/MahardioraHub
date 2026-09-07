@@ -22,7 +22,7 @@ export function AffiliateLinkTool({
     setError(null);
     setOk(false);
     if (!affiliateId) {
-      setError("Set Shopee Affiliate ID in Settings first.");
+      setError("Isi Shopee Affiliate ID di Settings dulu.");
       return;
     }
     try {
@@ -35,32 +35,32 @@ export function AffiliateLinkTool({
         targetInputId
       ) as HTMLInputElement | null;
       if (!field) {
-        setError("Affiliate link field not found.");
+        setError("Field affiliate link tidak ditemukan.");
         return;
       }
       field.value = link;
       field.dispatchEvent(new Event("input", { bubbles: true }));
       setOk(true);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not generate link");
+      setError(e instanceof Error ? e.message : "Gagal membuat link");
     }
   }
 
   return (
     <div className={styles.tool}>
-      <div className={styles.title}>Optional: generate from product URL</div>
+      <div className={styles.title}>Opsional: generate dari URL produk</div>
       <p className={styles.hint}>
-        Paste a Shopee product link. Uses your Affiliate ID from Settings to
-        build an <code>an_redir</code> tracked URL into the field below.
+        Tempel link produk Shopee. Pakai Affiliate ID dari Settings untuk
+        membuat URL <code>an_redir</code> ke field di bawah.
       </p>
       {!affiliateId ? (
         <p className="error">
-          Shopee Affiliate ID is empty — set it in{" "}
+          Shopee Affiliate ID masih kosong — isi di{" "}
           <a href="/admin/settings">Settings</a>.
         </p>
       ) : null}
       <div className="form-row">
-        <label htmlFor="shopeeProductUrl">Shopee product URL</label>
+        <label htmlFor="shopeeProductUrl">URL produk Shopee</label>
         <input
           id="shopeeProductUrl"
           type="url"
@@ -71,7 +71,7 @@ export function AffiliateLinkTool({
         />
       </div>
       <div className="form-row">
-        <label htmlFor="shopeeSubId">Sub ID (optional)</label>
+        <label htmlFor="shopeeSubId">Sub ID (opsional)</label>
         <input
           id="shopeeSubId"
           value={subId}
@@ -82,14 +82,14 @@ export function AffiliateLinkTool({
       </div>
       <button
         type="button"
-        className="btn btn-secondary"
+        className="btn btn-secondary btn-block"
         onClick={onGenerate}
         disabled={!affiliateId}
       >
         Generate affiliate link
       </button>
       {error ? <p className="error">{error}</p> : null}
-      {ok ? <p className="success">Filled into Affiliate link.</p> : null}
+      {ok ? <p className="success">Sudah diisi ke Affiliate link.</p> : null}
     </div>
   );
 }

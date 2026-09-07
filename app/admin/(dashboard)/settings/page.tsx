@@ -1,4 +1,3 @@
-import { AdminNav } from "@/components/AdminNav";
 import { getSettings } from "@/lib/settings";
 import { updateSettingsAction } from "./actions";
 
@@ -12,12 +11,11 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
 
   return (
     <>
-      <AdminNav siteName={settings.siteName} active="settings" />
-      <h1 className="page-title">Settings</h1>
-      {params.saved ? <p className="success">Saved.</p> : null}
-      <form action={updateSettingsAction} className="form">
+      <h1 className="admin-title">Settings</h1>
+      {params.saved ? <p className="success">Tersimpan.</p> : null}
+      <form action={updateSettingsAction} className="form admin-form">
         <div className="form-row">
-          <label htmlFor="siteName">Site name</label>
+          <label htmlFor="siteName">Nama Site</label>
           <input
             id="siteName"
             name="siteName"
@@ -27,7 +25,7 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
         </div>
         <div className="form-row">
           <label htmlFor="whatsappNumber">
-            WhatsApp number (international, digits only)
+            Nomor WhatsApp (internasional, angka saja)
           </label>
           <input
             id="whatsappNumber"
@@ -38,7 +36,7 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
           />
         </div>
         <div className="form-row">
-          <label htmlFor="contactEmail">Contact email</label>
+          <label htmlFor="contactEmail">Email kontak</label>
           <input
             id="contactEmail"
             name="contactEmail"
@@ -53,12 +51,14 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
             name="shopeeAffiliateId"
             defaultValue={settings.shopeeAffiliateId ?? ""}
             inputMode="numeric"
-            placeholder="From Shopee Affiliate dashboard"
+            placeholder="Dari dashboard Shopee Affiliate"
           />
         </div>
-        <button type="submit" className="btn">
-          Save settings
-        </button>
+        <div className="form-actions">
+          <button type="submit" className="btn btn-block">
+            Simpan
+          </button>
+        </div>
       </form>
     </>
   );

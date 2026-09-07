@@ -54,7 +54,7 @@ export default async function HomePage({ searchParams }: PageProps) {
         {products.length === 0 ? (
           <div className="empty">
             <Package size={36} strokeWidth={1.5} aria-hidden />
-            <p>No deals yet</p>
+            <p>Belum ada deals</p>
           </div>
         ) : (
           <ProductCatalog label="Deals" items={items} />

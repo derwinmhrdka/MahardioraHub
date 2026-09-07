@@ -163,6 +163,61 @@ export async function createProduct(input: ProductCreateInput) {
   });
 }
 
+export async function importProductsFromCsvRows(
+  rows: Array<{
+    kind: ProductKind;
+    title: string;
+    category: string;
+    price: number;
+    imageUrl: string | null;
+    shortNote: string | null;
+    storeArea: string | null;
+    shopName: string | null;
+    affiliateLink: string | null;
+    isActive: boolean;
+  }>
+) {
+  const categories = await prisma.category.findMany();
+  const bySlug = new Map(
+    categories.map((c) => [c.slug.toLowerCase(), c] as const)
+  );
+  const byName = new Map(
+    categories.map((c) => [c.name.toLowerCase(), c] as const)
+  );
+
+  let created = 0;
+  const errors: string[] = [];
+
+  for (let i = 0; i < rows.length; i += 1) {
+    const row = rows[i];
+    const key = row.category.trim().toLowerCase();
+    const category = bySlug.get(key) ?? byName.get(key);
+    if (!category) {
+      errors.push(`Row ${i + 2}: category "${row.category}" not found`);
+      continue;
+    }
+    try {
+      await createProduct({
+        kind: row.kind,
+        title: row.title,
+        categoryId: category.id,
+        price: row.price,
+        imageUrl: row.imageUrl,
+        shortNote: row.shortNote,
+        storeArea: row.storeArea,
+        shopName: row.shopName,
+        affiliateLink: row.affiliateLink,
+        isActive: row.isActive,
+      });
+      created += 1;
+    } catch {
+      errors.push(`Row ${i + 2}: failed to create "${row.title}"`);
+    }
+  }
+
+  return { created, errors };
+}
+
 export async function updateProduct(id: number, input: ProductUpdateInput) {
   // Optional an_redir helper: see lib/shopee.ts + AffiliateLinkTool (admin UI).
   // Future: Shopee Open API generateShortLink for official short links.
@@ -205,6 +260,13 @@ export async function setProductActive(id: number, isActive: boolean) {
     data: { isActive },
     include: productInclude,
   });
+}
+
+export async function deleteProduct(id: number) {
+  await prisma.$transaction([
+    prisma.click.deleteMany({ where: { productId: id } }),
+    prisma.product.delete({ where: { id } }),
+  ]);
 }
 
 export async function getProductForRedirect(id: number) {

@@ -48,13 +48,13 @@ export function CategoryChips({
 
   return (
     <div className={styles.wrap}>
-      <nav className={styles.chips} aria-label="Categories">
+      <nav className={styles.chips} aria-label="Kategori">
         <Link
           href={allHref}
           className={clsx(styles.chip, activeSlug == null && styles.active)}
         >
           <LayoutGrid size={14} strokeWidth={2} aria-hidden />
-          All
+          Semua
         </Link>
         {categories.map((category) => {
           const Icon = iconForSlug(category.slug);

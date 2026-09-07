@@ -1,0 +1,83 @@
+---
+description: Bahasa Indonesia UI copy — keep familiar English terms
+alwaysApply: true
+---
+
+# Bahasa UI (hybrid)
+
+Write user-facing copy in **Bahasa Indonesia**, but keep **familiar English UI terms** when Indonesians already use them. Never invent awkward calques.
+
+## Principle
+
+- Sentence/instruction prose → Bahasa (`Simpan perubahan`, `Tidak ada produk`)
+- Standard UI nouns/actions from the list below → keep English (or the allowed bilingual pair)
+- Prefer the English label in compact buttons/nav when it matches this glossary
+
+## Keep these (do not “translate hard”)
+
+### Navigasi & layout
+- **Menu** (bukan Arah Pilih)
+- **Dashboard** (bukan Panel Instrumen)
+- **Home / Beranda** (bukan Rumah)
+- **Sidebar** (bukan Bilah Samping)
+- **Footer** (bukan Catatan Kaki)
+
+### Aksi & tombol
+- **Login / Masuk** (bukan Log Masuk)
+- **Logout / Keluar** (bukan Log Keluar)
+- **Sign Up / Daftar** (bukan Mendaftar)
+- **Save / Simpan** (bukan Tabung)
+- **Checkout** (bukan Kasir)
+- **Download** (bukan Unduh)
+- **Upload** (bukan Unggah)
+- **Search / Cari**
+
+### Data
+- **Export** (bukan Ekspor)
+- **Import** (bukan Impor)
+- **Filter** (bukan Penyaring)
+- **Sort / Urutkan** (bukan Pemilahan)
+- **Draft** (bukan Konsep)
+- **Preview** (bukan Pratinjau)
+- **Reset** (bukan Atur Ulang)
+
+### Akun & pengaturan
+- **Profile / Profil**
+- **Setting / Pengaturan** (bukan Setelan)
+- **Password** (boleh juga Kata Sandi)
+- **Account / Akun**
+- **Role / Akses** (bukan Peran)
+
+### E-commerce
+- **Cart / Keranjang** (bukan Troli)
+- **Pricing / Harga**
+- **Invoice** (bukan Faktur)
+- **Payment Method** (bukan Cara Pembayaran)
+- **Voucher / Kupon**
+
+### Status
+- **Pending** (bukan Menunggu)
+- **Success** (bukan Berhasil) — OK in badges; prose may say “berhasil”
+- **Failed** (bukan Gagal) — OK in badges; prose may say “gagal”
+- **Feedback** (bukan Umpan Balik)
+
+## Examples
+
+```tsx
+// ❌ BAD
+<button>Unduh template</button>
+<button>Impor CSV</button>
+<span>Penyaring</span>
+
+// ✅ GOOD
+<button>Download template</button>
+<button>Import CSV</button>
+<span>Filter</span>
+<p>Belum ada produk. Ketuk Add untuk menambah.</p>
+```
+
+## When adding UI
+
+1. Default new labels to this glossary.
+2. Do not mass-rename product-domain English already in use (`Deals`, `Secondhand`, `Admin`) unless asked.
+3. Confirm dialogs and errors: Bahasa sentences + glossary terms inside them.
