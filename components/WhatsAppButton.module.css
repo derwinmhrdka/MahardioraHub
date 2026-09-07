@@ -2,22 +2,30 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
   width: 100%;
   padding: 0.7rem 1rem;
-  border: var(--stroke) solid var(--color-border);
+  border: var(--stroke) solid #128c7e;
   border-radius: 999px;
-  background: #111;
+  background: #25d366;
   color: #fff;
   font-family: var(--font-body-stack);
   font-size: var(--text-nav);
   font-weight: 700;
-  box-shadow: var(--shadow-doodle-sm);
+  box-shadow: 2px 2px 0 #128c7e;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
 }
 
 .btn:hover {
+  background: #20bd5a;
   transform: translate(-1px, -1px);
-  box-shadow: var(--shadow-doodle);
+  box-shadow: 3px 3px 0 #128c7e;
+  filter: none;
+}
+
+.btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 #128c7e;
 }
 
 .btn svg {

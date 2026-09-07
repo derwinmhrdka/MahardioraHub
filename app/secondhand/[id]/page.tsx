@@ -62,7 +62,7 @@ export default async function SecondhandItemPage({ params }: PageProps) {
                 Tersedia
               </span>
             </div>
-            <WhatsAppButton href={whatsappHref} label="Chat" />
+            <WhatsAppButton href={whatsappHref} label="Chat WA" />
           </div>
         </article>
       </main>

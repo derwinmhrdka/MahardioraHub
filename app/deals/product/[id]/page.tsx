@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ExternalLink, MapPin, Store, Tag } from "lucide-react";
+import { MapPin, Store, Tag } from "lucide-react";
+import { DealCta } from "@/components/DealCta";
 import { Header } from "@/components/Header";
 import { ProductCard } from "@/components/ProductCard";
 import styles from "@/components/ProductDetail.module.css";
@@ -62,10 +62,11 @@ export default async function DealProductPage({ params }: PageProps) {
                 </span>
               ) : null}
             </div>
-            <Link href={`/go/${product.id}`} className="btn btn-block">
-              <ExternalLink size={13} strokeWidth={2} aria-hidden />
-              Ambil deal
-            </Link>
+            <DealCta
+              productId={product.id}
+              shopName={product.shopName}
+              affiliateLink={product.affiliateLink}
+            />
           </div>
         </article>
 
