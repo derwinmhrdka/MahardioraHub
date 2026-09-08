@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="14" fill="#F7F3EB"/>
+  <rect x="3" y="3" width="58" height="58" rx="12" stroke="#111" stroke-width="3"/>
+  <!-- awning -->
+  <path d="M12 28h40v4H12z" fill="#111"/>
+  <path d="M14 18h36l4 10H10l4-10z" fill="#111"/>
+  <path d="M18 18v10M26 18v10M32 18v10M38 18v10M46 18v10" stroke="#F7F3EB" stroke-width="2.5"/>
+  <!-- store body -->
+  <path d="M14 32h36v22H14z" stroke="#111" stroke-width="3" fill="#fff"/>
+  <!-- door -->
+  <rect x="27" y="40" width="10" height="14" rx="1" fill="#111"/>
+  <!-- windows -->
+  <rect x="17" y="38" width="7" height="7" stroke="#111" stroke-width="2" fill="#F7F3EB"/>
+  <rect x="40" y="38" width="7" height="7" stroke="#111" stroke-width="2" fill="#F7F3EB"/>
+</svg>

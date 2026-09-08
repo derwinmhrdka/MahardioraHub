@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { MapPin, Store, Tag } from "lucide-react";
 import { DealCta } from "@/components/DealCta";
 import { Header } from "@/components/Header";
@@ -9,11 +10,33 @@ import styles from "@/components/ProductDetail.module.css";
 import { formatRupiah } from "@/lib/format";
 import { productImages } from "@/lib/product-images";
 import { getProduct, getRelatedDeals } from "@/lib/products";
-import { getSettings } from "@/lib/settings";
+import { buildShareMetadata } from "@/lib/seo";
+import { getSettings, productPageUrl } from "@/lib/settings";
 
 type PageProps = {
   params: Promise<{ id: string }>;
 };
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { id } = await params;
+  const productId = Number(id);
+  if (!Number.isFinite(productId)) return {};
+
+  const product = await getProduct(productId);
+  if (!product || product.kind !== "deal" || !product.isActive) return {};
+
+  const settings = await getSettings();
+  const images = productImages(product);
+  return buildShareMetadata({
+    title: product.title,
+    description: product.shortNote,
+    url: productPageUrl("deal", product.id),
+    imageUrl: images[0] ?? null,
+    siteName: settings.siteName,
+  });
+}
 
 export default async function DealProductPage({ params }: PageProps) {
   const { id } = await params;

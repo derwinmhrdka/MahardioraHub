@@ -39,9 +39,16 @@ export async function updateSettings(input: SettingInput) {
   });
 }
 
+const DEFAULT_SITE_ORIGIN = "https://mahardiora-hub.teknodika.com";
+
 export function siteOrigin(): string {
-  const raw = (process.env.DOMAIN ?? process.env.APP_URL ?? "").trim();
-  if (!raw) return "";
+  const raw = (
+    process.env.DOMAIN ??
+    process.env.APP_URL ??
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    ""
+  ).trim();
+  if (!raw) return DEFAULT_SITE_ORIGIN;
   if (/^https?:\/\//i.test(raw)) return raw.replace(/\/$/, "");
   return `https://${raw.replace(/\/$/, "")}`;
 }
@@ -49,8 +56,7 @@ export function siteOrigin(): string {
 export function productPageUrl(kind: "deal" | "secondhand", id: number): string {
   const path =
     kind === "deal" ? `/deals/product/${id}` : `/secondhand/${id}`;
-  const origin = siteOrigin();
-  return origin ? `${origin}${path}` : path;
+  return `${siteOrigin()}${path}`;
 }
 
 export function buildWhatsAppMessage(input: {

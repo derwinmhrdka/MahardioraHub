@@ -1,6 +1,7 @@
 import { formatRupiah } from "@/lib/format";
 import {
   clampDiscountPercent,
+  formatDiscountPercent,
   hasDiscount,
   salePrice,
 } from "@/lib/pricing";
@@ -20,6 +21,7 @@ export function ProductPrice({
   const discount = clampDiscountPercent(discountPercent ?? 0);
   const discounted = hasDiscount(discount);
   const total = salePrice(price, discount);
+  const discountLabel = formatDiscountPercent(discount);
 
   if (!discounted) {
     return (
@@ -38,9 +40,9 @@ export function ProductPrice({
       {size === "detail" ? (
         <span
           className={`${styles.badge} ${styles.burst}`}
-          aria-label={`Diskon ${discount}%`}
+          aria-label={`Diskon ${discountLabel}%`}
         >
-          -{discount}%
+          -{discountLabel}%
         </span>
       ) : null}
     </div>

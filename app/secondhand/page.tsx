@@ -1,4 +1,5 @@
 import { ProductKind } from "@prisma/client";
+import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { ProductBrowse } from "@/components/ProductBrowse";
 import { listCategories } from "@/lib/categories";
@@ -7,6 +8,8 @@ import {
   listPlatforms,
   listStoreAreas,
 } from "@/lib/products";
+import { buildShareMetadata } from "@/lib/seo";
+import { getSettings, siteOrigin } from "@/lib/settings";
 
 type PageProps = {
   searchParams: Promise<{
@@ -15,6 +18,16 @@ type PageProps = {
     platform?: string;
   }>;
 };
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings();
+  return buildShareMetadata({
+    title: "Secondhand",
+    description: `${settings.siteName} — barang bekas`,
+    url: `${siteOrigin()}/secondhand`,
+    siteName: settings.siteName,
+  });
+}
 
 export default async function SecondhandPage({ searchParams }: PageProps) {
   const query = await searchParams;

@@ -7,10 +7,23 @@ import {
   listStoreAreas,
 } from "@/lib/products";
 import { ProductKind } from "@prisma/client";
+import type { Metadata } from "next";
+import { buildShareMetadata } from "@/lib/seo";
+import { getSettings, siteOrigin } from "@/lib/settings";
 
 type PageProps = {
   searchParams: Promise<{ area?: string; platform?: string }>;
 };
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings();
+  return buildShareMetadata({
+    title: settings.siteName,
+    description: `${settings.siteName} — deals & secondhand`,
+    url: siteOrigin(),
+    siteName: settings.siteName,
+  });
+}
 
 export default async function HomePage({ searchParams }: PageProps) {
   const params = await searchParams;

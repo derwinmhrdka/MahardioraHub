@@ -10,6 +10,7 @@ import { productImages } from "@/lib/product-images";
 import {
   clampDiscountPercent,
   discountFromSalePrice,
+  formatDiscountPercent,
   salePrice,
 } from "@/lib/pricing";
 import styles from "./ProductForm.module.css";
@@ -65,7 +66,7 @@ export function ProductForm({
     defaults.price != null ? String(defaults.price) : ""
   );
   const [discountPercent, setDiscountPercent] = useState(
-    String(defaults.discountPercent ?? 0)
+    formatDiscountPercent(defaults.discountPercent ?? 0)
   );
   const [totalPrice, setTotalPrice] = useState(() => {
     const normal = defaults.price ?? 0;
@@ -87,9 +88,16 @@ export function ProductForm({
   }
 
   function onDiscountChange(raw: string) {
-    setDiscountPercent(raw);
+    // Allow typing decimals like 47.5
+    const cleaned = raw.replace(",", ".").replace(/[^\d.]/g, "");
+    const parts = cleaned.split(".");
+    const normalized =
+      parts.length <= 1
+        ? cleaned
+        : `${parts[0]}.${parts.slice(1).join("").slice(0, 2)}`;
+    setDiscountPercent(normalized);
     const normal = Number(price);
-    const discount = clampDiscountPercent(Number(raw) || 0);
+    const discount = clampDiscountPercent(Number(normalized) || 0);
     if (!Number.isFinite(normal)) return;
     setTotalPrice(String(salePrice(normal, discount)));
   }
@@ -101,7 +109,7 @@ export function ProductForm({
     if (!Number.isFinite(normal) || !Number.isFinite(total) || normal <= 0) {
       return;
     }
-    setDiscountPercent(String(discountFromSalePrice(normal, total)));
+    setDiscountPercent(formatDiscountPercent(discountFromSalePrice(normal, total)));
   }
 
   function fetchFromLink() {
@@ -260,11 +268,8 @@ export function ProductForm({
               <input
                 id="discountPercent"
                 name="discountPercent"
-                type="number"
-                min="0"
-                max="100"
-                step="1"
-                inputMode="numeric"
+                type="text"
+                inputMode="decimal"
                 value={discountPercent}
                 onChange={(e) => onDiscountChange(e.target.value)}
                 placeholder="%"

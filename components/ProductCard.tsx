@@ -3,6 +3,7 @@ import { MapPin, Tag } from "lucide-react";
 import { productImageUrl } from "@/lib/image-url";
 import { ProductPrice } from "@/components/ProductPrice";
 import { productNotePreview } from "@/components/ProductNote";
+import { formatDiscountPercent, hasDiscount } from "@/lib/pricing";
 import styles from "./ProductCard.module.css";
 
 type ProductCardProps = {
@@ -46,9 +47,9 @@ export function ProductCard({
         ) : (
           <div className={styles.placeholder}>Tidak ada gambar</div>
         )}
-        {discountPercent != null && discountPercent > 0 ? (
+        {hasDiscount(discountPercent) ? (
           <span className={styles.discBadge} aria-hidden>
-            -{Math.round(discountPercent)}%
+            -{formatDiscountPercent(discountPercent ?? 0)}%
           </span>
         ) : null}
       </div>

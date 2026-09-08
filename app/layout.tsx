@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Caveat, Nunito } from "next/font/google";
 import { SplashScreen } from "@/components/SplashScreen";
-import { getSettings } from "@/lib/settings";
+import { getSettings, siteOrigin } from "@/lib/settings";
 import "./globals.css";
 
 const caveat = Caveat({
@@ -27,19 +27,44 @@ export const viewport: Viewport = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
+  const origin = siteOrigin();
   try {
     const settings = await getSettings();
+    const description = `${settings.siteName} — deals & secondhand`;
     return {
+      metadataBase: new URL(origin),
       title: {
         default: settings.siteName,
         template: `%s · ${settings.siteName}`,
       },
-      description: "Curated deals and secondhand items",
+      description,
+      applicationName: settings.siteName,
+      icons: {
+        icon: [{ url: "/icon-store.svg", type: "image/svg+xml" }],
+        apple: [{ url: "/apple-icon" }],
+      },
+      openGraph: {
+        type: "website",
+        locale: "id_ID",
+        url: origin,
+        siteName: settings.siteName,
+        title: settings.siteName,
+        description,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: settings.siteName,
+        description,
+      },
     };
   } catch {
     return {
+      metadataBase: new URL(origin),
       title: "MahardioraHub",
-      description: "Curated deals and secondhand items",
+      description: "Deals & secondhand",
+      icons: {
+        icon: [{ url: "/icon-store.svg", type: "image/svg+xml" }],
+      },
     };
   }
 }
@@ -58,7 +83,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en" className={`${caveat.variable} ${nunito.variable}`}>
+    <html lang="id" className={`${caveat.variable} ${nunito.variable}`}>
       <body>
         <SplashScreen siteName={siteName} />
         {children}

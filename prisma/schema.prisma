@@ -26,7 +26,7 @@ model Product {
   categoryId    Int
   category      Category    @relation(fields: [categoryId], references: [id])
   price         Int
-  discountPercent Int       @default(0)
+  discountPercent Float     @default(0)
   imageUrl      String?
   imageUrls     String[]    @default([])
   shortNote     String?
