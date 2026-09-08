@@ -2,15 +2,17 @@
 
 import Link from "next/link";
 import { MapPin, Tag } from "lucide-react";
-import { formatRupiah } from "@/lib/format";
 import { productImageUrl } from "@/lib/image-url";
 import { ProductCard } from "@/components/ProductCard";
+import { productNotePreview } from "@/components/ProductNote";
+import { ProductPrice } from "@/components/ProductPrice";
 import styles from "./ProductCatalog.module.css";
 
 export type CatalogItem = {
   id: number;
   title: string;
   price: number;
+  discountPercent?: number | null;
   shortNote?: string | null;
   imageUrl?: string | null;
   href: string;
@@ -43,6 +45,7 @@ export function ProductCatalog({
               id={item.id}
               title={item.title}
               price={item.price}
+              discountPercent={item.discountPercent}
               shortNote={item.shortNote}
               imageUrl={item.imageUrl}
               categoryName={item.categoryName}
@@ -55,6 +58,7 @@ export function ProductCatalog({
         <div key="list" className={styles.list}>
           {items.map((item) => {
             const thumb = productImageUrl(item.imageUrl, 120);
+            const notePreview = productNotePreview(item.shortNote);
             return (
               <Link key={item.id} href={item.href} className={styles.row}>
                 <div className={styles.thumb}>
@@ -73,8 +77,8 @@ export function ProductCatalog({
                 </div>
                 <div className={styles.rowBody}>
                   <div className={styles.rowTitle}>{item.title}</div>
-                  {item.shortNote ? (
-                    <p className={styles.rowNote}>{item.shortNote}</p>
+                  {notePreview ? (
+                    <p className={styles.rowNote}>{notePreview}</p>
                   ) : null}
                   {item.categoryName || item.storeArea ? (
                     <div className={styles.rowMeta}>
@@ -93,7 +97,13 @@ export function ProductCatalog({
                     </div>
                   ) : null}
                 </div>
-                <div className={styles.rowPrice}>{formatRupiah(item.price)}</div>
+                <div className={styles.rowPrice}>
+                  <ProductPrice
+                    price={item.price}
+                    discountPercent={item.discountPercent}
+                    size="list"
+                  />
+                </div>
               </Link>
             );
           })}

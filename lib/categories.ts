@@ -24,19 +24,21 @@ export async function createCategory(name: string) {
   });
 }
 
-export async function renameCategory(id: number, name: string) {
+export async function findOrCreateCategoryByName(name: string) {
   const trimmed = name.trim();
-  const base = slugify(trimmed);
-  let slug = base || "category";
-  let attempt = 1;
-  while (true) {
-    const existing = await prisma.category.findUnique({ where: { slug } });
-    if (!existing || existing.id === id) break;
-    attempt += 1;
-    slug = `${base}-${attempt}`;
-  }
-  return prisma.category.update({
-    where: { id },
-    data: { name: trimmed, slug },
+  if (!trimmed) throw new Error("Nama kategori kosong");
+
+  const existing = await prisma.category.findFirst({
+    where: { name: { equals: trimmed, mode: "insensitive" } },
   });
+  if (existing) return existing;
+  return createCategory(trimmed);
+}
+
+export async function deleteCategory(id: number) {
+  const inUse = await prisma.product.count({ where: { categoryId: id } });
+  if (inUse > 0) {
+    throw new Error("Dipakai");
+  }
+  await prisma.category.delete({ where: { id } });
 }

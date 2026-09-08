@@ -7,7 +7,32 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
+  margin-bottom: 0.55rem;
+}
+
+.tabs {
+  display: inline-flex;
+  gap: 0.25rem;
   margin-bottom: 0.75rem;
+  padding: 0.15rem;
+  border: var(--stroke) solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+}
+
+.tab {
+  display: grid;
+  place-items: center;
+  width: 1.95rem;
+  height: 1.95rem;
+  border-radius: 999px;
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.tabOn {
+  background: #111;
+  color: #fff;
 }
 
 .title {
@@ -150,13 +175,15 @@
 }
 
 .on {
-  color: var(--color-success);
-  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  color: #16a34a;
 }
 
 .off {
-  color: var(--color-text-muted);
-  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  color: #dc2626;
 }
 
 .detail {

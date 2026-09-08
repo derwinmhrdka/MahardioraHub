@@ -1,11 +1,14 @@
 import { ProductKind } from "@prisma/client";
+import { clampDiscountPercent } from "@/lib/pricing";
 
 export const PRODUCT_CSV_HEADERS = [
   "kind",
   "title",
   "category",
   "price",
+  "discountPercent",
   "imageUrl",
+  "imageUrls",
   "shortNote",
   "storeArea",
   "shopName",
@@ -18,7 +21,9 @@ export type ProductCsvRow = {
   title: string;
   category: string;
   price: number;
+  discountPercent: number;
   imageUrl: string | null;
+  imageUrls: string[];
   shortNote: string | null;
   storeArea: string | null;
   shopName: string | null;
@@ -45,7 +50,9 @@ export function productCsvTemplate(): string {
       "Sample deal title",
       "electronics",
       "99000",
+      "0",
       "https://example.com/image.jpg",
+      "https://example.com/image.jpg|https://example.com/image-2.jpg",
       "Short note",
       "Jakarta",
       "Shopee",
@@ -57,6 +64,8 @@ export function productCsvTemplate(): string {
       "Sample secondhand title",
       "home",
       "150000",
+      "0",
+      "",
       "",
       "Good condition",
       "Bandung",
@@ -73,7 +82,9 @@ export function productsToCsv(
     title: string;
     category: { slug: string };
     price: number;
+    discountPercent?: number | null;
     imageUrl: string | null;
+    imageUrls?: string[] | null;
     shortNote: string | null;
     storeArea: string | null;
     shopName: string | null;
@@ -83,12 +94,19 @@ export function productsToCsv(
 ): string {
   const rows: string[][] = [[...PRODUCT_CSV_HEADERS]];
   for (const product of products) {
+    const gallery = (product.imageUrls ?? []).filter(Boolean);
     rows.push([
       product.kind,
       product.title,
       product.category.slug,
       String(product.price),
-      product.imageUrl ?? "",
+      String(
+        product.kind === ProductKind.secondhand
+          ? clampDiscountPercent(product.discountPercent ?? 0)
+          : 0
+      ),
+      product.imageUrl ?? gallery[0] ?? "",
+      gallery.join("|"),
       product.shortNote ?? "",
       product.storeArea ?? "",
       product.shopName ?? "",
@@ -187,12 +205,29 @@ export function parseProductCsv(text: string): {
     }
 
     const kind = kindRaw as ProductKind;
+    const imageUrl = get("imageUrl") || null;
+    const imageUrls = get("imageUrls")
+      .split(/[|\n]+/)
+      .map((url) => url.trim())
+      .filter(Boolean);
+    if (imageUrl && !imageUrls.includes(imageUrl)) imageUrls.unshift(imageUrl);
+
+    const discountRaw = get("discountPercent");
+    const discountPercent =
+      kind === ProductKind.secondhand
+        ? clampDiscountPercent(
+            discountRaw === "" ? 0 : Number(discountRaw)
+          )
+        : 0;
+
     rows.push({
       kind,
       title,
       category,
       price: Math.round(price),
-      imageUrl: get("imageUrl") || null,
+      discountPercent,
+      imageUrl: imageUrls[0] ?? imageUrl,
+      imageUrls,
       shortNote: get("shortNote") || null,
       storeArea: get("storeArea") || null,
       shopName: kind === ProductKind.deal ? get("shopName") || null : null,

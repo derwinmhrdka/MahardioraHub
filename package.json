@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 13000",
     "build": "prisma generate && next build",
-    "start": "next start",
+    "start": "next start -p 13000",
     "lint": "next lint",
     "postinstall": "prisma generate"
   },
@@ -19,12 +19,14 @@
     "next": "^15.2.0",
     "prisma": "^6.5.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "sharp": "^0.35.4"
   },
   "devDependencies": {
     "@types/node": "^20.17.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@types/sharp": "^0.31.1",
     "typescript": "^5.7.0"
   }
 }

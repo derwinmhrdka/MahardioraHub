@@ -1,12 +1,18 @@
+import { clampDiscountPercent } from "./pricing";
 import { ProductKind, Prisma } from "@prisma/client";
+import { normalizeImageUrls, productImages } from "./product-images";
 import { prisma } from "./prisma";
+import { cleanupProductUploadsAndOrphans, cleanupRemovedUploads, getReferencedLocalUploadUrls } from "./upload-gc";
+import { purgeOrphanUploads } from "./uploads";
 
 export type ProductCreateInput = {
   kind: ProductKind;
   title: string;
   categoryId: number;
   price: number;
+  discountPercent?: number;
   imageUrl?: string | null;
+  imageUrls?: string[];
   shortNote?: string | null;
   storeArea?: string | null;
   shopName?: string | null;
@@ -145,13 +151,24 @@ export async function getRelatedDeals(
 export async function createProduct(input: ProductCreateInput) {
   // Optional an_redir helper: see lib/shopee.ts + AffiliateLinkTool (admin UI).
   // Future: Shopee Open API generateShortLink for official short links.
-  return prisma.product.create({
+  const gallery = normalizeImageUrls([
+    ...(input.imageUrls ?? []),
+    ...(input.imageUrl ? [input.imageUrl] : []),
+  ]);
+  const discountPercent =
+    input.kind === ProductKind.secondhand
+      ? clampDiscountPercent(input.discountPercent ?? 0)
+      : 0;
+
+  const created = await prisma.product.create({
     data: {
       kind: input.kind,
       title: input.title,
       categoryId: input.categoryId,
       price: input.price,
-      imageUrl: input.imageUrl || null,
+      discountPercent,
+      imageUrl: gallery.imageUrl,
+      imageUrls: gallery.imageUrls,
       shortNote: input.shortNote || null,
       storeArea: input.storeArea?.trim() || null,
       shopName: input.kind === ProductKind.deal ? input.shopName || null : null,
@@ -161,6 +178,10 @@ export async function createProduct(input: ProductCreateInput) {
     },
     include: productInclude,
   });
+
+  const referenced = await getReferencedLocalUploadUrls();
+  await purgeOrphanUploads(referenced);
+  return created;
 }
 
 export async function importProductsFromCsvRows(
@@ -169,7 +190,9 @@ export async function importProductsFromCsvRows(
     title: string;
     category: string;
     price: number;
+    discountPercent?: number;
     imageUrl: string | null;
+    imageUrls?: string[];
     shortNote: string | null;
     storeArea: string | null;
     shopName: string | null;
@@ -202,7 +225,9 @@ export async function importProductsFromCsvRows(
         title: row.title,
         categoryId: category.id,
         price: row.price,
+        discountPercent: row.discountPercent,
         imageUrl: row.imageUrl,
+        imageUrls: row.imageUrls,
         shortNote: row.shortNote,
         storeArea: row.storeArea,
         shopName: row.shopName,
@@ -221,6 +246,14 @@ export async function importProductsFromCsvRows(
 export async function updateProduct(id: number, input: ProductUpdateInput) {
   // Optional an_redir helper: see lib/shopee.ts + AffiliateLinkTool (admin UI).
   // Future: Shopee Open API generateShortLink for official short links.
+  const existing =
+    input.imageUrls !== undefined || input.imageUrl !== undefined
+      ? await prisma.product.findUnique({
+          where: { id },
+          select: { imageUrl: true, imageUrls: true },
+        })
+      : null;
+
   const data: Prisma.ProductUpdateInput = {};
 
   if (input.kind !== undefined) data.kind = input.kind;
@@ -229,7 +262,14 @@ export async function updateProduct(id: number, input: ProductUpdateInput) {
     data.category = { connect: { id: input.categoryId } };
   }
   if (input.price !== undefined) data.price = input.price;
-  if (input.imageUrl !== undefined) data.imageUrl = input.imageUrl || null;
+  if (input.imageUrls !== undefined || input.imageUrl !== undefined) {
+    const gallery = normalizeImageUrls([
+      ...(input.imageUrls ?? []),
+      ...(input.imageUrl ? [input.imageUrl] : []),
+    ]);
+    data.imageUrl = gallery.imageUrl;
+    data.imageUrls = gallery.imageUrls;
+  }
   if (input.shortNote !== undefined) data.shortNote = input.shortNote || null;
   if (input.storeArea !== undefined) {
     data.storeArea = input.storeArea?.trim() || null;
@@ -240,18 +280,40 @@ export async function updateProduct(id: number, input: ProductUpdateInput) {
   if (kind === ProductKind.secondhand) {
     data.shopName = null;
     data.affiliateLink = null;
+    if (input.discountPercent !== undefined) {
+      data.discountPercent = clampDiscountPercent(input.discountPercent);
+    }
+  } else if (kind === ProductKind.deal) {
+    data.discountPercent = 0;
+    if (input.shopName !== undefined) data.shopName = input.shopName || null;
+    if (input.affiliateLink !== undefined) {
+      data.affiliateLink = input.affiliateLink || null;
+    }
   } else {
+    if (input.discountPercent !== undefined) {
+      data.discountPercent = clampDiscountPercent(input.discountPercent);
+    }
     if (input.shopName !== undefined) data.shopName = input.shopName || null;
     if (input.affiliateLink !== undefined) {
       data.affiliateLink = input.affiliateLink || null;
     }
   }
 
-  return prisma.product.update({
+  const updated = await prisma.product.update({
     where: { id },
     data,
     include: productInclude,
   });
+
+  if (existing) {
+    const before = productImages(existing);
+    const after = productImages(updated);
+    const afterSet = new Set(after);
+    const removed = before.filter((url) => !afterSet.has(url));
+    await cleanupRemovedUploads(removed);
+  }
+
+  return updated;
 }
 
 export async function setProductActive(id: number, isActive: boolean) {
@@ -263,10 +325,19 @@ export async function setProductActive(id: number, isActive: boolean) {
 }
 
 export async function deleteProduct(id: number) {
+  const existing = await prisma.product.findUnique({
+    where: { id },
+    select: { imageUrl: true, imageUrls: true },
+  });
+
   await prisma.$transaction([
     prisma.click.deleteMany({ where: { productId: id } }),
     prisma.product.delete({ where: { id } }),
   ]);
+
+  if (existing) {
+    await cleanupProductUploadsAndOrphans(productImages(existing));
+  }
 }
 
 export async function getProductForRedirect(id: number) {

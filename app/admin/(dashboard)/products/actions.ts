@@ -12,19 +12,48 @@ import {
 } from "@/lib/products";
 import { parseProductCsv } from "@/lib/products-csv";
 import { fetchProductLinkMeta } from "@/lib/link-meta";
+import { findOrCreateCategoryByName } from "@/lib/categories";
+import { parseImageUrlsField } from "@/lib/product-images";
+import { clampDiscountPercent } from "@/lib/pricing";
+import { cookies } from "next/headers";
+import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth";
+import {
+  MAX_UPLOAD_COUNT,
+  saveProductImage,
+} from "@/lib/uploads";
+import { cleanupRemovedUploads } from "@/lib/upload-gc";
 
-function parseProductForm(formData: FormData) {
+async function requireAdmin() {
+  const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  if (!(await verifySessionToken(token))) {
+    throw new Error("Unauthorized");
+  }
+}
+
+async function parseProductForm(formData: FormData) {
   const kind = String(formData.get("kind") ?? "") as ProductKind;
   const title = String(formData.get("title") ?? "").trim();
-  const categoryId = Number(formData.get("categoryId"));
+  const newCategoryName = String(formData.get("newCategoryName") ?? "").trim();
+  let categoryId = Number(formData.get("categoryId"));
   const priceRaw = String(formData.get("price") ?? "").trim();
   const price = priceRaw === "" ? 0 : Number(priceRaw);
+  const discountRaw = String(formData.get("discountPercent") ?? "").trim();
+  const discountPercent =
+    discountRaw === "" ? 0 : Number(discountRaw);
   const imageUrl = String(formData.get("imageUrl") ?? "").trim();
+  const imageUrls = parseImageUrlsField(
+    String(formData.get("imageUrls") ?? imageUrl)
+  );
   const shortNote = String(formData.get("shortNote") ?? "").trim();
   const storeArea = String(formData.get("storeArea") ?? "").trim();
   const shopName = String(formData.get("shopName") ?? "").trim();
   const affiliateLink = String(formData.get("affiliateLink") ?? "").trim();
   const isActive = formData.get("isActive") === "on";
+
+  if (newCategoryName) {
+    const category = await findOrCreateCategoryByName(newCategoryName);
+    categoryId = category.id;
+  }
 
   if (
     (kind !== ProductKind.deal && kind !== ProductKind.secondhand) ||
@@ -44,7 +73,12 @@ function parseProductForm(formData: FormData) {
     title,
     categoryId,
     price: Math.round(price),
-    imageUrl: imageUrl || null,
+    discountPercent:
+      kind === ProductKind.secondhand
+        ? clampDiscountPercent(discountPercent)
+        : 0,
+    imageUrl: imageUrls[0] ?? (imageUrl || null),
+    imageUrls,
     shortNote: shortNote || null,
     storeArea: storeArea || null,
     shopName: kind === ProductKind.deal ? shopName || null : null,
@@ -54,7 +88,7 @@ function parseProductForm(formData: FormData) {
 }
 
 export async function createProductAction(formData: FormData) {
-  const data = parseProductForm(formData);
+  const data = await parseProductForm(formData);
   await createProduct(data);
   revalidatePath("/");
   revalidatePath("/secondhand");
@@ -65,7 +99,7 @@ export async function createProductAction(formData: FormData) {
 export async function updateProductAction(formData: FormData) {
   const id = Number(formData.get("id"));
   if (!Number.isFinite(id)) throw new Error("Invalid product id");
-  const data = parseProductForm(formData);
+  const data = await parseProductForm(formData);
   await updateProduct(id, data);
   revalidatePath("/");
   revalidatePath("/secondhand");
@@ -132,4 +166,33 @@ export async function importProductsCsvAction(formData: FormData) {
 
 export async function fetchProductLinkMetaAction(url: string) {
   return fetchProductLinkMeta(url);
+}
+
+export async function uploadProductImagesAction(formData: FormData) {
+  await requireAdmin();
+
+  const files = formData
+    .getAll("files")
+    .filter((entry): entry is File => entry instanceof File && entry.size > 0);
+
+  if (files.length === 0) {
+    throw new Error("Pilih file");
+  }
+  if (files.length > MAX_UPLOAD_COUNT) {
+    throw new Error(`Max ${MAX_UPLOAD_COUNT} file`);
+  }
+
+  const urls: string[] = [];
+  for (const file of files) {
+    urls.push(await saveProductImage(file));
+  }
+  return { urls };
+}
+
+export async function deleteUploadedImageAction(url: string) {
+  await requireAdmin();
+  const trimmed = url.trim();
+  if (!trimmed) return { deleted: false };
+  await cleanupRemovedUploads([trimmed]);
+  return { deleted: true };
 }

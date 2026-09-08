@@ -3,6 +3,15 @@
 import { useState, useTransition } from "react";
 import { ProductKind } from "@prisma/client";
 import { fetchProductLinkMetaAction } from "@/app/admin/(dashboard)/products/actions";
+import { CategoryField } from "@/components/CategoryField";
+import { ImageGalleryField } from "@/components/ImageGalleryField";
+import { MoneyInput } from "@/components/MoneyInput";
+import { productImages } from "@/lib/product-images";
+import {
+  clampDiscountPercent,
+  discountFromSalePrice,
+  salePrice,
+} from "@/lib/pricing";
 import styles from "./ProductForm.module.css";
 
 type Category = {
@@ -15,7 +24,9 @@ type ProductFormValues = {
   title?: string;
   categoryId?: number;
   price?: number;
+  discountPercent?: number;
   imageUrl?: string | null;
+  imageUrls?: string[] | null;
   shortNote?: string | null;
   storeArea?: string | null;
   shopName?: string | null;
@@ -44,15 +55,54 @@ export function ProductForm({
   const [link, setLink] = useState(defaults.affiliateLink ?? "");
   const [title, setTitle] = useState(defaults.title ?? "");
   const [shortNote, setShortNote] = useState(defaults.shortNote ?? "");
-  const [imageUrl, setImageUrl] = useState(defaults.imageUrl ?? "");
+  const [imageUrls, setImageUrls] = useState(
+    productImages({
+      imageUrl: defaults.imageUrl,
+      imageUrls: defaults.imageUrls,
+    })
+  );
   const [price, setPrice] = useState(
     defaults.price != null ? String(defaults.price) : ""
   );
+  const [discountPercent, setDiscountPercent] = useState(
+    String(defaults.discountPercent ?? 0)
+  );
+  const [totalPrice, setTotalPrice] = useState(() => {
+    const normal = defaults.price ?? 0;
+    const discount = defaults.discountPercent ?? 0;
+    return String(salePrice(normal, discount));
+  });
   const [shopName, setShopName] = useState(defaults.shopName ?? "");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   const isDeal = kind === ProductKind.deal;
+
+  function onNormalPriceChange(digits: string) {
+    setPrice(digits);
+    const normal = Number(digits);
+    const discount = clampDiscountPercent(Number(discountPercent) || 0);
+    if (!Number.isFinite(normal)) return;
+    setTotalPrice(String(salePrice(normal, discount)));
+  }
+
+  function onDiscountChange(raw: string) {
+    setDiscountPercent(raw);
+    const normal = Number(price);
+    const discount = clampDiscountPercent(Number(raw) || 0);
+    if (!Number.isFinite(normal)) return;
+    setTotalPrice(String(salePrice(normal, discount)));
+  }
+
+  function onTotalPriceChange(digits: string) {
+    setTotalPrice(digits);
+    const normal = Number(price);
+    const total = Number(digits);
+    if (!Number.isFinite(normal) || !Number.isFinite(total) || normal <= 0) {
+      return;
+    }
+    setDiscountPercent(String(discountFromSalePrice(normal, total)));
+  }
 
   function fetchFromLink() {
     if (!link.trim()) return;
@@ -61,10 +111,16 @@ export function ProductForm({
       try {
         const meta = await fetchProductLinkMetaAction(link);
         if (meta.description) setShortNote(meta.description);
-        if (meta.imageUrl) setImageUrl(meta.imageUrl);
+        const nextImages = [
+          ...(meta.imageUrls ?? []),
+          ...(meta.imageUrl ? [meta.imageUrl] : []),
+        ].filter(Boolean);
+        if (nextImages.length) {
+          setImageUrls(Array.from(new Set(nextImages)));
+        }
         if (meta.price != null) setPrice(String(meta.price));
         if (meta.platform) setShopName(meta.platform);
-        if (!meta.description && !meta.imageUrl) setError("Gagal");
+        if (!meta.description && nextImages.length === 0) setError("Gagal");
       } catch (e) {
         setError(e instanceof Error ? e.message : "Gagal");
       }
@@ -130,33 +186,18 @@ export function ProductForm({
             />
           </div>
 
-          <div className="form-row">
-            <label htmlFor="categoryId">Kategori</label>
-            <select
-              id="categoryId"
-              name="categoryId"
-              defaultValue={defaults.categoryId ?? categories[0]?.id}
-              required
-            >
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <CategoryField
+            categories={categories}
+            defaultCategoryId={defaults.categoryId}
+          />
 
           <div className="form-row">
             <label htmlFor="price">Harga</label>
-            <input
+            <MoneyInput
               id="price"
               name="price"
-              type="number"
-              min="0"
-              step="1"
-              inputMode="numeric"
               value={price}
-              onChange={(e) => setPrice(e.target.value)}
+              onChange={setPrice}
               required
             />
           </div>
@@ -170,22 +211,24 @@ export function ProductForm({
             />
           </div>
 
-          <input type="hidden" name="shortNote" value={shortNote} />
-          <input type="hidden" name="imageUrl" value={imageUrl} />
+          <ImageGalleryField urls={imageUrls} onChange={setImageUrls} />
+
           <input type="hidden" name="shopName" value={shopName} />
           {(defaults.isActive ?? true) ? (
             <input type="hidden" name="isActive" value="on" />
           ) : null}
 
-          {(imageUrl || shortNote) && (
-            <div className={styles.preview}>
-              {imageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={imageUrl} alt="" />
-              ) : null}
-              {shortNote ? <p>{shortNote}</p> : null}
-            </div>
-          )}
+          <div className="form-row">
+            <label htmlFor="shortNoteDeal">Description</label>
+            <textarea
+              id="shortNoteDeal"
+              name="shortNote"
+              rows={4}
+              maxLength={2000}
+              value={shortNote}
+              onChange={(e) => setShortNote(e.target.value)}
+            />
+          </div>
         </>
       ) : (
         <>
@@ -198,49 +241,53 @@ export function ProductForm({
               required
             />
           </div>
+          <CategoryField
+            categories={categories}
+            defaultCategoryId={defaults.categoryId}
+          />
           <div className="form-row">
-            <label htmlFor="categoryId">Kategori</label>
-            <select
-              id="categoryId"
-              name="categoryId"
-              defaultValue={defaults.categoryId ?? categories[0]?.id}
-              required
-            >
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="form-row">
-            <label htmlFor="price">Harga</label>
-            <input
-              id="price"
-              name="price"
-              type="number"
-              min="0"
-              step="1"
-              inputMode="numeric"
-              defaultValue={defaults.price ?? ""}
-              required
+            <label>Harga</label>
+            <div className={styles.priceGrid}>
+              <MoneyInput
+                id="price"
+                name="price"
+                value={price}
+                onChange={onNormalPriceChange}
+                placeholder="Normal"
+                aria-label="Harga"
+                required
+              />
+              <input
+                id="discountPercent"
+                name="discountPercent"
+                type="number"
+                min="0"
+                max="100"
+                step="1"
+                inputMode="numeric"
+                value={discountPercent}
+                onChange={(e) => onDiscountChange(e.target.value)}
+                placeholder="%"
+                aria-label="Diskon"
+              />
+            </div>
+            <MoneyInput
+              id="totalPrice"
+              value={totalPrice}
+              onChange={onTotalPriceChange}
+              placeholder="Total"
+              aria-label="Total"
+              className={styles.totalInput}
             />
           </div>
+          <ImageGalleryField urls={imageUrls} onChange={setImageUrls} />
           <div className="form-row">
-            <label htmlFor="imageUrl">Gambar</label>
-            <input
-              id="imageUrl"
-              name="imageUrl"
-              type="url"
-              defaultValue={defaults.imageUrl ?? ""}
-            />
-          </div>
-          <div className="form-row">
-            <label htmlFor="shortNote">Catatan</label>
-            <input
+            <label htmlFor="shortNote">Description</label>
+            <textarea
               id="shortNote"
               name="shortNote"
-              maxLength={120}
+              rows={4}
+              maxLength={2000}
               defaultValue={defaults.shortNote ?? ""}
             />
           </div>

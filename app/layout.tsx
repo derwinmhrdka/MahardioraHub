@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Caveat, Nunito } from "next/font/google";
+import { SplashScreen } from "@/components/SplashScreen";
 import { getSettings } from "@/lib/settings";
 import "./globals.css";
 
@@ -43,14 +44,25 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  let siteName = "MahardioraHub";
+  try {
+    const settings = await getSettings();
+    siteName = settings.siteName;
+  } catch {
+    // keep fallback
+  }
+
   return (
     <html lang="en" className={`${caveat.variable} ${nunito.variable}`}>
-      <body>{children}</body>
+      <body>
+        <SplashScreen siteName={siteName} />
+        {children}
+      </body>
     </html>
   );
 }

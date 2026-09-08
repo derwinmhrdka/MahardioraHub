@@ -3,9 +3,11 @@ import { MapPin, Store, Tag } from "lucide-react";
 import { DealCta } from "@/components/DealCta";
 import { Header } from "@/components/Header";
 import { ProductCard } from "@/components/ProductCard";
+import { ProductImageSlider } from "@/components/ProductImageSlider";
+import { ProductNote } from "@/components/ProductNote";
 import styles from "@/components/ProductDetail.module.css";
 import { formatRupiah } from "@/lib/format";
-import { productImageUrl } from "@/lib/image-url";
+import { productImages } from "@/lib/product-images";
 import { getProduct, getRelatedDeals } from "@/lib/products";
 import { getSettings } from "@/lib/settings";
 
@@ -25,32 +27,17 @@ export default async function DealProductPage({ params }: PageProps) {
     getSettings(),
     getRelatedDeals(product.id, product.categoryId),
   ]);
-  const imageSrc = productImageUrl(product.imageUrl, 600);
-
   return (
     <div className="section-deals">
       <Header siteName={settings.siteName} active="deals" />
       <main className="container">
         <article className={styles.detail}>
-          <div className={styles.imageWrap}>
-            {imageSrc ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={imageSrc}
-                alt=""
-                className={styles.image}
-                loading="eager"
-                decoding="async"
-              />
-            ) : (
-              <div className={styles.placeholder}>Tidak ada gambar</div>
-            )}
-          </div>
+          <ProductImageSlider images={productImages(product)} alt={product.title} />
           <div className={styles.meta}>
             <p className={styles.price}>{formatRupiah(product.price)}</p>
             <h1>{product.title}</h1>
             {product.shortNote ? (
-              <p className={styles.note}>{product.shortNote}</p>
+              <ProductNote text={product.shortNote} className={styles.note} />
             ) : null}
             <div className={styles.metaRow}>
               <span className={styles.metaItem}>

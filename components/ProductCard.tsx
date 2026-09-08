@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { MapPin, Tag } from "lucide-react";
-import { formatRupiah } from "@/lib/format";
 import { productImageUrl } from "@/lib/image-url";
+import { ProductPrice } from "@/components/ProductPrice";
+import { productNotePreview } from "@/components/ProductNote";
 import styles from "./ProductCard.module.css";
 
 type ProductCardProps = {
   id: number;
   title: string;
   price: number;
+  discountPercent?: number | null;
   shortNote?: string | null;
   imageUrl?: string | null;
   href: string;
@@ -18,6 +20,7 @@ type ProductCardProps = {
 export function ProductCard({
   title,
   price,
+  discountPercent = 0,
   shortNote,
   imageUrl,
   href,
@@ -26,6 +29,7 @@ export function ProductCard({
 }: ProductCardProps) {
   const hasMeta = Boolean(categoryName || storeArea);
   const src = productImageUrl(imageUrl, 400);
+  const notePreview = productNotePreview(shortNote);
 
   return (
     <Link href={href} className={styles.card}>
@@ -42,11 +46,20 @@ export function ProductCard({
         ) : (
           <div className={styles.placeholder}>Tidak ada gambar</div>
         )}
+        {discountPercent != null && discountPercent > 0 ? (
+          <span className={styles.discBadge} aria-hidden>
+            -{Math.round(discountPercent)}%
+          </span>
+        ) : null}
       </div>
       <div className={styles.body}>
-        <div className={styles.price}>{formatRupiah(price)}</div>
+        <ProductPrice
+          price={price}
+          discountPercent={discountPercent}
+          size="card"
+        />
         <div className={styles.title}>{title}</div>
-        {shortNote ? <p className={styles.note}>{shortNote}</p> : null}
+        {notePreview ? <p className={styles.note}>{notePreview}</p> : null}
         {hasMeta ? (
           <div className={styles.meta}>
             {categoryName ? (

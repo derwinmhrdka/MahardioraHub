@@ -33,7 +33,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-RUN apk add --no-cache libc6-compat openssl \
+RUN apk add --no-cache libc6-compat openssl su-exec \
   && addgroup -S nodejs \
   && adduser -S nextjs -G nodejs
 
@@ -47,8 +47,14 @@ COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
 
-RUN chown -R nextjs:nodejs /app
+# Image processing (platform binaries live under @img)
+COPY --from=builder /app/node_modules/sharp ./node_modules/sharp
+COPY --from=builder /app/node_modules/@img ./node_modules/@img
 
-USER nextjs
+COPY docker-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh \
+  && mkdir -p /app/uploads \
+  && chown -R nextjs:nodejs /app /app/uploads
+
 EXPOSE 3000
-CMD ["node", "server.js"]
+ENTRYPOINT ["/entrypoint.sh"]

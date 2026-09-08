@@ -43,6 +43,9 @@ services:
     ports:
       # Host nginx proxies here (default 13000). Change APP_HOST_PORT in .env if taken.
       - "127.0.0.1:${APP_HOST_PORT:-13000}:3000"
+    volumes:
+      - uploads:/app/uploads
 
 volumes:
   pgdata:
+  uploads:

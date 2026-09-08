@@ -39,6 +39,9 @@ next-env.d.ts
 /prisma/*.db
 /prisma/*.db-journal
 
+# uploaded product images
+/uploads
+
 # cursor
 cursor-prompt.md
 requirements.md

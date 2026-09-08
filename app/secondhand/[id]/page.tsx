@@ -1,12 +1,14 @@
 import { notFound } from "next/navigation";
 import { CheckCircle2, MapPin, Tag } from "lucide-react";
 import { Header } from "@/components/Header";
+import { ProductImageSlider } from "@/components/ProductImageSlider";
+import { ProductNote } from "@/components/ProductNote";
+import { ProductPrice } from "@/components/ProductPrice";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import styles from "@/components/ProductDetail.module.css";
-import { formatRupiah } from "@/lib/format";
-import { productImageUrl } from "@/lib/image-url";
+import { productImages } from "@/lib/product-images";
 import { getProduct } from "@/lib/products";
-import { buildWhatsAppLink, getSettings } from "@/lib/settings";
+import { buildWhatsAppLink, getSettings, productPageUrl } from "@/lib/settings";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -23,36 +25,26 @@ export default async function SecondhandItemPage({ params }: PageProps) {
   }
 
   const settings = await getSettings();
-  const whatsappHref = buildWhatsAppLink(
-    settings.whatsappNumber,
-    product.title
-  );
-  const imageSrc = productImageUrl(product.imageUrl, 600);
-
+  const whatsappHref = buildWhatsAppLink(settings.whatsappNumber, {
+    template: settings.whatsappTemplate,
+    productTitle: product.title,
+    productLink: productPageUrl("secondhand", product.id),
+  });
   return (
     <div className="section-secondhand">
       <Header siteName={settings.siteName} active="secondhand" />
       <main className="container">
         <article className={styles.detail}>
-          <div className={styles.imageWrap}>
-            {imageSrc ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={imageSrc}
-                alt=""
-                className={styles.image}
-                loading="eager"
-                decoding="async"
-              />
-            ) : (
-              <div className={styles.placeholder}>Tidak ada gambar</div>
-            )}
-          </div>
+          <ProductImageSlider images={productImages(product)} alt={product.title} />
           <div className={styles.meta}>
-            <p className={styles.price}>{formatRupiah(product.price)}</p>
+            <ProductPrice
+              price={product.price}
+              discountPercent={product.discountPercent}
+              size="detail"
+            />
             <h1>{product.title}</h1>
             {product.shortNote ? (
-              <p className={styles.note}>{product.shortNote}</p>
+              <ProductNote text={product.shortNote} className={styles.note} />
             ) : null}
             <div className={styles.metaRow}>
               <span className={styles.metaItem}>

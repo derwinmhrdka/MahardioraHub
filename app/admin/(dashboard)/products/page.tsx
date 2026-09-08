@@ -8,6 +8,7 @@ import {
 
 type PageProps = {
   searchParams: Promise<{
+    tab?: string;
     imported?: string;
     failed?: string;
     importError?: string;
@@ -17,12 +18,15 @@ type PageProps = {
 export default async function AdminProductsPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const products = await listAllProducts();
+  const activeTab =
+    params.tab === "secondhand" ? "secondhand" : "deal";
 
   const items = products.map((product) => ({
     id: product.id,
     title: product.title,
     kind: product.kind,
     price: product.price,
+    discountPercent: product.discountPercent,
     isActive: product.isActive,
     storeArea: product.storeArea,
     categoryName: product.category.name,
@@ -46,6 +50,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
   return (
     <AdminProductList
       products={items}
+      activeTab={activeTab}
       hideAction={hideProductAction}
       showAction={showProductAction}
       deleteAction={deleteProductAction}

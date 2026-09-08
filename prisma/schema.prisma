@@ -26,7 +26,9 @@ model Product {
   categoryId    Int
   category      Category    @relation(fields: [categoryId], references: [id])
   price         Int
+  discountPercent Int       @default(0)
   imageUrl      String?
+  imageUrls     String[]    @default([])
   shortNote     String?
   storeArea     String?
   shopName      String?
@@ -46,6 +48,7 @@ model Click {
 model Setting {
   id                Int     @id
   whatsappNumber    String
+  whatsappTemplate  String  @default("Halo, saya tertarik dengan produk ini.")
   siteName          String
   contactEmail      String?
   shopeeAffiliateId String? // used by admin optional an_redir link helper

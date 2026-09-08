@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   ExternalLink,
-  FolderTree,
   LogOut,
   Package,
   Settings,
@@ -17,16 +16,11 @@ type AdminNavProps = {
 };
 
 function navActive(pathname: string) {
-  if (pathname.startsWith("/admin/categories")) return "categories";
   if (pathname.startsWith("/admin/settings")) return "settings";
   if (pathname.startsWith("/admin/products") || pathname === "/admin") {
     return "products";
   }
   return null;
-}
-
-function iconStroke(active: boolean) {
-  return active ? 2.25 : 1.75;
 }
 
 export function AdminNav({ siteName }: AdminNavProps) {
@@ -47,8 +41,7 @@ export function AdminNav({ siteName }: AdminNavProps) {
             title="Logout"
             aria-label="Logout"
           >
-            <LogOut size={12} strokeWidth={2} aria-hidden />
-            <span>Logout</span>
+            <LogOut size={14} strokeWidth={2.25} aria-hidden />
           </button>
         </form>
       </header>
@@ -56,42 +49,27 @@ export function AdminNav({ siteName }: AdminNavProps) {
       <nav className={styles.bottom} aria-label="Admin Menu">
         <Link
           href="/admin/products"
-          className={styles.tab}
+          className={`${styles.tab} ${active === "products" ? styles.tabOn : ""}`}
           aria-current={active === "products" ? "page" : undefined}
         >
-          <Package
-            size={12}
-            strokeWidth={iconStroke(active === "products")}
-            aria-hidden
-          />
+          <Package size={14} strokeWidth={2.25} aria-hidden />
           <span>Produk</span>
         </Link>
         <Link
-          href="/admin/categories"
-          className={styles.tab}
-          aria-current={active === "categories" ? "page" : undefined}
-        >
-          <FolderTree
-            size={12}
-            strokeWidth={iconStroke(active === "categories")}
-            aria-hidden
-          />
-          <span>Kategori</span>
-        </Link>
-        <Link
           href="/admin/settings"
-          className={styles.tab}
+          className={`${styles.tab} ${active === "settings" ? styles.tabOn : ""}`}
           aria-current={active === "settings" ? "page" : undefined}
         >
-          <Settings
-            size={12}
-            strokeWidth={iconStroke(active === "settings")}
-            aria-hidden
-          />
+          <Settings size={14} strokeWidth={2.25} aria-hidden />
           <span>Settings</span>
         </Link>
-        <Link href="/" className={styles.tab} target="_blank" rel="noreferrer">
-          <ExternalLink size={12} strokeWidth={1.75} aria-hidden />
+        <Link
+          href="/"
+          className={styles.tab}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <ExternalLink size={14} strokeWidth={2.25} aria-hidden />
           <span>Site</span>
         </Link>
       </nav>

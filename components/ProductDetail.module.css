@@ -96,10 +96,44 @@
   margin: 0;
   font-size: 0.95rem;
   font-weight: 400;
+  line-height: 1.45;
   color: var(--color-text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.note p {
+  margin: 0 0 0.45rem;
+  white-space: pre-line;
+}
+
+.note p:last-child {
+  margin-bottom: 0;
+}
+
+.note ul {
+  margin: 0 0 0.45rem;
+  padding-left: 1.15rem;
+}
+
+.note ul:last-child {
+  margin-bottom: 0;
+}
+
+.note li {
+  margin: 0.15rem 0;
+}
+
+.note a {
+  color: #111;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  word-break: break-all;
+}
+
+.note a:hover {
+  opacity: 0.75;
 }
 
 .metaRow {

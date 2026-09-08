@@ -13,6 +13,7 @@ async function main() {
       id: 1,
       siteName: "MahardioraHub",
       whatsappNumber: "6281234567890",
+      whatsappTemplate: "Halo, saya tertarik dengan produk ini.",
       contactEmail: "hello@dealhub.local",
       shopeeAffiliateId: null,
     },

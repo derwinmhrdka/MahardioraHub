@@ -2,10 +2,17 @@ export type ProductLinkMeta = {
   title: string | null;
   description: string | null;
   imageUrl: string | null;
+  imageUrls: string[];
   price: number | null;
   platform: string | null;
   source: "shopee-api" | "open-graph" | "mixed";
 };
+
+function shopeeFileUrl(hashOrUrl: string): string {
+  return hashOrUrl.startsWith("http")
+    ? hashOrUrl
+    : `https://down-id.img.susercontent.com/file/${hashOrUrl}`;
+}
 
 const BROWSER_UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
@@ -198,23 +205,27 @@ async function fetchShopeeApiMeta(
     shopeePriceToIdr(item.price_min) ??
     null;
   let imageUrl: string | null = null;
+  const imageUrls: string[] = [];
   const image = item.image;
   if (typeof image === "string" && image) {
-    imageUrl = image.startsWith("http")
-      ? image
-      : `https://down-id.img.susercontent.com/file/${image}`;
-  } else if (Array.isArray(item.images) && typeof item.images[0] === "string") {
-    const first = item.images[0] as string;
-    imageUrl = first.startsWith("http")
-      ? first
-      : `https://down-id.img.susercontent.com/file/${first}`;
+    imageUrl = shopeeFileUrl(image);
+    imageUrls.push(imageUrl);
   }
+  if (Array.isArray(item.images)) {
+    for (const entry of item.images) {
+      if (typeof entry !== "string" || !entry) continue;
+      imageUrls.push(shopeeFileUrl(entry));
+    }
+  }
+  const uniqueImages = Array.from(new Set(imageUrls));
+  if (!imageUrl && uniqueImages[0]) imageUrl = uniqueImages[0];
 
   if (!title && !description && !imageUrl && price == null) return null;
   return {
     title,
     description,
     imageUrl,
+    imageUrls: uniqueImages,
     price,
     platform: "Shopee",
     source: "shopee-api",
@@ -265,6 +276,7 @@ function parseHtmlMeta(
     title: cleanedTitle,
     description: description ? description.slice(0, 120) : null,
     imageUrl,
+    imageUrls: imageUrl ? [imageUrl] : [],
     price,
     platform: detectPlatform(hostname),
     source: "open-graph",
@@ -292,7 +304,13 @@ async function fetchOpenGraphMeta(
 
 function hasUsefulMeta(meta: Partial<ProductLinkMeta> | null | undefined): boolean {
   if (!meta) return false;
-  return Boolean(meta.title || meta.description || meta.imageUrl || meta.price != null);
+  return Boolean(
+    meta.title ||
+      meta.description ||
+      meta.imageUrl ||
+      (meta.imageUrls && meta.imageUrls.length > 0) ||
+      meta.price != null
+  );
 }
 
 export async function fetchProductLinkMeta(
@@ -373,7 +391,11 @@ export async function fetchProductLinkMeta(
 
   const title = shopee?.title || og.title || null;
   const description = shopee?.description || og.description || null;
-  const imageUrl = shopee?.imageUrl || og.imageUrl || null;
+  const imageUrls = Array.from(
+    new Set([...(shopee?.imageUrls ?? []), ...(og.imageUrls ?? [])].filter(Boolean))
+  );
+  const imageUrl = shopee?.imageUrl || og.imageUrl || imageUrls[0] || null;
+  if (imageUrl && !imageUrls.includes(imageUrl)) imageUrls.unshift(imageUrl);
   const price = shopee?.price ?? og.price ?? null;
   const platform =
     shopee?.platform || og.platform || (isShopee ? "Shopee" : null);
@@ -386,6 +408,7 @@ export async function fetchProductLinkMeta(
     title,
     description,
     imageUrl,
+    imageUrls,
     price,
     platform,
     source: shopee?.imageUrl || shopee?.title ? "shopee-api" : "open-graph",

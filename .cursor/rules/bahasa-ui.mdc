@@ -1,9 +1,26 @@
 ---
-description: Bahasa UI hybrid + short labels only (no long descriptions)
+description: Bahasa UI hybrid + short labels; prefer icons over text
 alwaysApply: true
 ---
 
 # Bahasa UI + copy singkat
+
+## Visual first (hard rule)
+
+- Prefer **icons / symbols** over words for toggles, actions, and empty affordances.
+- Visible text only when an icon alone is ambiguous; keep it **1–2 words**.
+- No instructional sentences (`Ctrl+V di sini`, `Pilih file lalu...`).
+- Use `aria-label` / `title` for accessibility; do not duplicate long copy on screen.
+
+```tsx
+// ❌ BAD
+<button>Upload file gambar</button>
+<span>Ctrl+V di sini untuk paste</span>
+
+// ✅ GOOD
+<button aria-label="Upload"><Upload size={14} /></button>
+<button aria-label="Paste"><ClipboardPaste size={14} /></button>
+```
 
 ## Copy length (hard rule)
 
@@ -11,7 +28,7 @@ alwaysApply: true
 - Labels = **1–3 words** max (`Harga`, `Platform`, `Affiliate link`).
 - No parentheticals like `(Rp, bilangan bulat)`, `(deal saja)`, `(opsional)` in labels.
 - Hints/helper paragraphs: **avoid**. Use `placeholder` if needed.
-- Success/error: one short line.
+- Success/error: one short line (or icon-only state when clear).
 
 ```tsx
 // ❌ BAD

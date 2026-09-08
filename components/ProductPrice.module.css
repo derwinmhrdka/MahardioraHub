@@ -1,0 +1,161 @@
+/* 16-point starburst seal */
+.burst {
+  clip-path: polygon(
+    50% 0%,
+    56% 12%,
+    68% 4%,
+    68% 18%,
+    84% 16%,
+    78% 28%,
+    96% 32%,
+    84% 42%,
+    100% 50%,
+    84% 58%,
+    96% 68%,
+    78% 72%,
+    84% 84%,
+    68% 82%,
+    68% 96%,
+    56% 88%,
+    50% 100%,
+    44% 88%,
+    32% 96%,
+    32% 82%,
+    16% 84%,
+    22% 72%,
+    4% 68%,
+    16% 58%,
+    0% 50%,
+    16% 42%,
+    4% 32%,
+    22% 28%,
+    16% 16%,
+    32% 18%,
+    32% 4%,
+    44% 12%
+  );
+}
+
+.wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.5rem;
+}
+
+.price,
+.row {
+  margin: 0;
+  font-family: var(--font-body-stack);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+  color: var(--color-text);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem 0.4rem;
+}
+
+.was {
+  text-decoration: line-through;
+  text-decoration-thickness: 1.25px;
+  text-decoration-color: currentColor;
+  color: var(--color-text-muted);
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.now {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.badge {
+  display: inline-grid;
+  place-items: center;
+  width: 2.55rem;
+  height: 2.55rem;
+  padding: 0.2rem;
+  border: 0;
+  background: #e11d2e;
+  color: #fff;
+  font-family: var(--font-body-stack);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  box-shadow: 1px 1px 0 #111;
+}
+
+.card {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.card .price,
+.card .now {
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.card .was {
+  font-size: 0.62rem;
+  font-weight: 400;
+}
+
+.list {
+  font-size: 0.78rem;
+  font-weight: 600;
+  justify-content: flex-end;
+}
+
+.list .row {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.list .now {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.list .was {
+  font-size: 0.6rem;
+}
+
+.detail {
+  align-items: center;
+}
+
+.detail .now {
+  font-size: clamp(1.25rem, 4vw, 1.55rem);
+  font-weight: 400;
+}
+
+.detail .was {
+  font-size: clamp(0.75rem, 2.2vw, 0.9rem);
+}
+
+.detail .badge {
+  width: 2.85rem;
+  height: 2.85rem;
+  font-size: 0.62rem;
+}
+
+.admin {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.admin .now {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.admin .was {
+  font-size: 0.6rem;
+}

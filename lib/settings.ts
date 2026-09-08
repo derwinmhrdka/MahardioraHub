@@ -2,10 +2,13 @@ import { prisma } from "./prisma";
 
 export type SettingInput = {
   whatsappNumber: string;
+  whatsappTemplate: string;
   siteName: string;
   contactEmail?: string | null;
   shopeeAffiliateId?: string | null;
 };
+
+const DEFAULT_WA_TEMPLATE = "Halo, saya tertarik dengan produk ini.";
 
 export async function getSettings() {
   const settings = await prisma.setting.findUnique({ where: { id: 1 } });
@@ -21,12 +24,14 @@ export async function updateSettings(input: SettingInput) {
     create: {
       id: 1,
       whatsappNumber: input.whatsappNumber,
+      whatsappTemplate: input.whatsappTemplate || DEFAULT_WA_TEMPLATE,
       siteName: input.siteName,
       contactEmail: input.contactEmail || null,
       shopeeAffiliateId: input.shopeeAffiliateId || null,
     },
     update: {
       whatsappNumber: input.whatsappNumber,
+      whatsappTemplate: input.whatsappTemplate || DEFAULT_WA_TEMPLATE,
       siteName: input.siteName,
       contactEmail: input.contactEmail || null,
       shopeeAffiliateId: input.shopeeAffiliateId || null,
@@ -34,12 +39,41 @@ export async function updateSettings(input: SettingInput) {
   });
 }
 
+export function siteOrigin(): string {
+  const raw = (process.env.DOMAIN ?? process.env.APP_URL ?? "").trim();
+  if (!raw) return "";
+  if (/^https?:\/\//i.test(raw)) return raw.replace(/\/$/, "");
+  return `https://${raw.replace(/\/$/, "")}`;
+}
+
+export function productPageUrl(kind: "deal" | "secondhand", id: number): string {
+  const path =
+    kind === "deal" ? `/deals/product/${id}` : `/secondhand/${id}`;
+  const origin = siteOrigin();
+  return origin ? `${origin}${path}` : path;
+}
+
+export function buildWhatsAppMessage(input: {
+  template: string;
+  productTitle: string;
+  productLink: string;
+}): string {
+  const intro = (input.template || DEFAULT_WA_TEMPLATE).trim();
+  return [
+    intro,
+    `Produk : ${input.productTitle}`,
+    `Link : ${input.productLink}`,
+  ].join("\n");
+}
+
 export function buildWhatsAppLink(
   whatsappNumber: string,
-  itemTitle: string
+  input: {
+    template: string;
+    productTitle: string;
+    productLink: string;
+  }
 ): string {
-  const text = encodeURIComponent(
-    `Hi, I'm interested in: ${itemTitle}`
-  );
+  const text = encodeURIComponent(buildWhatsAppMessage(input));
   return `https://wa.me/${whatsappNumber}?text=${text}`;
 }
