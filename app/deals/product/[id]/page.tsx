@@ -80,11 +80,13 @@ export default async function DealProductPage({ params }: PageProps) {
                 </span>
               ) : null}
             </div>
-            <DealCta
-              productId={product.id}
-              shopName={product.shopName}
-              affiliateLink={product.affiliateLink}
-            />
+            <div className={styles.actions}>
+              <DealCta
+                productId={product.id}
+                shopName={product.shopName}
+                affiliateLink={product.affiliateLink}
+              />
+            </div>
           </div>
         </article>
 

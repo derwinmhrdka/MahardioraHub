@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -29,6 +30,24 @@ export function AdminNav({ siteName, userImage, userName }: AdminNavProps) {
   const pathname = usePathname();
   const active = navActive(pathname);
   const initial = (userName || "?").slice(0, 1).toUpperCase();
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function onPointer(e: MouseEvent) {
+      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    window.addEventListener("mousedown", onPointer);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("mousedown", onPointer);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
 
   return (
     <>
@@ -37,25 +56,37 @@ export function AdminNav({ siteName, userImage, userName }: AdminNavProps) {
           <span className={styles.brand}>{siteName}</span>
           <span className={styles.brandSub}>Admin</span>
         </div>
-        <div className={styles.topRight}>
-          <span className={styles.avatar} aria-hidden>
+        <div className={styles.topRight} ref={rootRef}>
+          <button
+            type="button"
+            className={`${styles.avatarBtn} ${open ? styles.avatarOn : ""}`}
+            aria-label="Akun"
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+          >
             {userImage ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={userImage} alt="" referrerPolicy="no-referrer" />
             ) : (
               <span>{initial}</span>
             )}
-          </span>
-          <form action={logoutAction}>
-            <button
-              type="submit"
-              className={styles.logout}
-              title="Logout"
-              aria-label="Logout"
-            >
-              <LogOut size={14} strokeWidth={2.25} aria-hidden />
-            </button>
-          </form>
+          </button>
+
+          {open ? (
+            <div className={styles.menu} role="menu">
+              <p className={styles.roleLabel}>Admin</p>
+              <form action={logoutAction}>
+                <button
+                  type="submit"
+                  className={styles.menuItem}
+                  role="menuitem"
+                >
+                  <LogOut size={14} strokeWidth={2.25} aria-hidden />
+                  Logout
+                </button>
+              </form>
+            </div>
+          ) : null}
         </div>
       </header>
 

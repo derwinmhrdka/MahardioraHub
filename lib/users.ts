@@ -39,6 +39,22 @@ export async function upsertGoogleUser(input: {
   });
 }
 
+export async function upsertDevUser(role: "admin" | "visitor") {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("Dev login disabled");
+  }
+  const email =
+    role === "admin" ? "dev-admin@localhost" : "dev-visitor@localhost";
+  const name = role === "admin" ? "Dev Admin" : "Dev Visitor";
+  const dbRole = role === "admin" ? UserRole.admin : UserRole.visitor;
+
+  return prisma.user.upsert({
+    where: { email },
+    create: { email, name, role: dbRole },
+    update: { name, role: dbRole },
+  });
+}
+
 export async function listAdminAllowlist() {
   const rows = await prisma.adminAllowlist.findMany({
     orderBy: { email: "asc" },

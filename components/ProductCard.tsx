@@ -1,4 +1,5 @@
 import Link from "next/link";
+import clsx from "clsx";
 import { MapPin, Tag } from "lucide-react";
 import { productImageUrl } from "@/lib/image-url";
 import { ProductPrice } from "@/components/ProductPrice";
@@ -11,6 +12,7 @@ type ProductCardProps = {
   title: string;
   price: number;
   discountPercent?: number | null;
+  stock?: number | null;
   shortNote?: string | null;
   imageUrl?: string | null;
   href: string;
@@ -22,6 +24,7 @@ export function ProductCard({
   title,
   price,
   discountPercent = 0,
+  stock,
   shortNote,
   imageUrl,
   href,
@@ -31,9 +34,14 @@ export function ProductCard({
   const hasMeta = Boolean(categoryName || storeArea);
   const src = productImageUrl(imageUrl, 400);
   const notePreview = productNotePreview(shortNote);
+  const soldOut = stock != null && stock <= 0;
 
   return (
-    <Link href={href} className={styles.card}>
+    <Link
+      href={href}
+      className={clsx(styles.card, soldOut && styles.soldOut)}
+      aria-label={soldOut ? `${title} — Sold Out` : title}
+    >
       <div className={styles.imageWrap}>
         {src ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -47,7 +55,9 @@ export function ProductCard({
         ) : (
           <div className={styles.placeholder}>Tidak ada gambar</div>
         )}
-        {hasDiscount(discountPercent) ? (
+        {soldOut ? (
+          <span className={styles.soldBadge}>Sold Out!</span>
+        ) : hasDiscount(discountPercent) ? (
           <span className={styles.discBadge} aria-hidden>
             -{formatDiscountPercent(discountPercent ?? 0)}%
           </span>

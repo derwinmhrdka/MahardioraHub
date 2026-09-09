@@ -116,19 +116,36 @@
 .userStack {
   display: flex;
   flex-direction: column;
-  gap: 1.1rem;
+  gap: 1.25rem;
 }
 
 .userBlock {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.5rem;
+  padding-top: 0.15rem;
+}
+
+.userBlock + .userBlock {
+  margin-top: 0.15rem;
+  padding-top: 1rem;
+  border-top: var(--stroke) dashed #111;
 }
 
 .userHead {
   display: inline-flex;
   align-items: center;
+  gap: 0.4rem;
+  margin: 0;
   color: #111;
+  font-family: var(--font-body-stack);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.userHead svg {
+  flex-shrink: 0;
 }
 
 .userAvatar {

@@ -41,6 +41,9 @@ async function parseProductForm(formData: FormData) {
   const shopName = String(formData.get("shopName") ?? "").trim();
   const affiliateLink = String(formData.get("affiliateLink") ?? "").trim();
   const isActive = formData.get("isActive") === "on";
+  const stockRaw = String(formData.get("stock") ?? "").trim();
+  const stock =
+    stockRaw === "" ? 1 : Math.max(0, Math.round(Number(stockRaw)));
 
   if (newCategoryName) {
     const category = await findOrCreateCategoryByName(newCategoryName);
@@ -51,7 +54,8 @@ async function parseProductForm(formData: FormData) {
     (kind !== ProductKind.deal && kind !== ProductKind.secondhand) ||
     !title ||
     !Number.isFinite(categoryId) ||
-    !Number.isFinite(price)
+    !Number.isFinite(price) ||
+    !Number.isFinite(stock)
   ) {
     throw new Error("Invalid product form");
   }
@@ -69,6 +73,7 @@ async function parseProductForm(formData: FormData) {
       kind === ProductKind.secondhand
         ? clampDiscountPercent(discountPercent)
         : 0,
+    stock: kind === ProductKind.secondhand ? stock : 0,
     imageUrl: imageUrls[0] ?? (imageUrl || null),
     imageUrls,
     shortNote: shortNote || null,

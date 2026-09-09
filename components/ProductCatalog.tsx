@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import clsx from "clsx";
 import { MapPin, Tag } from "lucide-react";
 import { productImageUrl } from "@/lib/image-url";
 import { ProductCard } from "@/components/ProductCard";
@@ -13,6 +14,7 @@ export type CatalogItem = {
   title: string;
   price: number;
   discountPercent?: number | null;
+  stock?: number | null;
   shortNote?: string | null;
   imageUrl?: string | null;
   href: string;
@@ -46,6 +48,7 @@ export function ProductCatalog({
               title={item.title}
               price={item.price}
               discountPercent={item.discountPercent}
+              stock={item.stock}
               shortNote={item.shortNote}
               imageUrl={item.imageUrl}
               categoryName={item.categoryName}
@@ -59,8 +62,14 @@ export function ProductCatalog({
           {items.map((item) => {
             const thumb = productImageUrl(item.imageUrl, 120);
             const notePreview = productNotePreview(item.shortNote);
+            const soldOut = item.stock != null && item.stock <= 0;
             return (
-              <Link key={item.id} href={item.href} className={styles.row}>
+              <Link
+                key={item.id}
+                href={item.href}
+                className={clsx(styles.row, soldOut && styles.rowSoldOut)}
+                aria-label={soldOut ? `${item.title} — Sold Out` : item.title}
+              >
                 <div className={styles.thumb}>
                   {thumb ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -74,6 +83,9 @@ export function ProductCatalog({
                   ) : (
                     <div className={styles.thumbPlaceholder}>Tanpa gambar</div>
                   )}
+                  {soldOut ? (
+                    <span className={styles.rowSoldBadge}>Sold Out!</span>
+                  ) : null}
                 </div>
                 <div className={styles.rowBody}>
                   <div className={styles.rowTitle}>{item.title}</div>

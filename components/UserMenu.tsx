@@ -72,27 +72,22 @@ export function UserMenu({ user }: UserMenuProps) {
 
       {open ? (
         <div className={styles.menu} role="menu">
+          <p className={styles.roleLabel}>{isAdmin ? "Admin" : "Visitor"}</p>
           {isAdmin ? (
             <Link
               href="/admin/products"
               className={styles.item}
               role="menuitem"
-              aria-label="Admin"
-              title="Admin"
               onClick={() => setOpen(false)}
             >
               <Shield size={14} strokeWidth={2.25} aria-hidden />
+              Admin
             </Link>
           ) : null}
           <form action={signOutAction}>
-            <button
-              type="submit"
-              className={styles.item}
-              role="menuitem"
-              aria-label="Logout"
-              title="Logout"
-            >
+            <button type="submit" className={styles.item} role="menuitem">
               <LogOut size={14} strokeWidth={2.25} aria-hidden />
+              Logout
             </button>
           </form>
         </div>

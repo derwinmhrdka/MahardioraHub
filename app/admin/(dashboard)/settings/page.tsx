@@ -208,9 +208,10 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
       {tab === "user" ? (
         <section aria-label="User" className={styles.userPanel}>
           <div className={styles.userBlock}>
-            <div className={styles.userHead} aria-hidden>
-              <Shield size={14} strokeWidth={2.25} />
-            </div>
+            <h2 className={styles.userHead}>
+              <Shield size={14} strokeWidth={2.25} aria-hidden />
+              Admin
+            </h2>
 
             <ul className={styles.userList}>
               {admins.length === 0 ? (
@@ -269,9 +270,10 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
           </div>
 
           <div className={styles.userBlock}>
-            <div className={styles.userHead} aria-hidden>
-              <UserRound size={14} strokeWidth={2.25} />
-            </div>
+            <h2 className={styles.userHead}>
+              <UserRound size={14} strokeWidth={2.25} aria-hidden />
+              Visitor
+            </h2>
 
             <ul className={styles.userList}>
               {visitors.length === 0 ? (

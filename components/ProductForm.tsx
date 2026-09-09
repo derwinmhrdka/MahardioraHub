@@ -26,6 +26,7 @@ type ProductFormValues = {
   categoryId?: number;
   price?: number;
   discountPercent?: number;
+  stock?: number;
   imageUrl?: string | null;
   imageUrls?: string[] | null;
   shortNote?: string | null;
@@ -283,6 +284,19 @@ export function ProductForm({
               placeholder="Total"
               aria-label="Total"
               className={styles.totalInput}
+            />
+          </div>
+          <div className="form-row">
+            <label htmlFor="stock">Stock</label>
+            <input
+              id="stock"
+              name="stock"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              step={1}
+              defaultValue={defaults.stock ?? 1}
+              required
             />
           </div>
           <ImageGalleryField urls={imageUrls} onChange={setImageUrls} />

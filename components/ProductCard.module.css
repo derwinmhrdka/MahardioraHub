@@ -205,3 +205,52 @@
   flex-shrink: 0;
   color: var(--color-text-muted);
 }
+
+.soldOut {
+  background: #e8e8e8;
+  border-color: #9a9a9a;
+  box-shadow: 1px 1px 0 #9a9a9a;
+  filter: grayscale(1);
+}
+
+.soldOut:hover {
+  transform: translate(-2px, -2px) rotate(-0.4deg);
+  box-shadow: 2px 2px 0 #9a9a9a;
+}
+
+.soldOut .image {
+  filter: grayscale(1) contrast(0.95) brightness(0.92);
+}
+
+.soldOut .title,
+.soldOut .note,
+.soldOut .metaItem,
+.soldOut .metaItem svg {
+  color: #6b6b6b;
+}
+
+.soldBadge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 3;
+  transform: translate(-50%, -50%) rotate(-12deg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 5.6rem;
+  padding: 0.4rem 0.65rem;
+  border: 2px solid #111;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #111;
+  font-family: var(--font-display-stack);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  box-shadow: 2px 2px 0 #111;
+  pointer-events: none;
+  white-space: nowrap;
+}
+

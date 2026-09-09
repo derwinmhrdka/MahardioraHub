@@ -42,48 +42,96 @@
 }
 
 .topRight {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.4rem;
 }
 
-.avatar {
+.avatarBtn {
   display: grid;
   place-items: center;
   width: 2.15rem;
   height: 2.15rem;
+  padding: 0;
   overflow: hidden;
   border: var(--stroke) solid var(--color-border);
   border-radius: 999px;
   background: var(--color-surface);
   font-size: 0.8rem;
   font-weight: 800;
+  color: #111;
+  cursor: pointer;
   box-shadow: 1px 1px 0 #111;
 }
 
-.avatar img {
+.avatarBtn img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.logout {
-  display: grid;
-  place-items: center;
-  width: 2.15rem;
-  height: 2.15rem;
-  padding: 0;
-  border: var(--stroke) solid var(--color-border);
-  border-radius: 999px;
-  background: var(--color-surface);
-  color: var(--color-text);
-  cursor: pointer;
-  box-shadow: 1px 1px 0 #111;
-}
-
-.logout:hover {
+.avatarOn,
+.avatarBtn:hover {
   background: #111;
   color: #fff;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  z-index: 50;
+  min-width: 8.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.4rem;
+  border: var(--stroke) solid #111;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 2px 2px 0 #111;
+}
+
+.menu form {
+  margin: 0;
+}
+
+.roleLabel {
+  margin: 0;
+  padding: 0.15rem 0.4rem 0.25rem;
+  font-family: var(--font-body-stack);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--color-text-muted);
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  min-height: 2rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid #111;
+  border-radius: 10px;
+  background: #f7f3eb;
+  color: #111;
+  font-family: var(--font-body-stack);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.menuItem:hover {
+  background: #111;
+  color: #fff;
+}
+
+.menuItem svg {
+  flex-shrink: 0;
 }
 
 .bottom {

@@ -11,6 +11,7 @@ export type ProductCreateInput = {
   categoryId: number;
   price: number;
   discountPercent?: number;
+  stock?: number;
   imageUrl?: string | null;
   imageUrls?: string[];
   shortNote?: string | null;
@@ -159,6 +160,10 @@ export async function createProduct(input: ProductCreateInput) {
     input.kind === ProductKind.secondhand
       ? clampDiscountPercent(input.discountPercent ?? 0)
       : 0;
+  const stock =
+    input.kind === ProductKind.secondhand
+      ? Math.max(0, Math.round(input.stock ?? 1))
+      : 0;
 
   const created = await prisma.product.create({
     data: {
@@ -167,6 +172,7 @@ export async function createProduct(input: ProductCreateInput) {
       categoryId: input.categoryId,
       price: input.price,
       discountPercent,
+      stock,
       imageUrl: gallery.imageUrl,
       imageUrls: gallery.imageUrls,
       shortNote: input.shortNote || null,
@@ -185,12 +191,13 @@ export async function createProduct(input: ProductCreateInput) {
 }
 
 export async function importProductsFromCsvRows(
-  rows: Array<{
+    rows: Array<{
     kind: ProductKind;
     title: string;
     category: string;
     price: number;
     discountPercent?: number;
+    stock?: number;
     imageUrl: string | null;
     imageUrls?: string[];
     shortNote: string | null;
@@ -226,6 +233,7 @@ export async function importProductsFromCsvRows(
         categoryId: category.id,
         price: row.price,
         discountPercent: row.discountPercent,
+        stock: row.stock,
         imageUrl: row.imageUrl,
         imageUrls: row.imageUrls,
         shortNote: row.shortNote,
@@ -283,8 +291,12 @@ export async function updateProduct(id: number, input: ProductUpdateInput) {
     if (input.discountPercent !== undefined) {
       data.discountPercent = clampDiscountPercent(input.discountPercent);
     }
+    if (input.stock !== undefined) {
+      data.stock = Math.max(0, Math.round(input.stock));
+    }
   } else if (kind === ProductKind.deal) {
     data.discountPercent = 0;
+    data.stock = 0;
     if (input.shopName !== undefined) data.shopName = input.shopName || null;
     if (input.affiliateLink !== undefined) {
       data.affiliateLink = input.affiliateLink || null;
@@ -292,6 +304,9 @@ export async function updateProduct(id: number, input: ProductUpdateInput) {
   } else {
     if (input.discountPercent !== undefined) {
       data.discountPercent = clampDiscountPercent(input.discountPercent);
+    }
+    if (input.stock !== undefined) {
+      data.stock = Math.max(0, Math.round(input.stock));
     }
     if (input.shopName !== undefined) data.shopName = input.shopName || null;
     if (input.affiliateLink !== undefined) {

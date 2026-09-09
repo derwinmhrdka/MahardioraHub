@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { CheckCircle2, MapPin, Tag } from "lucide-react";
+import { MapPin, Package, Tag } from "lucide-react";
+import { AddToCartButton } from "@/components/AddToCartButton";
 import { Header } from "@/components/Header";
 import { ProductImageSlider } from "@/components/ProductImageSlider";
 import { ProductNote } from "@/components/ProductNote";
@@ -83,11 +84,22 @@ export default async function SecondhandItemPage({ params }: PageProps) {
                 </span>
               ) : null}
               <span className={styles.metaItem}>
-                <CheckCircle2 size={11} strokeWidth={2} aria-hidden />
-                Tersedia
+                <Package size={11} strokeWidth={2} aria-hidden />
+                {product.stock}
               </span>
             </div>
-            <WhatsAppButton href={whatsappHref} label="Chat WA" />
+            <div className={styles.actions}>
+              <WhatsAppButton
+                href={whatsappHref}
+                label="Chat WA"
+                disabled={product.stock <= 0}
+              />
+              <AddToCartButton
+                productId={product.id}
+                next={`/secondhand/${product.id}`}
+                stock={product.stock}
+              />
+            </div>
           </div>
         </article>
       </main>

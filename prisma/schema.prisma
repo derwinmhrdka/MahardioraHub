@@ -27,6 +27,7 @@ model Product {
   category      Category    @relation(fields: [categoryId], references: [id])
   price         Int
   discountPercent Float     @default(0)
+  stock         Int         @default(1)
   imageUrl      String?
   imageUrls     String[]    @default([])
   shortNote     String?
@@ -36,6 +37,7 @@ model Product {
   isActive      Boolean     @default(true)
   createdAt     DateTime    @default(now())
   clicks        Click[]
+  cartItems     CartItem[]
 }
 
 model Click {
@@ -61,13 +63,14 @@ enum UserRole {
 
 /** Google-authenticated users (visitors + admins). */
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
+  id        String     @id @default(cuid())
+  email     String     @unique
   name      String?
   image     String?
-  role      UserRole @default(visitor)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  role      UserRole   @default(visitor)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  cartItems CartItem[]
 }
 
 /** Emails allowed to access /admin after Google login. */
@@ -75,6 +78,20 @@ model AdminAllowlist {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   createdAt DateTime @default(now())
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId])
+  @@index([userId])
 }
 
 // Future: InboxLink model (rawLink, telegramChatId, status) for Telegram bot product intake.

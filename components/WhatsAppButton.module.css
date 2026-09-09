@@ -28,6 +28,24 @@
   box-shadow: 1px 1px 0 #128c7e;
 }
 
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+  transform: none;
+  filter: grayscale(1);
+  box-shadow: 1px 1px 0 #9a9a9a;
+  border-color: #9a9a9a;
+  background: #b7cfc0;
+  color: #fff;
+}
+
+.btn:disabled:hover {
+  background: #b7cfc0;
+  transform: none;
+  box-shadow: 1px 1px 0 #9a9a9a;
+  filter: grayscale(1);
+}
+
 .btn svg {
   flex-shrink: 0;
 }

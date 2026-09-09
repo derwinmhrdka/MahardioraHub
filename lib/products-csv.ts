@@ -7,6 +7,7 @@ export const PRODUCT_CSV_HEADERS = [
   "category",
   "price",
   "discountPercent",
+  "stock",
   "imageUrl",
   "imageUrls",
   "shortNote",
@@ -22,6 +23,7 @@ export type ProductCsvRow = {
   category: string;
   price: number;
   discountPercent: number;
+  stock: number;
   imageUrl: string | null;
   imageUrls: string[];
   shortNote: string | null;
@@ -51,6 +53,7 @@ export function productCsvTemplate(): string {
       "electronics",
       "99000",
       "0",
+      "0",
       "https://example.com/image.jpg",
       "https://example.com/image.jpg|https://example.com/image-2.jpg",
       "Short note",
@@ -65,6 +68,7 @@ export function productCsvTemplate(): string {
       "home",
       "150000",
       "0",
+      "1",
       "",
       "",
       "Good condition",
@@ -83,6 +87,7 @@ export function productsToCsv(
     category: { slug: string };
     price: number;
     discountPercent?: number | null;
+    stock?: number | null;
     imageUrl: string | null;
     imageUrls?: string[] | null;
     shortNote: string | null;
@@ -103,6 +108,11 @@ export function productsToCsv(
       String(
         product.kind === ProductKind.secondhand
           ? clampDiscountPercent(product.discountPercent ?? 0)
+          : 0
+      ),
+      String(
+        product.kind === ProductKind.secondhand
+          ? Math.max(0, Math.round(product.stock ?? 0))
           : 0
       ),
       product.imageUrl ?? gallery[0] ?? "",
@@ -219,6 +229,14 @@ export function parseProductCsv(text: string): {
             discountRaw === "" ? 0 : Number(discountRaw)
           )
         : 0;
+    const stockRaw = get("stock");
+    const stock =
+      kind === ProductKind.secondhand
+        ? Math.max(
+            0,
+            Math.round(stockRaw === "" ? 1 : Number(stockRaw) || 0)
+          )
+        : 0;
 
     rows.push({
       kind,
@@ -226,6 +244,7 @@ export function parseProductCsv(text: string): {
       category,
       price: Math.round(price),
       discountPercent,
+      stock,
       imageUrl: imageUrls[0] ?? imageUrl,
       imageUrls,
       shortNote: get("shortNote") || null,

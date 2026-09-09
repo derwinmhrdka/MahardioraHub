@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { DevLoginButtons } from "@/components/DevLoginButtons";
 import { GoogleLoginButton } from "@/components/GoogleLoginButton";
 import { getSettings } from "@/lib/settings";
 import styles from "./login.module.css";
@@ -11,6 +12,7 @@ type PageProps = {
 export default async function LoginPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const session = await auth();
+  const isDev = process.env.NODE_ENV !== "production";
 
   if (session?.user?.role === "admin") {
     redirect("/admin/products");
@@ -47,7 +49,11 @@ export default async function LoginPage({ searchParams }: PageProps) {
 
         <p className={styles.brand}>{siteName}</p>
 
-        <GoogleLoginButton next={next} />
+        {isDev ? (
+          <DevLoginButtons next={next} />
+        ) : (
+          <GoogleLoginButton next={next} />
+        )}
 
         {params.error ? <p className={styles.error} aria-label="Gagal" /> : null}
       </div>

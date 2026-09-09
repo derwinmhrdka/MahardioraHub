@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 13000",
+    "dev": "node scripts/free-port.mjs 13000 && next dev -p 13000",
     "build": "prisma generate && next build",
     "start": "next start -p 13000",
     "lint": "next lint",

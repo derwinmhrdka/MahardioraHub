@@ -179,3 +179,40 @@
     grid-template-columns: 48px minmax(0, 1fr) auto;
   }
 }
+
+.rowSoldOut {
+  background: #e8e8e8;
+  border-color: #9a9a9a;
+  box-shadow: 1px 1px 0 #9a9a9a;
+  filter: grayscale(1);
+}
+
+.rowSoldOut:hover {
+  box-shadow: 2px 2px 0 #9a9a9a;
+}
+
+.rowSoldOut .rowTitle,
+.rowSoldOut .rowNote,
+.rowSoldOut .rowPrice,
+.rowSoldOut .metaItem {
+  color: #6b6b6b;
+}
+
+.rowSoldBadge {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  padding: 0.1rem;
+  background: rgba(255, 255, 255, 0.72);
+  color: #111;
+  font-family: var(--font-display-stack);
+  font-size: 0.42rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  text-align: center;
+  line-height: 1.1;
+  pointer-events: none;
+}
+

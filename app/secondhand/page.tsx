@@ -51,6 +51,7 @@ export default async function SecondhandPage({ searchParams }: PageProps) {
     title: product.title,
     price: product.price,
     discountPercent: product.discountPercent,
+    stock: product.stock,
     shortNote: product.shortNote,
     imageUrl: product.imageUrl,
     categoryName: product.category.name,
