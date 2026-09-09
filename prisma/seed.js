@@ -7,6 +7,8 @@ async function main() {
   await prisma.product.deleteMany();
   await prisma.category.deleteMany();
   await prisma.setting.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.adminAllowlist.deleteMany();
 
   await prisma.setting.create({
     data: {
@@ -17,6 +19,13 @@ async function main() {
       contactEmail: "hello@dealhub.local",
       shopeeAffiliateId: null,
     },
+  });
+
+  await prisma.adminAllowlist.createMany({
+    data: [
+      { email: "derwinmahardika@gmail.com" },
+      { email: "anggitamahardika@gmail.com" },
+    ],
   });
 
   const electronics = await prisma.category.create({

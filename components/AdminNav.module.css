@@ -41,6 +41,32 @@
   letter-spacing: 0.01em;
 }
 
+.topRight {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  overflow: hidden;
+  border: var(--stroke) solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  font-size: 0.8rem;
+  font-weight: 800;
+  box-shadow: 1px 1px 0 #111;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .logout {
   display: grid;
   place-items: center;

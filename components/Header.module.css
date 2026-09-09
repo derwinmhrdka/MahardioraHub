@@ -46,6 +46,12 @@
   gap: 0.35rem;
 }
 
+.right {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
 .nav a {
   display: inline-flex;
   align-items: center;

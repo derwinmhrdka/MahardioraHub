@@ -1,15 +1,19 @@
 import Link from "next/link";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Shield, ShieldOff, Trash2, UserRound } from "lucide-react";
 import { listCategories } from "@/lib/categories";
 import { getSettings } from "@/lib/settings";
+import { listAdminAllowlist, listVisitorUsers } from "@/lib/users";
 import {
+  addAdminAction,
   createCategoryAction,
   deleteCategoryAction,
+  makeAdminAction,
+  revokeAdminAction,
   updateSettingsAction,
 } from "./actions";
 import styles from "./settings.module.css";
 
-type Tab = "general" | "kontak" | "kategori";
+type Tab = "general" | "kontak" | "kategori" | "user";
 
 type PageProps = {
   searchParams: Promise<{
@@ -17,26 +21,33 @@ type PageProps = {
     saved?: string;
     catSaved?: string;
     catError?: string;
+    userSaved?: string;
+    userError?: string;
   }>;
 };
 
 function parseTab(raw: string | undefined): Tab {
-  if (raw === "kontak" || raw === "kategori") return raw;
+  if (raw === "kontak" || raw === "kategori" || raw === "user") return raw;
   return "general";
 }
 
 export default async function AdminSettingsPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const tab = parseTab(params.tab);
-  const [settings, categories] = await Promise.all([
+  const [settings, categories, admins, visitors] = await Promise.all([
     getSettings(),
     listCategories(),
+    tab === "user" ? listAdminAllowlist() : Promise.resolve([]),
+    tab === "user" ? listVisitorUsers() : Promise.resolve([]),
   ]);
 
   const showSaved =
     (params.saved && (tab === "general" || tab === "kontak")) ||
-    (params.catSaved && tab === "kategori");
-  const showCatError = params.catError && tab === "kategori";
+    (params.catSaved && tab === "kategori") ||
+    (params.userSaved && tab === "user");
+  const showError =
+    (params.catError && tab === "kategori") ||
+    (params.userError && tab === "user");
 
   return (
     <>
@@ -67,10 +78,18 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
         >
           Kategori
         </Link>
+        <Link
+          href="/admin/settings?tab=user"
+          role="tab"
+          aria-selected={tab === "user"}
+          className={`${styles.tab} ${tab === "user" ? styles.tabOn : ""}`}
+        >
+          User
+        </Link>
       </div>
 
       {showSaved ? <p className="success">OK</p> : null}
-      {showCatError ? <p className="error">Gagal</p> : null}
+      {showError ? <p className="error">Gagal</p> : null}
 
       {tab === "general" ? (
         <form action={updateSettingsAction} className="form admin-form">
@@ -183,6 +202,114 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
               <Plus size={16} strokeWidth={2.25} aria-hidden />
             </button>
           </form>
+        </section>
+      ) : null}
+
+      {tab === "user" ? (
+        <section aria-label="User" className={styles.userPanel}>
+          <div className={styles.userBlock}>
+            <div className={styles.userHead} aria-hidden>
+              <Shield size={14} strokeWidth={2.25} />
+            </div>
+
+            <ul className={styles.userList}>
+              {admins.length === 0 ? (
+                <li className={styles.catEmpty}>—</li>
+              ) : (
+                admins.map((admin) => (
+                  <li key={admin.email} className={styles.userRow}>
+                    <span className={styles.userAvatar} aria-hidden>
+                      {admin.image ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={admin.image}
+                          alt=""
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <UserRound size={14} strokeWidth={2.25} />
+                      )}
+                    </span>
+                    <span className={styles.userMeta}>
+                      <span className={styles.userEmail}>{admin.email}</span>
+                    </span>
+                    <form action={revokeAdminAction}>
+                      <input type="hidden" name="email" value={admin.email} />
+                      <button
+                        type="submit"
+                        className={`${styles.iconBtn} ${styles.iconWarn}`}
+                        aria-label="Revoke"
+                        title="Revoke"
+                      >
+                        <ShieldOff size={14} strokeWidth={2.25} aria-hidden />
+                      </button>
+                    </form>
+                  </li>
+                ))
+              )}
+            </ul>
+
+            <form action={addAdminAction} className={styles.addRow}>
+              <input
+                name="email"
+                type="email"
+                placeholder="email"
+                aria-label="Email"
+                required
+              />
+              <button
+                type="submit"
+                className={styles.iconBtn}
+                aria-label="Admin"
+                title="Admin"
+              >
+                <Shield size={16} strokeWidth={2.25} aria-hidden />
+              </button>
+            </form>
+          </div>
+
+          <div className={styles.userBlock}>
+            <div className={styles.userHead} aria-hidden>
+              <UserRound size={14} strokeWidth={2.25} />
+            </div>
+
+            <ul className={styles.userList}>
+              {visitors.length === 0 ? (
+                <li className={styles.catEmpty}>—</li>
+              ) : (
+                visitors.map((visitor) => (
+                  <li key={visitor.id} className={styles.userRow}>
+                    <span className={styles.userAvatar} aria-hidden>
+                      {visitor.image ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={visitor.image}
+                          alt=""
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <UserRound size={14} strokeWidth={2.25} />
+                      )}
+                    </span>
+                    <span className={styles.userMeta}>
+                      <span className={styles.userEmail}>{visitor.email}</span>
+                    </span>
+                    <form action={makeAdminAction}>
+                      <input type="hidden" name="email" value={visitor.email} />
+                      <button
+                        type="submit"
+                        className={styles.iconBtn}
+                        aria-label="Admin"
+                        title="Admin"
+                      >
+                        <Shield size={14} strokeWidth={2.25} aria-hidden />
+                      </button>
+                    </form>
+                  </li>
+                ))
+              )}
+            </ul>
+          </div>
         </section>
       ) : null}
     </>

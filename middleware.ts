@@ -1,28 +1,32 @@
-import { NextRequest, NextResponse } from "next/server";
-import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth";
+import NextAuth from "next-auth";
+import { NextResponse } from "next/server";
+import { authConfig } from "@/auth.config";
 
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const token = request.cookies.get(SESSION_COOKIE)?.value;
-  const isAuthed = await verifySessionToken(token);
+const { auth } = NextAuth(authConfig);
+
+export default auth((req) => {
+  const { pathname } = req.nextUrl;
+  const isAdmin = req.auth?.user?.role === "admin";
+
+  if (!pathname.startsWith("/admin")) {
+    return NextResponse.next();
+  }
+
+  if (!isAdmin) {
+    if (req.auth?.user) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+    const login = new URL("/login", req.url);
+    login.searchParams.set("next", pathname);
+    return NextResponse.redirect(login);
+  }
 
   if (pathname === "/admin" || pathname === "/admin/") {
-    if (isAuthed) {
-      return NextResponse.redirect(new URL("/admin/products", request.url));
-    }
-    return NextResponse.next();
-  }
-
-  if (pathname.startsWith("/admin/logout")) {
-    return NextResponse.next();
-  }
-
-  if (!isAuthed) {
-    return NextResponse.redirect(new URL("/admin", request.url));
+    return NextResponse.redirect(new URL("/admin/products", req.url));
   }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
   matcher: ["/admin", "/admin/:path*"],

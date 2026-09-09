@@ -35,8 +35,11 @@ services:
         condition: service_completed_successfully
     environment:
       DATABASE_URL: postgresql://dealhub:dealhub@db:5432/dealhub
-      ADMIN_USER: ${ADMIN_USER:-admin}
-      ADMIN_PASS: ${ADMIN_PASS:-changeme}
+      AUTH_SECRET: ${AUTH_SECRET:-change-me-to-a-long-random-string}
+      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID:-}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET:-}
+      AUTH_URL: ${AUTH_URL:-}
+      DOMAIN: ${DOMAIN:-mahardiora-hub.teknodika.com}
       # Inside the container only — does not use host :3000 / :3001
       PORT: "3000"
       NODE_ENV: production

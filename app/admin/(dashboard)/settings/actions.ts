@@ -3,9 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createCategory, deleteCategory } from "@/lib/categories";
+import { requireAdmin } from "@/lib/auth";
 import { getSettings, updateSettings } from "@/lib/settings";
+import { grantAdminByEmail, revokeAdminByEmail } from "@/lib/users";
 
 export async function updateSettingsAction(formData: FormData) {
+  await requireAdmin();
   const current = await getSettings();
   const section = String(formData.get("section") ?? "general");
 
@@ -47,7 +50,9 @@ export async function updateSettingsAction(formData: FormData) {
   revalidatePath("/secondhand");
   revalidatePath("/admin/settings");
   revalidatePath("/admin/products/new");
-  redirect(`/admin/settings?tab=${section === "kontak" ? "kontak" : "general"}&saved=1`);
+  redirect(
+    `/admin/settings?tab=${section === "kontak" ? "kontak" : "general"}&saved=1`
+  );
 }
 
 function revalidateCategoryPaths() {
@@ -59,6 +64,7 @@ function revalidateCategoryPaths() {
 }
 
 export async function createCategoryAction(formData: FormData) {
+  await requireAdmin();
   const name = String(formData.get("name") ?? "").trim();
   if (!name) {
     redirect("/admin/settings?tab=kategori&catError=1");
@@ -73,6 +79,7 @@ export async function createCategoryAction(formData: FormData) {
 }
 
 export async function deleteCategoryAction(formData: FormData) {
+  await requireAdmin();
   const id = Number(formData.get("id"));
   if (!Number.isFinite(id)) {
     redirect("/admin/settings?tab=kategori&catError=1");
@@ -84,4 +91,44 @@ export async function deleteCategoryAction(formData: FormData) {
   }
   revalidateCategoryPaths();
   redirect("/admin/settings?tab=kategori&catSaved=1");
+}
+
+function revalidateUserTab() {
+  revalidatePath("/admin/settings");
+}
+
+export async function addAdminAction(formData: FormData) {
+  await requireAdmin();
+  const email = String(formData.get("email") ?? "").trim();
+  try {
+    await grantAdminByEmail(email);
+  } catch {
+    redirect("/admin/settings?tab=user&userError=1");
+  }
+  revalidateUserTab();
+  redirect("/admin/settings?tab=user&userSaved=1");
+}
+
+export async function makeAdminAction(formData: FormData) {
+  await requireAdmin();
+  const email = String(formData.get("email") ?? "").trim();
+  try {
+    await grantAdminByEmail(email);
+  } catch {
+    redirect("/admin/settings?tab=user&userError=1");
+  }
+  revalidateUserTab();
+  redirect("/admin/settings?tab=user&userSaved=1");
+}
+
+export async function revokeAdminAction(formData: FormData) {
+  await requireAdmin();
+  const email = String(formData.get("email") ?? "").trim();
+  try {
+    await revokeAdminByEmail(email);
+  } catch {
+    redirect("/admin/settings?tab=user&userError=1");
+  }
+  revalidateUserTab();
+  redirect("/admin/settings?tab=user&userSaved=1");
 }

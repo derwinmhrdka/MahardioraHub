@@ -54,4 +54,27 @@ model Setting {
   shopeeAffiliateId String? // used by admin optional an_redir link helper
 }
 
+enum UserRole {
+  visitor
+  admin
+}
+
+/** Google-authenticated users (visitors + admins). */
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  image     String?
+  role      UserRole @default(visitor)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/** Emails allowed to access /admin after Google login. */
+model AdminAllowlist {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
 // Future: InboxLink model (rawLink, telegramChatId, status) for Telegram bot product intake.

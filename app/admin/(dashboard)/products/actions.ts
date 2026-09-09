@@ -15,20 +15,12 @@ import { fetchProductLinkMeta } from "@/lib/link-meta";
 import { findOrCreateCategoryByName } from "@/lib/categories";
 import { parseImageUrlsField } from "@/lib/product-images";
 import { clampDiscountPercent } from "@/lib/pricing";
-import { cookies } from "next/headers";
-import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth";
+import { requireAdmin } from "@/lib/auth";
 import {
   MAX_UPLOAD_COUNT,
   saveProductImage,
 } from "@/lib/uploads";
 import { cleanupRemovedUploads } from "@/lib/upload-gc";
-
-async function requireAdmin() {
-  const token = (await cookies()).get(SESSION_COOKIE)?.value;
-  if (!(await verifySessionToken(token))) {
-    throw new Error("Unauthorized");
-  }
-}
 
 async function parseProductForm(formData: FormData) {
   const kind = String(formData.get("kind") ?? "") as ProductKind;
