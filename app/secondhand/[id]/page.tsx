@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { MapPin, Package, Tag } from "lucide-react";
+import Link from "next/link";
+import { ArrowLeft, MapPin, Package, Tag } from "lucide-react";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { Header } from "@/components/Header";
 import { ProductImageSlider } from "@/components/ProductImageSlider";
@@ -60,6 +61,14 @@ export default async function SecondhandItemPage({ params }: PageProps) {
     <div className="section-secondhand">
       <Header siteName={settings.siteName} active="secondhand" />
       <main className="container">
+        <Link
+          href="/secondhand"
+          className={styles.back}
+          aria-label="Kembali"
+          title="Kembali"
+        >
+          <ArrowLeft size={16} strokeWidth={2.5} aria-hidden />
+        </Link>
         <article className={styles.detail}>
           <ProductImageSlider images={productImages(product)} alt={product.title} />
           <div className={styles.meta}>

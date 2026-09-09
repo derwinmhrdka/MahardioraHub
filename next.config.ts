@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "12mb",
     },
+    middlewareClientMaxBodySize: "12mb",
   },
   // Avoid webpack pack cache filling the disk during Docker builds (ENOSPC).
   webpack: (config, { dev }) => {

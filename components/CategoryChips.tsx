@@ -1,11 +1,16 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
 import {
   Baby,
   Home,
   LayoutGrid,
+  Search,
   Smartphone,
   Tag,
+  X,
 } from "lucide-react";
 import { withFilters } from "@/lib/urls";
 import styles from "./CategoryChips.module.css";
@@ -22,6 +27,8 @@ type CategoryChipsProps = {
   mode?: "deals" | "secondhand";
   area?: string | null;
   platform?: string | null;
+  query?: string;
+  onQueryChange?: (query: string) => void;
 };
 
 function iconForSlug(slug: string) {
@@ -40,18 +47,94 @@ export function CategoryChips({
   mode = "deals",
   area = null,
   platform = null,
+  query = "",
+  onQueryChange,
 }: CategoryChipsProps) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const allHref =
     mode === "secondhand"
       ? withFilters("/secondhand", { area, platform })
       : withFilters("/", { area, platform });
 
+  useEffect(() => {
+    if (!open) return;
+    inputRef.current?.focus();
+
+    function onPointer(e: MouseEvent) {
+      if (!rootRef.current?.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+
+    document.addEventListener("mousedown", onPointer);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
   return (
-    <div className={styles.wrap}>
-      <nav className={styles.chips} aria-label="Kategori">
+    <div
+      ref={rootRef}
+      className={clsx(styles.wrap, open && styles.searchOpen)}
+    >
+      <div className={clsx(styles.searchSlot, open && styles.searchSlotOpen)}>
+        {open ? (
+          <div className={styles.searchField}>
+            <Search size={14} strokeWidth={2.25} aria-hidden />
+            <input
+              ref={inputRef}
+              type="search"
+              className={styles.searchInput}
+              value={query}
+              placeholder="Cari"
+              aria-label="Cari"
+              onChange={(e) => onQueryChange?.(e.target.value)}
+            />
+            {query ? (
+              <button
+                type="button"
+                className={styles.clear}
+                aria-label="Clear"
+                title="Clear"
+                onClick={() => {
+                  onQueryChange?.("");
+                  inputRef.current?.focus();
+                }}
+              >
+                <X size={12} strokeWidth={2.5} aria-hidden />
+              </button>
+            ) : null}
+          </div>
+        ) : (
+          <button
+            type="button"
+            className={styles.searchBtn}
+            aria-label="Cari"
+            title="Cari"
+            onClick={() => setOpen(true)}
+          >
+            <Search size={14} strokeWidth={2.25} aria-hidden />
+          </button>
+        )}
+      </div>
+
+      <nav
+        className={clsx(styles.chips, open && styles.chipsMin)}
+        aria-label="Kategori"
+        aria-hidden={open}
+      >
         <Link
           href={allHref}
           className={clsx(styles.chip, activeSlug == null && styles.active)}
+          tabIndex={open ? -1 : undefined}
         >
           <LayoutGrid size={10} strokeWidth={2} aria-hidden />
           Semua
@@ -76,6 +159,7 @@ export function CategoryChips({
                 styles.chip,
                 activeSlug === category.slug && styles.active
               )}
+              tabIndex={open ? -1 : undefined}
             >
               <Icon size={10} strokeWidth={2} aria-hidden />
               {label}

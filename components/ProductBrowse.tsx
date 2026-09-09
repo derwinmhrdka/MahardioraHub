@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
 import {
@@ -61,7 +61,24 @@ export function ProductBrowse({
 }: ProductBrowseProps) {
   const [view, setView] = useState<ViewMode>("card");
   const [filterOpen, setFilterOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const filterActive = Boolean(activeArea || activePlatform);
+
+  const filteredItems = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return items;
+    return items.filter((item) => {
+      const haystack = [
+        item.title,
+        item.shortNote ?? "",
+        item.categoryName ?? "",
+        item.storeArea ?? "",
+      ]
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [items, query]);
 
   useEffect(() => {
     const saved = window.localStorage.getItem(STORAGE_KEY);
@@ -133,16 +150,18 @@ export function ProductBrowse({
           mode={mode}
           area={activeArea}
           platform={activePlatform}
+          query={query}
+          onQueryChange={setQuery}
         />
       </div>
 
-      {items.length === 0 ? (
+      {filteredItems.length === 0 ? (
         <div className="empty">
           <EmptyIcon size={24} strokeWidth={1.5} aria-hidden />
           <p>{emptyText}</p>
         </div>
       ) : (
-        <ProductCatalog label={label} items={items} view={view} />
+        <ProductCatalog label={label} items={filteredItems} view={view} />
       )}
 
       <nav className={styles.dock} aria-label="Catalog tools">

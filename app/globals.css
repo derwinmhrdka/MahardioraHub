@@ -406,13 +406,8 @@ p {
 }
 
 .form-actions {
-  position: sticky;
-  bottom: calc(5.25rem + env(safe-area-inset-bottom));
-  z-index: 20;
-  margin: 0.35rem -0.75rem -0.25rem;
-  padding: 0.55rem 0.75rem;
-  background: var(--color-bg);
-  border-top: var(--stroke) solid var(--color-border);
+  margin: 0.85rem 0 0;
+  padding: 0;
 }
 
 .form-actions .btn {
@@ -493,11 +488,7 @@ p {
   }
 
   .form-actions {
-    position: static;
-    margin: 0;
-    padding: 0;
-    background: none;
-    border-top: none;
+    margin-top: 1rem;
   }
 
   .form-actions .btn {

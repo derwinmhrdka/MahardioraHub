@@ -6,6 +6,35 @@
   min-width: 0;
 }
 
+.back {
+  display: inline-grid;
+  place-items: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  margin: 0 0 0.65rem;
+  border: var(--stroke) solid #111;
+  border-radius: 999px;
+  background: #fff;
+  color: #111;
+  box-shadow: 1px 1px 0 #111;
+  text-decoration: none;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.back:hover {
+  background: #111;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.back:active {
+  transform: translate(1px, 1px);
+  box-shadow: 0 0 0 #111;
+}
+
 @media (min-width: 720px) {
   .detail {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

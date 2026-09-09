@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import {
   deleteUploadedImageAction,
-  uploadProductImagesAction,
 } from "@/app/admin/(dashboard)/products/actions";
 import { MAX_UPLOAD_COUNT } from "@/lib/uploads-shared";
 import styles from "./ProductForm.module.css";
@@ -101,8 +100,20 @@ export function ImageGalleryField({ urls, onChange }: ImageGalleryFieldProps) {
 
     startTransition(async () => {
       try {
-        const result = await uploadProductImagesAction(formData);
-        onChange(Array.from(new Set([...urlsRef.current, ...result.urls])));
+        const result = await fetch("/api/uploads", {
+          method: "POST",
+          body: formData,
+        });
+        const data = (await result.json().catch(() => null)) as
+          | { urls?: string[]; error?: string }
+          | null;
+        if (!result.ok) {
+          throw new Error(data?.error || "Gagal");
+        }
+        if (!data?.urls?.length) {
+          throw new Error("Gagal");
+        }
+        onChange(Array.from(new Set([...urlsRef.current, ...data.urls])));
       } catch (e) {
         setError(e instanceof Error ? e.message : "Gagal");
       } finally {

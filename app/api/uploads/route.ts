@@ -1,0 +1,44 @@
+import { NextResponse } from "next/server";
+import { auth } from "@/auth";
+import { MAX_UPLOAD_COUNT, saveProductImage } from "@/lib/uploads";
+
+export const runtime = "nodejs";
+
+export async function POST(request: Request) {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  let formData: FormData;
+  try {
+    formData = await request.formData();
+  } catch {
+    return NextResponse.json({ error: "Payload terlalu besar" }, { status: 413 });
+  }
+
+  const files = formData
+    .getAll("files")
+    .filter((entry): entry is File => entry instanceof File && entry.size > 0);
+
+  if (files.length === 0) {
+    return NextResponse.json({ error: "Pilih file" }, { status: 400 });
+  }
+  if (files.length > MAX_UPLOAD_COUNT) {
+    return NextResponse.json(
+      { error: `Max ${MAX_UPLOAD_COUNT} file` },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const urls: string[] = [];
+    for (const file of files) {
+      urls.push(await saveProductImage(file));
+    }
+    return NextResponse.json({ urls });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Gagal";
+    return NextResponse.json({ error: message }, { status: 400 });
+  }
+}

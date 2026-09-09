@@ -1,22 +1,133 @@
 .wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   margin: 0;
   padding: 0;
   min-width: 0;
 }
 
+.searchSlot {
+  flex: 0 0 auto;
+  min-width: 1.95rem;
+  transition: flex 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    min-width 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.searchSlotOpen {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.searchBtn {
+  display: grid;
+  place-items: center;
+  width: 1.95rem;
+  height: 1.95rem;
+  padding: 0;
+  border: var(--stroke) solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: #111;
+  box-shadow: 1px 1px 0 #111;
+  cursor: pointer;
+}
+
+.searchBtn:hover {
+  background: #111;
+  color: #fff;
+}
+
+.searchField {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  min-height: 1.95rem;
+  padding: 0.2rem 0.45rem 0.2rem 0.55rem;
+  border: var(--stroke) solid #111;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 1px 1px 0 #111;
+  animation: searchIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.searchField svg {
+  flex-shrink: 0;
+  color: #111;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  outline: none;
+  font-family: var(--font-body-stack);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #111;
+  box-shadow: none !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+
+.searchInput::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.clear {
+  display: grid;
+  place-items: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  padding: 0;
+  border: 1px solid #111;
+  border-radius: 999px;
+  background: #f7f3eb;
+  color: #111;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.clear:hover {
+  background: #111;
+  color: #fff;
+}
+
 .chips {
   display: flex;
   gap: 0.4rem;
+  flex: 1 1 auto;
+  min-width: 0;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   padding: 0.1rem 0;
   overscroll-behavior-x: contain;
+  opacity: 1;
+  max-width: 100%;
+  transform: translateX(0);
+  transition:
+    opacity 0.22s ease,
+    max-width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    flex 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .chips::-webkit-scrollbar {
   display: none;
+}
+
+.chipsMin {
+  flex: 0 0 0;
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translateX(0.5rem);
 }
 
 .chip {
@@ -50,4 +161,26 @@
 
 .active svg {
   color: #fff;
+}
+
+@keyframes searchIn {
+  from {
+    opacity: 0.4;
+    transform: scaleX(0.86);
+    transform-origin: left center;
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .searchSlot,
+  .chips,
+  .searchField {
+    transition: none;
+    animation: none;
+  }
 }

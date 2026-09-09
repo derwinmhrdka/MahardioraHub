@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { MapPin, Store, Tag } from "lucide-react";
+import Link from "next/link";
+import { ArrowLeft, MapPin, Store, Tag } from "lucide-react";
 import { DealCta } from "@/components/DealCta";
 import { Header } from "@/components/Header";
 import { ProductCard } from "@/components/ProductCard";
@@ -54,6 +55,14 @@ export default async function DealProductPage({ params }: PageProps) {
     <div className="section-deals">
       <Header siteName={settings.siteName} active="deals" />
       <main className="container">
+        <Link
+          href="/"
+          className={styles.back}
+          aria-label="Kembali"
+          title="Kembali"
+        >
+          <ArrowLeft size={16} strokeWidth={2.5} aria-hidden />
+        </Link>
         <article className={styles.detail}>
           <ProductImageSlider images={productImages(product)} alt={product.title} />
           <div className={styles.meta}>

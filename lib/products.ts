@@ -76,10 +76,17 @@ export async function listDealsByCategory(
 }
 
 export async function listActiveSecondhand(filters: ProductListFilters = {}) {
-  return prisma.product.findMany({
+  const rows = await prisma.product.findMany({
     where: activeWhere(ProductKind.secondhand, filters),
     include: productInclude,
     orderBy: { createdAt: "desc" },
+  });
+
+  return rows.sort((a, b) => {
+    const aSold = a.stock <= 0 ? 1 : 0;
+    const bSold = b.stock <= 0 ? 1 : 0;
+    if (aSold !== bSold) return aSold - bSold;
+    return b.createdAt.getTime() - a.createdAt.getTime();
   });
 }
 

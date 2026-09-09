@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  ExternalLink,
+  Home,
   LogOut,
   Package,
   Settings,
@@ -107,13 +107,8 @@ export function AdminNav({ siteName, userImage, userName }: AdminNavProps) {
           <Settings size={14} strokeWidth={2.25} aria-hidden />
           <span>Settings</span>
         </Link>
-        <Link
-          href="/"
-          className={styles.tab}
-          target="_blank"
-          rel="noreferrer"
-        >
-          <ExternalLink size={14} strokeWidth={2.25} aria-hidden />
+        <Link href="/" className={styles.tab}>
+          <Home size={14} strokeWidth={2.25} aria-hidden />
           <span>Site</span>
         </Link>
       </nav>

@@ -18,6 +18,13 @@ async function requireUserId() {
   return id;
 }
 
+function revalidateCartViews(productId?: number) {
+  revalidatePath("/secondhand");
+  if (productId != null && Number.isFinite(productId)) {
+    revalidatePath(`/secondhand/${productId}`);
+  }
+}
+
 export async function addToCartAction(formData: FormData) {
   const session = await auth();
   const userId = session?.user?.id;
@@ -41,10 +48,10 @@ export async function addToCartAction(formData: FormData) {
   try {
     await addToCart(userId, productId, 1);
   } catch {
-    redirect(returnTo);
+    return;
   }
-  revalidatePath("/secondhand");
-  redirect(returnTo);
+
+  revalidateCartViews(productId);
 }
 
 export async function updateCartQtyAction(formData: FormData) {
@@ -55,7 +62,7 @@ export async function updateCartQtyAction(formData: FormData) {
     throw new Error("Invalid");
   }
   await setCartQuantity(userId, productId, quantity);
-  revalidatePath("/secondhand");
+  revalidateCartViews(productId);
 }
 
 export async function removeCartItemAction(formData: FormData) {
@@ -63,5 +70,5 @@ export async function removeCartItemAction(formData: FormData) {
   const productId = Number(formData.get("productId"));
   if (!Number.isFinite(productId)) throw new Error("Invalid");
   await removeFromCart(userId, productId);
-  revalidatePath("/secondhand");
+  revalidateCartViews(productId);
 }

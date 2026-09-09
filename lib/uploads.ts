@@ -68,7 +68,19 @@ export function resolveUploadFile(filename: string): string | null {
 }
 
 export async function saveProductImage(file: File): Promise<string> {
-  if (!ALLOWED_MIME.has(file.type)) {
+  const mime =
+    file.type ||
+    (file.name.toLowerCase().endsWith(".png")
+      ? "image/png"
+      : file.name.toLowerCase().endsWith(".webp")
+        ? "image/webp"
+        : file.name.toLowerCase().endsWith(".gif")
+          ? "image/gif"
+          : file.name.toLowerCase().match(/\.(jpe?g)$/)
+            ? "image/jpeg"
+            : "");
+
+  if (!ALLOWED_MIME.has(mime)) {
     throw new Error("Format gambar tidak didukung");
   }
   if (file.size <= 0 || file.size > MAX_UPLOAD_BYTES) {
