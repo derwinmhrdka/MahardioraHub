@@ -18,7 +18,7 @@ export function SplashScreen({ siteName }: SplashScreenProps) {
     const outTimer = window.setTimeout(() => setPhase("out"), 1100);
     const doneTimer = window.setTimeout(() => {
       setPhase("done");
-    20|      document.body.style.overflow = prev;
+      document.body.style.overflow = prev;
     }, 1650);
 
     return () => {
