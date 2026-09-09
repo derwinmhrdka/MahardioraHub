@@ -20,22 +20,11 @@
 
 .brand {
   display: flex;
-  align-items: center;
-  gap: 0.45rem;
+  flex-direction: column;
+  gap: 0;
   line-height: 1.05;
   color: var(--color-text);
   text-decoration: none;
-}
-
-.brandMark {
-  flex-shrink: 0;
-}
-
-.brandText {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  min-width: 0;
 }
 
 .brandName {
