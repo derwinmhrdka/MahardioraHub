@@ -10,6 +10,7 @@ import {
   Settings,
 } from "lucide-react";
 import { logoutAction } from "@/app/admin/actions";
+import { StoreMark } from "@/components/StoreMark";
 import styles from "./AdminNav.module.css";
 
 type AdminNavProps = {
@@ -53,8 +54,11 @@ export function AdminNav({ siteName, userImage, userName }: AdminNavProps) {
     <>
       <header className={styles.top}>
         <div className={styles.brandBlock}>
-          <span className={styles.brand}>{siteName}</span>
-          <span className={styles.brandSub}>Admin</span>
+          <StoreMark size={28} className={styles.brandMark} />
+          <span className={styles.brandCopy}>
+            <span className={styles.brand}>{siteName}</span>
+            <span className={styles.brandSub}>Admin</span>
+          </span>
         </div>
         <div className={styles.topRight} ref={rootRef}>
           <button

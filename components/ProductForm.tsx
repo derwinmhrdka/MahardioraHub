@@ -66,6 +66,9 @@ export function ProductForm({
   const [price, setPrice] = useState(
     defaults.price != null ? String(defaults.price) : ""
   );
+  const [discountRaw, setDiscountRaw] = useState(() =>
+    clampDiscountPercent(defaults.discountPercent ?? 0)
+  );
   const [discountPercent, setDiscountPercent] = useState(
     formatDiscountPercent(defaults.discountPercent ?? 0)
   );
@@ -83,22 +86,22 @@ export function ProductForm({
   function onNormalPriceChange(digits: string) {
     setPrice(digits);
     const normal = Number(digits);
-    const discount = clampDiscountPercent(Number(discountPercent) || 0);
     if (!Number.isFinite(normal)) return;
-    setTotalPrice(String(salePrice(normal, discount)));
+    setTotalPrice(String(salePrice(normal, discountRaw)));
   }
 
   function onDiscountChange(raw: string) {
-    // Allow typing decimals like 47.5
+    // Allow typing decimals like 47.5 / 42.5563
     const cleaned = raw.replace(",", ".").replace(/[^\d.]/g, "");
     const parts = cleaned.split(".");
     const normalized =
       parts.length <= 1
         ? cleaned
-        : `${parts[0]}.${parts.slice(1).join("").slice(0, 2)}`;
+        : `${parts[0]}.${parts.slice(1).join("").slice(0, 6)}`;
     setDiscountPercent(normalized);
-    const normal = Number(price);
     const discount = clampDiscountPercent(Number(normalized) || 0);
+    setDiscountRaw(discount);
+    const normal = Number(price);
     if (!Number.isFinite(normal)) return;
     setTotalPrice(String(salePrice(normal, discount)));
   }
@@ -110,7 +113,9 @@ export function ProductForm({
     if (!Number.isFinite(normal) || !Number.isFinite(total) || normal <= 0) {
       return;
     }
-    setDiscountPercent(formatDiscountPercent(discountFromSalePrice(normal, total)));
+    const raw = discountFromSalePrice(normal, total);
+    setDiscountRaw(raw);
+    setDiscountPercent(formatDiscountPercent(raw));
   }
 
   function fetchFromLink() {
@@ -266,9 +271,9 @@ export function ProductForm({
                 aria-label="Harga"
                 required
               />
+              <input type="hidden" name="discountPercent" value={discountRaw} />
               <input
                 id="discountPercent"
-                name="discountPercent"
                 type="text"
                 inputMode="decimal"
                 value={discountPercent}

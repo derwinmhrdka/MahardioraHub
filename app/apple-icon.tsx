@@ -15,7 +15,7 @@ export default function AppleIcon() {
           justifyContent: "center",
           background: "#F7F3EB",
           border: "8px solid #111",
-          borderRadius: 36,
+          borderRadius: 40,
         }}
       >
         <div
@@ -23,33 +23,58 @@ export default function AppleIcon() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: 4,
+            gap: 0,
+            transform: "rotate(-2deg)",
           }}
         >
           <div
             style={{
-              width: 96,
-              height: 36,
+              width: 108,
+              height: 42,
               background: "#111",
-              borderRadius: 4,
+              borderRadius: "22px 22px 6px 6px",
             }}
           />
           <div
             style={{
-              width: 88,
-              height: 70,
+              width: 92,
+              height: 72,
               background: "#fff",
               border: "6px solid #111",
+              borderRadius: 14,
               display: "flex",
               alignItems: "flex-end",
               justifyContent: "center",
+              gap: 14,
+              paddingBottom: 0,
             }}
           >
             <div
               style={{
-                width: 28,
-                height: 40,
+                width: 16,
+                height: 16,
+                border: "4px solid #111",
+                borderRadius: 4,
+                background: "#F7F3EB",
+                marginBottom: 22,
+              }}
+            />
+            <div
+              style={{
+                width: 26,
+                height: 42,
                 background: "#111",
+                borderRadius: "14px 14px 0 0",
+              }}
+            />
+            <div
+              style={{
+                width: 16,
+                height: 16,
+                border: "4px solid #111",
+                borderRadius: 4,
+                background: "#F7F3EB",
+                marginBottom: 22,
               }}
             />
           </div>

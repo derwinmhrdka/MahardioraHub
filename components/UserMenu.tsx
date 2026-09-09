@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { LogIn, LogOut, Shield } from "lucide-react";
 import { signOutAction } from "@/app/login/actions";
 import styles from "./UserMenu.module.css";
@@ -18,8 +19,13 @@ type UserMenuProps = {
 };
 
 export function UserMenu({ user }: UserMenuProps) {
+  const pathname = usePathname() || "/";
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const loginHref =
+    pathname.startsWith("/login")
+      ? "/login"
+      : `/login?next=${encodeURIComponent(pathname)}`;
 
   useEffect(() => {
     if (!open) return;
@@ -39,7 +45,12 @@ export function UserMenu({ user }: UserMenuProps) {
 
   if (!user) {
     return (
-      <Link href="/login" className={styles.login} aria-label="Login" title="Login">
+      <Link
+        href={loginHref}
+        className={styles.login}
+        aria-label="Login"
+        title="Login"
+      >
         <LogIn size={16} strokeWidth={2.25} aria-hidden />
       </Link>
     );

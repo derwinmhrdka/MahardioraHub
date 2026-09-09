@@ -15,7 +15,7 @@ export default function Icon() {
           justifyContent: "center",
           background: "#F7F3EB",
           border: "2px solid #111",
-          borderRadius: 8,
+          borderRadius: 9,
         }}
       >
         <div
@@ -23,23 +23,25 @@ export default function Icon() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: 1,
+            gap: 0,
+            transform: "rotate(-2deg)",
           }}
         >
           <div
             style={{
-              width: 18,
-              height: 7,
+              width: 20,
+              height: 8,
               background: "#111",
-              borderRadius: 1,
+              borderRadius: "8px 8px 2px 2px",
             }}
           />
           <div
             style={{
-              width: 16,
-              height: 12,
+              width: 17,
+              height: 13,
               background: "#fff",
               border: "2px solid #111",
+              borderRadius: 3,
               display: "flex",
               alignItems: "flex-end",
               justifyContent: "center",
@@ -48,8 +50,9 @@ export default function Icon() {
             <div
               style={{
                 width: 5,
-                height: 7,
+                height: 8,
                 background: "#111",
+                borderRadius: "5px 5px 0 0",
               }}
             />
           </div>

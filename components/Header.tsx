@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { CartDrawer } from "@/components/CartDrawer";
+import { StoreMark } from "@/components/StoreMark";
 import { UserMenu } from "@/components/UserMenu";
 import {
   buildCartWhatsAppMessage,
@@ -84,8 +85,11 @@ export async function Header({ active = "deals" }: HeaderProps) {
           href={active === "secondhand" ? "/secondhand" : "/"}
           className={styles.brand}
         >
-          <span className={styles.brandName}>Mahardiora</span>
-          <span className={styles.brandSub}>{subtitle}</span>
+          <StoreMark size={34} className={styles.brandMark} />
+          <span className={styles.brandText}>
+            <span className={styles.brandName}>Mahardiora</span>
+            <span className={styles.brandSub}>{subtitle}</span>
+          </span>
         </Link>
         <div className={styles.right}>
           <nav className={styles.nav} aria-label="Main">

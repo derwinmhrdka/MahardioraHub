@@ -9,6 +9,7 @@ import { ProductNote } from "@/components/ProductNote";
 import { ProductPrice } from "@/components/ProductPrice";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import styles from "@/components/ProductDetail.module.css";
+import { auth } from "@/auth";
 import { productImages } from "@/lib/product-images";
 import { getProduct } from "@/lib/products";
 import { buildShareMetadata } from "@/lib/seo";
@@ -52,6 +53,7 @@ export default async function SecondhandItemPage({ params }: PageProps) {
   }
 
   const settings = await getSettings();
+  const session = await auth();
   const whatsappHref = buildWhatsAppLink(settings.whatsappNumber, {
     template: settings.whatsappTemplate,
     productTitle: product.title,
@@ -107,6 +109,7 @@ export default async function SecondhandItemPage({ params }: PageProps) {
                 productId={product.id}
                 next={`/secondhand/${product.id}`}
                 stock={product.stock}
+                loggedIn={Boolean(session?.user?.id)}
               />
             </div>
           </div>

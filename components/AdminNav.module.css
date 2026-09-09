@@ -16,10 +16,21 @@
 
 .brandBlock {
   display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  line-height: 1.05;
+}
+
+.brandMark {
+  flex-shrink: 0;
+}
+
+.brandCopy {
+  display: flex;
   flex-direction: column;
   gap: 0;
   min-width: 0;
-  line-height: 1.05;
 }
 
 .brand {

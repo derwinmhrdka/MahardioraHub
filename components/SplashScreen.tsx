@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { StoreMark } from "@/components/StoreMark";
 import styles from "./SplashScreen.module.css";
 
 type SplashScreenProps = {
@@ -17,7 +18,7 @@ export function SplashScreen({ siteName }: SplashScreenProps) {
     const outTimer = window.setTimeout(() => setPhase("out"), 1100);
     const doneTimer = window.setTimeout(() => {
       setPhase("done");
-      document.body.style.overflow = prev;
+    20|      document.body.style.overflow = prev;
     }, 1650);
 
     return () => {
@@ -35,7 +36,10 @@ export function SplashScreen({ siteName }: SplashScreenProps) {
       aria-hidden={phase === "out"}
       role="presentation"
     >
-      <p className={styles.brand}>{siteName}</p>
+      <div className={styles.hero}>
+        <StoreMark animated size={96} className={styles.mark} />
+        <p className={styles.brand}>{siteName}</p>
+      </div>
     </div>
   );
 }

@@ -1,25 +1,30 @@
 /** Secondhand pricing: `price` = normal, discount % → total. */
 
-const DISCOUNT_DECIMALS = 2;
+/** Precision stored in DB / used for salePrice reconstruction. */
+const DISCOUNT_STORAGE_DECIMALS = 6;
+
+/** Precision shown on badges / visitor UI. */
+const DISCOUNT_DISPLAY_DECIMALS = 1;
 
 function roundTo(value: number, decimals: number): number {
   const factor = 10 ** decimals;
   return Math.round(value * factor) / factor;
 }
 
+/** Clamp 0–100 with storage precision (keeps enough digits to reconstruct total). */
 export function clampDiscountPercent(value: number): number {
   if (!Number.isFinite(value)) return 0;
-  return roundTo(Math.min(100, Math.max(0, value)), DISCOUNT_DECIMALS);
+  return roundTo(Math.min(100, Math.max(0, value)), DISCOUNT_STORAGE_DECIMALS);
 }
 
 export function salePrice(price: number, discountPercent: number): number {
   const discount = clampDiscountPercent(discountPercent);
   const normal = Math.round(price);
   if (discount <= 0) return normal;
-  // Keep as much precision as possible before final rupiah round
   return Math.round((normal * (100 - discount)) / 100);
 }
 
+/** Exact % from normal + typed total (storage precision, not display rounding). */
 export function discountFromSalePrice(
   price: number,
   total: number
@@ -36,9 +41,10 @@ export function hasDiscount(discountPercent: number | null | undefined): boolean
   return clampDiscountPercent(discountPercent ?? 0) > 0;
 }
 
-/** Format % for badges/cards: integer if .0, else 1 decimal. */
+/** Format % for badges/cards: 1 decimal (42.5563 → "42.6", 42.5 → "42.5"). */
 export function formatDiscountPercent(value: number): string {
-  const one = roundTo(clampDiscountPercent(value), 1);
+  const n = Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : 0;
+  const one = roundTo(n, DISCOUNT_DISPLAY_DECIMALS);
   if (Number.isInteger(one)) return String(one);
-  return one.toFixed(1);
+  return one.toFixed(DISCOUNT_DISPLAY_DECIMALS);
 }

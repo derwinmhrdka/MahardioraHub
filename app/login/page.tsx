@@ -1,7 +1,10 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { auth } from "@/auth";
 import { DevLoginButtons } from "@/components/DevLoginButtons";
 import { GoogleLoginButton } from "@/components/GoogleLoginButton";
+import { StoreMark } from "@/components/StoreMark";
 import { getSettings } from "@/lib/settings";
 import styles from "./login.module.css";
 
@@ -39,13 +42,17 @@ export default async function LoginPage({ searchParams }: PageProps) {
       <div className={styles.orbit} aria-hidden />
       <div className={styles.orbitSlow} aria-hidden />
 
+      <Link
+        href={next}
+        className={styles.back}
+        aria-label="Kembali"
+        title="Kembali"
+      >
+        <ArrowLeft size={16} strokeWidth={2.5} aria-hidden />
+      </Link>
+
       <div className={styles.stage}>
-        <div className={styles.mark} aria-hidden>
-          <span className={styles.awning} />
-          <span className={styles.shop}>
-            <span className={styles.door} />
-          </span>
-        </div>
+        <StoreMark animated size={88} className={styles.mark} />
 
         <p className={styles.brand}>{siteName}</p>
 

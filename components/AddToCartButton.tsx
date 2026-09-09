@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useFormStatus } from "react-dom";
 import { ShoppingCart } from "lucide-react";
 import { addToCartAction } from "@/app/cart/actions";
@@ -9,6 +10,7 @@ type AddToCartButtonProps = {
   productId: number;
   next?: string;
   stock?: number;
+  loggedIn?: boolean;
 };
 
 function SubmitButton() {
@@ -25,6 +27,7 @@ export function AddToCartButton({
   productId,
   next,
   stock = 0,
+  loggedIn = true,
 }: AddToCartButtonProps) {
   const returnTo = next || `/secondhand/${productId}`;
   const available = stock > 0;
@@ -35,6 +38,18 @@ export function AddToCartButton({
         <ShoppingCart size={16} strokeWidth={2.25} aria-hidden />
         Tambah
       </button>
+    );
+  }
+
+  if (!loggedIn) {
+    return (
+      <Link
+        href={`/login?next=${encodeURIComponent(returnTo)}`}
+        className={styles.btn}
+      >
+        <ShoppingCart size={16} strokeWidth={2.25} aria-hidden />
+        Tambah
+      </Link>
     );
   }
 
