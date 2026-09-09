@@ -5,7 +5,7 @@ WORKDIR /app
 RUN apk add --no-cache libc6-compat openssl
 COPY package.json package-lock.json* ./
 COPY prisma ./prisma
-RUN npm ci
+RUN npm ci && npm cache clean --force
 
 FROM node:20-alpine AS builder
 WORKDIR /app
@@ -14,8 +14,12 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV DATABASE_URL="postgresql://dealhub:dealhub@db:5432/dealhub"
-RUN npx prisma generate
-RUN npm run build
+# Keep Next/webpack from writing large caches (ENOSPC on small VPS disks)
+ENV NEXT_PRIVATE_CACHE=0
+RUN npx prisma generate \
+  && npm run build \
+  && rm -rf .next/cache node_modules/.cache /tmp/* \
+  && npm cache clean --force
 
 # One-shot image for migrate / seed (full Prisma CLI + deps)
 FROM node:20-alpine AS migrate
@@ -23,7 +27,7 @@ WORKDIR /app
 RUN apk add --no-cache libc6-compat openssl
 COPY package.json package-lock.json* ./
 COPY prisma ./prisma
-RUN npm ci
+RUN npm ci && npm cache clean --force
 CMD ["npx", "prisma", "migrate", "deploy"]
 
 FROM node:20-alpine AS runner

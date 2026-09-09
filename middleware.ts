@@ -1,21 +1,23 @@
-import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
-import { authConfig } from "@/auth.config";
+import type { NextRequest } from "next/server";
 
-const { auth } = NextAuth(authConfig);
+/** Auth.js session cookie names (Edge-safe: no next-auth/jose import). */
+function hasAuthSession(req: NextRequest): boolean {
+  return (
+    req.cookies.has("authjs.session-token") ||
+    req.cookies.has("__Secure-authjs.session-token") ||
+    req.cookies.has("__Host-authjs.session-token")
+  );
+}
 
-export default auth((req) => {
+export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const isAdmin = req.auth?.user?.role === "admin";
 
   if (!pathname.startsWith("/admin")) {
     return NextResponse.next();
   }
 
-  if (!isAdmin) {
-    if (req.auth?.user) {
-      return NextResponse.redirect(new URL("/", req.url));
-    }
+  if (!hasAuthSession(req)) {
     const login = new URL("/login", req.url);
     login.searchParams.set("next", pathname);
     return NextResponse.redirect(login);
@@ -26,7 +28,7 @@ export default auth((req) => {
   }
 
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: ["/admin", "/admin/:path*"],

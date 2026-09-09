@@ -16,6 +16,10 @@ set +a
 APP_HOST_PORT="${APP_HOST_PORT:-13000}"
 DOMAIN="${DOMAIN:-mahardiora-hub.teknodika.com}"
 
+echo "==> Freeing Docker disk (dangling images/build cache)..."
+docker builder prune -f >/dev/null 2>&1 || true
+docker image prune -f >/dev/null 2>&1 || true
+
 echo "==> Building and starting containers (db, migrate, app) on 127.0.0.1:${APP_HOST_PORT}..."
 echo "    HTTPS is handled by host nginx — see deploy/nginx-mahardiorahub.conf.example"
 $COMPOSE up -d --build --remove-orphans
