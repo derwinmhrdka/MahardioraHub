@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { Plus, Shield, ShieldOff, Trash2, UserRound } from "lucide-react";
+import { FlashSaleAdmin } from "@/components/FlashSaleAdmin";
 import { listCategories } from "@/lib/categories";
+import {
+  getFlashSaleAdmin,
+  listSecondhandForFlashSale,
+} from "@/lib/flash-sale";
+import { productImages } from "@/lib/product-images";
 import { getSettings } from "@/lib/settings";
 import { listAdminAllowlist, listVisitorUsers } from "@/lib/users";
 import {
@@ -13,7 +19,7 @@ import {
 } from "./actions";
 import styles from "./settings.module.css";
 
-type Tab = "general" | "kontak" | "kategori" | "user";
+type Tab = "general" | "kontak" | "kategori" | "user" | "flash";
 
 type PageProps = {
   searchParams: Promise<{
@@ -23,31 +29,45 @@ type PageProps = {
     catError?: string;
     userSaved?: string;
     userError?: string;
+    flashSaved?: string;
+    flashError?: string;
   }>;
 };
 
 function parseTab(raw: string | undefined): Tab {
-  if (raw === "kontak" || raw === "kategori" || raw === "user") return raw;
+  if (
+    raw === "kontak" ||
+    raw === "kategori" ||
+    raw === "user" ||
+    raw === "flash"
+  ) {
+    return raw;
+  }
   return "general";
 }
 
 export default async function AdminSettingsPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const tab = parseTab(params.tab);
-  const [settings, categories, admins, visitors] = await Promise.all([
-    getSettings(),
-    listCategories(),
-    tab === "user" ? listAdminAllowlist() : Promise.resolve([]),
-    tab === "user" ? listVisitorUsers() : Promise.resolve([]),
-  ]);
+  const [settings, categories, admins, visitors, flashSale, flashProducts] =
+    await Promise.all([
+      getSettings(),
+      listCategories(),
+      tab === "user" ? listAdminAllowlist() : Promise.resolve([]),
+      tab === "user" ? listVisitorUsers() : Promise.resolve([]),
+      tab === "flash" ? getFlashSaleAdmin() : Promise.resolve(null),
+      tab === "flash" ? listSecondhandForFlashSale() : Promise.resolve([]),
+    ]);
 
   const showSaved =
     (params.saved && (tab === "general" || tab === "kontak")) ||
     (params.catSaved && tab === "kategori") ||
-    (params.userSaved && tab === "user");
+    (params.userSaved && tab === "user") ||
+    (params.flashSaved && tab === "flash");
   const showError =
     (params.catError && tab === "kategori") ||
-    (params.userError && tab === "user");
+    (params.userError && tab === "user") ||
+    (params.flashError && tab === "flash");
 
   return (
     <>
@@ -77,6 +97,14 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
           className={`${styles.tab} ${tab === "kategori" ? styles.tabOn : ""}`}
         >
           Kategori
+        </Link>
+        <Link
+          href="/admin/settings?tab=flash"
+          role="tab"
+          aria-selected={tab === "flash"}
+          className={`${styles.tab} ${tab === "flash" ? styles.tabOn : ""}`}
+        >
+          Flash
         </Link>
         <Link
           href="/admin/settings?tab=user"
@@ -203,6 +231,23 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
             </button>
           </form>
         </section>
+      ) : null}
+
+      {tab === "flash" && flashSale ? (
+        <FlashSaleAdmin
+          isActive={flashSale.isActive}
+          durationMinutes={flashSale.durationMinutes}
+          endsAt={flashSale.endsAt?.toISOString() ?? null}
+          selectedIds={flashSale.items.map((item) => item.productId)}
+          products={flashProducts.map((product) => ({
+            id: product.id,
+            title: product.title,
+            price: product.price,
+            discountPercent: product.discountPercent,
+            imageUrl: productImages(product)[0] ?? null,
+            stock: product.stock,
+          }))}
+        />
       ) : null}
 
       {tab === "user" ? (

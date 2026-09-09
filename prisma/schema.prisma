@@ -38,6 +38,7 @@ model Product {
   createdAt     DateTime    @default(now())
   clicks        Click[]
   cartItems     CartItem[]
+  flashSaleItems FlashSaleItem[]
 }
 
 model Click {
@@ -54,6 +55,29 @@ model Setting {
   siteName          String
   contactEmail      String?
   shopeeAffiliateId String? // used by admin optional an_redir link helper
+}
+
+/** Singleton flash sale config + timed product picks (secondhand only). */
+model FlashSale {
+  id               Int             @id @default(1)
+  isActive         Boolean         @default(false)
+  durationMinutes  Int             @default(60)
+  startedAt        DateTime?
+  endsAt           DateTime?
+  items            FlashSaleItem[]
+  updatedAt        DateTime        @updatedAt
+}
+
+model FlashSaleItem {
+  id          Int       @id @default(autoincrement())
+  flashSaleId Int       @default(1)
+  flashSale   FlashSale @relation(fields: [flashSaleId], references: [id], onDelete: Cascade)
+  productId   Int
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sortOrder   Int       @default(0)
+
+  @@unique([flashSaleId, productId])
+  @@index([flashSaleId, sortOrder])
 }
 
 enum UserRole {

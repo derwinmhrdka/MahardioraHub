@@ -4,8 +4,35 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createCategory, deleteCategory } from "@/lib/categories";
 import { requireAdmin } from "@/lib/auth";
+import {
+  updateFlashSaleConfig,
+} from "@/lib/flash-sale";
 import { getSettings, updateSettings } from "@/lib/settings";
 import { grantAdminByEmail, revokeAdminByEmail } from "@/lib/users";
+
+export async function updateFlashSaleAction(formData: FormData) {
+  await requireAdmin();
+  const isActive = String(formData.get("isActive") ?? "") === "on";
+  const durationMinutes = Number(formData.get("durationMinutes") ?? 60);
+  const productIds = formData
+    .getAll("productIds")
+    .map((v) => Number(v))
+    .filter((n) => Number.isFinite(n));
+
+  try {
+    await updateFlashSaleConfig({
+      isActive,
+      durationMinutes: Number.isFinite(durationMinutes) ? durationMinutes : 60,
+      productIds,
+    });
+  } catch {
+    redirect("/admin/settings?tab=flash&flashError=1");
+  }
+
+  revalidatePath("/secondhand");
+  revalidatePath("/admin/settings");
+  redirect("/admin/settings?tab=flash&flashSaved=1");
+}
 
 export async function updateSettingsAction(formData: FormData) {
   await requireAdmin();

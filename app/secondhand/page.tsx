@@ -1,8 +1,10 @@
 import { ProductKind } from "@prisma/client";
 import type { Metadata } from "next";
+import { FlashSaleStrip } from "@/components/FlashSaleStrip";
 import { Header } from "@/components/Header";
 import { ProductBrowse } from "@/components/ProductBrowse";
 import { listCategories } from "@/lib/categories";
+import { getActiveFlashSalePublic } from "@/lib/flash-sale";
 import {
   listActiveSecondhand,
   listPlatforms,
@@ -35,7 +37,7 @@ export default async function SecondhandPage({ searchParams }: PageProps) {
   const categorySlug = query.category?.trim() || null;
   const platform = query.platform?.trim() || null;
 
-  const [categories, areas, platforms, products] = await Promise.all([
+  const [categories, areas, platforms, products, flashSale] = await Promise.all([
     listCategories(),
     listStoreAreas(ProductKind.secondhand),
     listPlatforms(ProductKind.secondhand),
@@ -44,6 +46,7 @@ export default async function SecondhandPage({ searchParams }: PageProps) {
       categorySlug,
       platform,
     }),
+    getActiveFlashSalePublic(),
   ]);
 
   const items = products.map((product) => ({
@@ -64,6 +67,13 @@ export default async function SecondhandPage({ searchParams }: PageProps) {
       <Header active="secondhand" />
       <main className="container">
         <h1 className="page-title">Secondhand</h1>
+        {flashSale ? (
+          <FlashSaleStrip
+            endsAt={flashSale.endsAt}
+            startedAt={flashSale.startedAt}
+            items={flashSale.items}
+          />
+        ) : null}
         <ProductBrowse
           mode="secondhand"
           label="Secondhand"
