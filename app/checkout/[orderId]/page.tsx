@@ -43,15 +43,17 @@ export default async function CheckoutQrisPage({ params }: PageProps) {
     <div className="section-secondhand">
       <Header siteName={settings.siteName} active="secondhand" />
       <main className={`container ${styles.main}`}>
-        <Link
-          href="/orders?tab=payment"
-          className={styles.back}
-          aria-label="Kembali"
-          title="Kembali"
-        >
-          <ArrowLeft size={16} strokeWidth={2.5} aria-hidden />
-        </Link>
-        <h1 className={styles.title}>QRIS</h1>
+        <div className={styles.top}>
+          <Link
+            href="/orders?tab=pending"
+            className={styles.back}
+            aria-label="Kembali"
+            title="Kembali"
+          >
+            <ArrowLeft size={16} strokeWidth={2.5} aria-hidden />
+          </Link>
+          <h1 className={styles.title}>QRIS</h1>
+        </div>
         <QrisCheckout
           orderId={order.id}
           externalId={order.externalId}

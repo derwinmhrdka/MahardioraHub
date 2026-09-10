@@ -11,10 +11,10 @@ export async function cancelOrderAction(formData: FormData) {
   if (!userId) redirect("/login?next=/orders");
 
   const orderId = String(formData.get("orderId") ?? "").trim();
-  if (!orderId) redirect("/orders?tab=payment");
+  if (!orderId) redirect("/orders?tab=pending");
 
   await cancelUserOrder(orderId, userId);
   revalidatePath("/orders");
   revalidatePath("/checkout");
-  redirect("/orders?tab=payment&cancelled=1");
+  redirect("/orders?tab=cancel&cancelled=1");
 }

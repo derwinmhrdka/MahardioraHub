@@ -265,43 +265,61 @@ export async function getOrderForUser(orderId: string, userId: string) {
 
 export async function listOrdersForUser(
   userId: string,
-  tab: "payment" | "selesai"
+  tab: "pending" | "completed" | "cancel"
 ) {
-  const statuses =
-    tab === "payment"
-      ? [OrderStatus.pending]
-      : [
-          OrderStatus.paid,
-          OrderStatus.cancelled,
-          OrderStatus.expired,
-          OrderStatus.failed,
-        ];
+  if (tab === "pending") {
+    await expireOverdueQrisOrders(userId);
+  }
 
-  const orders = await prisma.order.findMany({
+  const statuses =
+    tab === "pending"
+      ? [OrderStatus.pending]
+      : tab === "completed"
+        ? [OrderStatus.paid]
+        : [
+            OrderStatus.cancelled,
+            OrderStatus.expired,
+            OrderStatus.failed,
+          ];
+
+  return prisma.order.findMany({
     where: { userId, status: { in: statuses } },
     orderBy: { createdAt: "desc" },
     include: { items: true },
   });
+}
 
-  if (tab !== "payment") return orders;
+export async function countPendingOrders(userId: string) {
+  await expireOverdueQrisOrders(userId);
+  return prisma.order.count({
+    where: { userId, status: OrderStatus.pending },
+  });
+}
 
-  const now = Date.now();
-  const active = [];
-  for (const order of orders) {
-    if (
-      order.payMethod === OrderPayMethod.qris &&
-      order.expiresAt &&
-      order.expiresAt.getTime() <= now
-    ) {
-      await prisma.order.update({
-        where: { id: order.id },
-        data: { status: OrderStatus.expired },
-      });
-      continue;
+/** Past expiresAt → cancel QR + move to cancelled (Cancel tab). */
+async function expireOverdueQrisOrders(userId: string) {
+  const overdue = await prisma.order.findMany({
+    where: {
+      userId,
+      status: OrderStatus.pending,
+      payMethod: OrderPayMethod.qris,
+      expiresAt: { lte: new Date() },
+    },
+  });
+
+  for (const order of overdue) {
+    if (order.payProvider === OrderPayProvider.midtrans) {
+      try {
+        await cancelMidtransTransaction(order.externalId);
+      } catch {
+        // ignore
+      }
     }
-    active.push(order);
+    await prisma.order.update({
+      where: { id: order.id },
+      data: { status: OrderStatus.cancelled, qrString: null },
+    });
   }
-  return active;
 }
 
 /**

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Check, Copy, RefreshCw } from "lucide-react";
-import { cancelOrderAction } from "@/app/orders/actions";
+import { CancelOrderButton } from "@/components/CancelOrderButton";
 import { formatRupiah } from "@/lib/format";
 import styles from "./QrisCheckout.module.css";
 
@@ -60,9 +60,7 @@ export function QrisCheckout({
 
   useEffect(() => {
     if (status !== "pending") return;
-    if (timedOut) {
-      setStatus("expired");
-    }
+    if (timedOut) setStatus("expired");
   }, [status, timedOut]);
 
   async function checkStatus() {
@@ -126,107 +124,111 @@ export function QrisCheckout({
     }
   }
 
+  const statusLabel =
+    status === "pending"
+      ? "Menunggu pembayaran"
+      : status === "paid"
+        ? "Paid"
+        : status === "expired"
+          ? "Expired"
+          : "Failed";
+
   return (
     <div className={styles.wrap}>
-      <p className={styles.amount}>{formatRupiah(amount)}</p>
+      <section className={styles.panel} aria-label="QRIS">
+        <div className={styles.topRow}>
+          <div>
+            <p className={styles.topLabel}>Total</p>
+            <p className={styles.amount}>{formatRupiah(amount)}</p>
+          </div>
+          {status === "pending" ? (
+            <div className={styles.timerBlock}>
+              <p className={styles.topLabel}>Bayar dalam</p>
+              <p
+                className={`${styles.timer} ${urgent ? styles.timerUrgent : ""}`}
+                aria-live="polite"
+              >
+                {formatRemain(remainMs)}
+              </p>
+            </div>
+          ) : null}
+        </div>
 
-      <div className={styles.qrHead}>
-        <p className={styles.hint}>Scan QRIS</p>
-        {status === "pending" ? (
-          <span
-            className={`${styles.timer} ${urgent ? styles.timerUrgent : ""}`}
-            aria-live="polite"
-            aria-label={`Sisa ${formatRemain(remainMs)}`}
-          >
-            {formatRemain(remainMs)}
+        <div className={styles.qrBlock}>
+          <div className={styles.qrFrame}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={qrImg}
+              alt="QRIS"
+              className={`${styles.qr} ${status !== "pending" ? styles.qrDim : ""}`}
+              width={280}
+              height={280}
+            />
+          </div>
+          <p className={styles.hint}>Scan QRIS</p>
+          <p className={styles.status} aria-live="polite">
+            {statusLabel}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          className={styles.extId}
+          onClick={() => void copyExternalId()}
+          title="Copy"
+          aria-label="Copy invoice"
+        >
+          <span className={styles.extText}>
+            {copied ? "copied" : externalId}
           </span>
-        ) : null}
-      </div>
-
-      <div className={styles.qrFrame}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={qrImg}
-          alt="QRIS"
-          className={`${styles.qr} ${status !== "pending" ? styles.qrDim : ""}`}
-          width={280}
-          height={280}
-        />
-      </div>
-
-      <button
-        type="button"
-        className={styles.extId}
-        onClick={() => void copyExternalId()}
-        title="Copy"
-        aria-label="Copy external id"
-      >
-        {copied ? "copied" : externalId}
-      </button>
-
-      <p className={styles.status} aria-live="polite">
-        {status === "pending"
-          ? "Menunggu..."
-          : status === "paid"
-            ? "Paid"
-            : status === "expired"
-              ? "Expired"
-              : "Failed"}
-      </p>
-
-      <div className={styles.actions}>
-        {status === "pending" && canSimulate ? (
-          <button
-            type="button"
-            className={styles.btn}
-            onClick={() => void simulatePay()}
-            disabled={simulating}
-            title="Simulate bayar (test)"
-            aria-label="Simulate"
-          >
-            {simulating ? "..." : "Sim"}
-          </button>
-        ) : null}
-
-        {status === "pending" ? (
-          <button
-            type="button"
-            className={canSimulate ? styles.btnGhost : styles.btn}
-            onClick={() => void checkStatus()}
-            disabled={checking}
-          >
-            <RefreshCw size={14} strokeWidth={2.25} aria-hidden />
-            {checking ? "..." : "Cek"}
-          </button>
-        ) : null}
-
-        <button type="button" className={styles.btnGhost} onClick={() => void copyExternalId()}>
           {copied ? (
-            <Check size={14} strokeWidth={2.25} aria-hidden />
+            <Check size={12} strokeWidth={2.5} aria-hidden />
           ) : (
-            <Copy size={14} strokeWidth={2.25} aria-hidden />
+            <Copy size={12} strokeWidth={2.5} aria-hidden />
           )}
-          ID
         </button>
+      </section>
 
+      <div className={styles.footer}>
         {status === "pending" ? (
-          <form action={cancelOrderAction}>
-            <input type="hidden" name="orderId" value={orderId} />
-            <button type="submit" className={styles.btnGhost}>
-              Cancel
+          <>
+            <button
+              type="button"
+              className={styles.btnPrimary}
+              onClick={() => void checkStatus()}
+              disabled={checking}
+            >
+              <RefreshCw size={15} strokeWidth={2.4} aria-hidden />
+              {checking ? "..." : "Cek"}
             </button>
-          </form>
+            <CancelOrderButton
+              orderId={orderId}
+              className={styles.btnSecondary}
+            />
+          </>
         ) : null}
 
         {status === "expired" || status === "failed" ? (
-          <Link href="/checkout" className={styles.btn}>
+          <Link href="/checkout" className={styles.btnPrimary}>
             Ulang
           </Link>
         ) : null}
 
-        <Link href="/orders?tab=payment" className={styles.btnGhost}>
-          Order
-        </Link>
+        <div className={styles.links}>
+          {status === "pending" && canSimulate ? (
+            <button
+              type="button"
+              className={styles.linkBtn}
+              onClick={() => void simulatePay()}
+              disabled={simulating}
+            >
+              {simulating ? "..." : "Sim"}
+            </button>
+          ) : null}
+          <Link href="/orders?tab=pending" className={styles.linkBtn}>
+            Order
+          </Link>
+        </div>
       </div>
     </div>
   );
