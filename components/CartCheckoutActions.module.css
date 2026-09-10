@@ -1,0 +1,58 @@
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.form {
+  margin: 0;
+  flex: 1 1 auto;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 2.35rem;
+  min-width: 4.2rem;
+  padding: 0.4rem 0.75rem;
+  border: var(--stroke) solid #111;
+  border-radius: 999px;
+  font-family: var(--font-body-stack);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 #111;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #111;
+}
+
+.btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 0 0 0 #111;
+}
+
+.invoice {
+  background: #111;
+  color: #fff;
+}
+
+.qris {
+  background: #fff;
+  color: #111;
+}
+
+.wa {
+  background: #25d366;
+  color: #111;
+  flex: 1 1 auto;
+}

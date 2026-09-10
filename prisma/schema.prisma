@@ -95,6 +95,7 @@ model User {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   cartItems CartItem[]
+  orders    Order[]
 }
 
 /** Emails allowed to access /admin after Google login. */
@@ -116,6 +117,55 @@ model CartItem {
 
   @@unique([userId, productId])
   @@index([userId])
+}
+
+enum OrderStatus {
+  pending
+  paid
+  expired
+  failed
+}
+
+enum OrderPayMethod {
+  invoice
+  qris
+}
+
+/** Secondhand checkout via Xendit (Invoice / dynamic QRIS). */
+model Order {
+  id              String         @id @default(cuid())
+  userId          String
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status          OrderStatus    @default(pending)
+  payMethod       OrderPayMethod
+  amount          Int
+  currency        String         @default("IDR")
+  externalId      String         @unique
+  xenditId        String?
+  invoiceUrl      String?
+  qrString        String?
+  paidAt          DateTime?
+  expiresAt       DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  items           OrderItem[]
+
+  @@index([userId, status])
+  @@index([xenditId])
+}
+
+model OrderItem {
+  id              Int     @id @default(autoincrement())
+  orderId         String
+  order           Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId       Int
+  title           String
+  unitPrice       Int
+  quantity        Int
+  discountPercent Float   @default(0)
+
+  @@index([orderId])
+  @@index([productId])
 }
 
 // Future: InboxLink model (rawLink, telegramChatId, status) for Telegram bot product intake.

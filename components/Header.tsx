@@ -9,6 +9,7 @@ import {
 import { productImages } from "@/lib/product-images";
 import { salePrice } from "@/lib/pricing";
 import { getSettings } from "@/lib/settings";
+import { xenditConfigured } from "@/lib/xendit";
 import Link from "next/link";
 import { Package, Recycle } from "lucide-react";
 import styles from "./Header.module.css";
@@ -110,6 +111,7 @@ export async function Header({ active = "deals" }: HeaderProps) {
               loggedIn={Boolean(userId)}
               items={cartItems}
               checkoutHref={checkoutHref}
+              xenditEnabled={xenditConfigured()}
             />
           ) : null}
           <UserMenu user={user} />

@@ -40,6 +40,8 @@ services:
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET:-}
       AUTH_URL: ${AUTH_URL:-}
       DOMAIN: ${DOMAIN:-mahardiora-hub.teknodika.com}
+      XENDIT_SECRET_KEY: ${XENDIT_SECRET_KEY:-}
+      XENDIT_CALLBACK_TOKEN: ${XENDIT_CALLBACK_TOKEN:-}
       # Inside the container only — does not use host :3000 / :3001
       PORT: "3000"
       NODE_ENV: production
