@@ -1,0 +1,75 @@
+.form {
+  gap: 0.75rem;
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.clearBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: var(--stroke) solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: #111;
+  cursor: pointer;
+  box-shadow: var(--shadow-doodle-sm);
+}
+
+.clearBtn:hover {
+  background: #fee2e2;
+}
+
+.clearBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ratioBlock {
+  margin: 0 0 0.15rem;
+}
+
+.ratioFrame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  width: 100%;
+  max-width: 18rem;
+  aspect-ratio: 3 / 1;
+  border: var(--stroke) dashed var(--color-border);
+  border-radius: 10px;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 6px,
+      rgba(0, 0, 0, 0.03) 6px,
+      rgba(0, 0, 0, 0.03) 12px
+    ),
+    var(--color-accent-soft);
+}
+
+.ratioLabel {
+  font-family: var(--font-body-stack);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--color-text);
+  letter-spacing: 0.04em;
+}
+
+.ratioSize {
+  font-family: var(--font-body-stack);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}

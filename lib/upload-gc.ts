@@ -6,11 +6,17 @@ import {
   purgeOrphanUploads,
 } from "@/lib/uploads";
 
-/** All `/uploads/...` paths currently stored on products. */
+/** All `/uploads/...` paths currently stored on products + settings. */
 export async function getReferencedLocalUploadUrls(): Promise<Set<string>> {
-  const products = await prisma.product.findMany({
-    select: { imageUrl: true, imageUrls: true },
-  });
+  const [products, settings] = await Promise.all([
+    prisma.product.findMany({
+      select: { imageUrl: true, imageUrls: true },
+    }),
+    prisma.setting.findUnique({
+      where: { id: 1 },
+      select: { collectionBannerImages: true },
+    }),
+  ]);
 
   const referenced = new Set<string>();
   for (const product of products) {
@@ -18,6 +24,10 @@ export async function getReferencedLocalUploadUrls(): Promise<Set<string>> {
       const normalized = normalizeLocalUploadUrl(url);
       if (normalized) referenced.add(normalized);
     }
+  }
+  for (const url of settings?.collectionBannerImages ?? []) {
+    const normalized = normalizeLocalUploadUrl(url);
+    if (normalized) referenced.add(normalized);
   }
   return referenced;
 }

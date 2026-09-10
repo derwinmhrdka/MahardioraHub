@@ -16,6 +16,7 @@ import { findOrCreateCategoryByName } from "@/lib/categories";
 import { parseImageUrlsField } from "@/lib/product-images";
 import { clampDiscountPercent } from "@/lib/pricing";
 import { requireAdmin } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import {
   MAX_UPLOAD_COUNT,
   saveProductImage,
@@ -190,6 +191,26 @@ export async function deleteUploadedImageAction(url: string) {
   await requireAdmin();
   const trimmed = url.trim();
   if (!trimmed) return { deleted: false };
+
+  // Detach from Collection banner first so GC can unlink the file.
+  const settings = await prisma.setting.findUnique({
+    where: { id: 1 },
+    select: { collectionBannerImages: true },
+  });
+  const bannerUrls = settings?.collectionBannerImages ?? [];
+  if (bannerUrls.includes(trimmed)) {
+    const next = bannerUrls.filter((item) => item !== trimmed);
+    await prisma.setting.update({
+      where: { id: 1 },
+      data: {
+        collectionBannerImages: next,
+        ...(next.length === 0 ? { collectionBannerActive: false } : {}),
+      },
+    });
+    revalidatePath("/secondhand");
+    revalidatePath("/admin/settings");
+  }
+
   await cleanupRemovedUploads([trimmed]);
   return { deleted: true };
 }

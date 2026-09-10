@@ -1,4 +1,5 @@
 import { OrderPayProvider } from "@prisma/client";
+import { normalizeBannerImages } from "./collection-banner";
 import { prisma } from "./prisma";
 
 export type SettingInput = {
@@ -8,7 +9,15 @@ export type SettingInput = {
   contactEmail?: string | null;
   shopeeAffiliateId?: string | null;
   qrisProvider?: OrderPayProvider;
+  collectionBannerActive?: boolean;
+  collectionBannerImages?: string[];
 };
+
+export {
+  COLLECTION_BANNER_MAX,
+  COLLECTION_BANNER_RATIO,
+  COLLECTION_BANNER_SIZE_HINT,
+} from "./collection-banner";
 
 const DEFAULT_WA_TEMPLATE = "Halo, saya tertarik dengan produk ini.";
 
@@ -22,6 +31,12 @@ export async function getSettings() {
 
 export async function updateSettings(input: SettingInput) {
   const qrisProvider = input.qrisProvider ?? OrderPayProvider.midtrans;
+  const bannerActive = input.collectionBannerActive;
+  const bannerImages =
+    input.collectionBannerImages !== undefined
+      ? normalizeBannerImages(input.collectionBannerImages)
+      : undefined;
+
   return prisma.setting.upsert({
     where: { id: 1 },
     create: {
@@ -32,6 +47,8 @@ export async function updateSettings(input: SettingInput) {
       contactEmail: input.contactEmail || null,
       shopeeAffiliateId: input.shopeeAffiliateId || null,
       qrisProvider,
+      collectionBannerActive: bannerActive ?? false,
+      collectionBannerImages: bannerImages ?? [],
     },
     update: {
       whatsappNumber: input.whatsappNumber,
@@ -40,8 +57,21 @@ export async function updateSettings(input: SettingInput) {
       contactEmail: input.contactEmail || null,
       shopeeAffiliateId: input.shopeeAffiliateId || null,
       qrisProvider,
+      ...(bannerActive !== undefined
+        ? { collectionBannerActive: bannerActive }
+        : {}),
+      ...(bannerImages !== undefined
+        ? { collectionBannerImages: bannerImages }
+        : {}),
     },
   });
+}
+
+/** Active Collection promo slides for the public page. */
+export async function getCollectionBanner(): Promise<string[]> {
+  const settings = await getSettings();
+  if (!settings.collectionBannerActive) return [];
+  return normalizeBannerImages(settings.collectionBannerImages);
 }
 
 const DEFAULT_SITE_ORIGIN = "https://mahardiora-hub.teknodika.com";

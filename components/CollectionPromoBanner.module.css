@@ -1,0 +1,93 @@
+.wrap {
+  width: 100%;
+  max-width: min(980px, 100%);
+  margin: 0.55rem auto 0;
+  padding: 0 0.75rem;
+  box-sizing: border-box;
+  animation: bannerIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 1;
+  border-radius: 14px;
+  overflow: hidden;
+  border: var(--stroke) solid var(--color-border);
+  background: var(--color-accent-soft);
+  box-shadow: var(--shadow-doodle-sm);
+}
+
+.track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.slide {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.35rem;
+  margin: 0.4rem 0 0;
+}
+
+.dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.22);
+  cursor: pointer;
+  transition:
+    width 0.25s ease,
+    background 0.25s ease;
+}
+
+.dotOn {
+  width: 1.1rem;
+  background: #111;
+}
+
+@keyframes bannerIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrap {
+    animation: none;
+  }
+
+  .track {
+    transition: none;
+  }
+
+  .dot {
+    transition: none;
+  }
+}

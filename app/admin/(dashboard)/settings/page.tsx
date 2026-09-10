@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Plus, Shield, ShieldOff, Trash2, UserRound } from "lucide-react";
+import { CollectionBannerAdmin } from "@/components/CollectionBannerAdmin";
 import { FlashSaleAdmin } from "@/components/FlashSaleAdmin";
 import { listCategories } from "@/lib/categories";
 import {
@@ -17,11 +18,19 @@ import {
   deleteCategoryAction,
   makeAdminAction,
   revokeAdminAction,
+  updateCollectionBannerAction,
   updateSettingsAction,
 } from "./actions";
 import styles from "./settings.module.css";
 
-type Tab = "general" | "kontak" | "kategori" | "user" | "flash" | "payment";
+type Tab =
+  | "general"
+  | "kontak"
+  | "kategori"
+  | "user"
+  | "flash"
+  | "payment"
+  | "banner";
 
 type PageProps = {
   searchParams: Promise<{
@@ -33,6 +42,8 @@ type PageProps = {
     userError?: string;
     flashSaved?: string;
     flashError?: string;
+    bannerSaved?: string;
+    bannerError?: string;
   }>;
 };
 
@@ -42,7 +53,8 @@ function parseTab(raw: string | undefined): Tab {
     raw === "kategori" ||
     raw === "user" ||
     raw === "flash" ||
-    raw === "payment"
+    raw === "payment" ||
+    raw === "banner"
   ) {
     return raw;
   }
@@ -67,11 +79,13 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
       (tab === "general" || tab === "kontak" || tab === "payment")) ||
     (params.catSaved && tab === "kategori") ||
     (params.userSaved && tab === "user") ||
-    (params.flashSaved && tab === "flash");
+    (params.flashSaved && tab === "flash") ||
+    (params.bannerSaved && tab === "banner");
   const showError =
     (params.catError && tab === "kategori") ||
     (params.userError && tab === "user") ||
-    (params.flashError && tab === "flash");
+    (params.flashError && tab === "flash") ||
+    (params.bannerError && tab === "banner");
 
   const midtransOk = midtransConfigured();
   const xenditOk = xenditConfigured();
@@ -120,6 +134,14 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
           className={`${styles.tab} ${tab === "flash" ? styles.tabOn : ""}`}
         >
           Flash
+        </Link>
+        <Link
+          href="/admin/settings?tab=banner"
+          role="tab"
+          aria-selected={tab === "banner"}
+          className={`${styles.tab} ${tab === "banner" ? styles.tabOn : ""}`}
+        >
+          Banner
         </Link>
         <Link
           href="/admin/settings?tab=user"
@@ -300,6 +322,14 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
             imageUrl: productImages(product)[0] ?? null,
             stock: product.stock,
           }))}
+        />
+      ) : null}
+
+      {tab === "banner" ? (
+        <CollectionBannerAdmin
+          isActive={settings.collectionBannerActive}
+          images={settings.collectionBannerImages}
+          action={updateCollectionBannerAction}
         />
       ) : null}
 

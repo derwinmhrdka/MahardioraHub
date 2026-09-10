@@ -9,6 +9,7 @@ import {
   updateFlashSaleConfig,
 } from "@/lib/flash-sale";
 import { getSettings, updateSettings } from "@/lib/settings";
+import { cleanupProductUploadsAndOrphans } from "@/lib/upload-gc";
 import { grantAdminByEmail, revokeAdminByEmail } from "@/lib/users";
 
 export async function updateFlashSaleAction(formData: FormData) {
@@ -33,6 +34,41 @@ export async function updateFlashSaleAction(formData: FormData) {
   revalidatePath("/secondhand");
   revalidatePath("/admin/settings");
   redirect("/admin/settings?tab=flash&flashSaved=1");
+}
+
+export async function updateCollectionBannerAction(formData: FormData) {
+  await requireAdmin();
+  const current = await getSettings();
+  const images = String(formData.get("images") ?? "")
+    .split(/[\n,]/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const isActive =
+    images.length > 0 && String(formData.get("isActive") ?? "") === "on";
+  const previous = current.collectionBannerImages ?? [];
+
+  try {
+    await updateSettings({
+      siteName: current.siteName,
+      whatsappNumber: current.whatsappNumber,
+      whatsappTemplate: current.whatsappTemplate,
+      contactEmail: current.contactEmail,
+      shopeeAffiliateId: current.shopeeAffiliateId,
+      qrisProvider: current.qrisProvider,
+      collectionBannerActive: isActive,
+      collectionBannerImages: images,
+    });
+    const kept = new Set(images);
+    await cleanupProductUploadsAndOrphans(
+      previous.filter((url) => !kept.has(url))
+    );
+  } catch {
+    redirect("/admin/settings?tab=banner&bannerError=1");
+  }
+
+  revalidatePath("/secondhand");
+  revalidatePath("/admin/settings");
+  redirect("/admin/settings?tab=banner&bannerSaved=1");
 }
 
 export async function updateSettingsAction(formData: FormData) {

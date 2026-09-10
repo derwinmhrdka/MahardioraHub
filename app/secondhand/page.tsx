@@ -1,5 +1,6 @@
 import { ProductKind } from "@prisma/client";
 import type { Metadata } from "next";
+import { CollectionPromoBanner } from "@/components/CollectionPromoBanner";
 import { FlashSaleStrip } from "@/components/FlashSaleStrip";
 import { Header } from "@/components/Header";
 import { ProductBrowse } from "@/components/ProductBrowse";
@@ -11,7 +12,11 @@ import {
   listStoreAreas,
 } from "@/lib/products";
 import { buildShareMetadata } from "@/lib/seo";
-import { getSettings, siteOrigin } from "@/lib/settings";
+import {
+  getCollectionBanner,
+  getSettings,
+  siteOrigin,
+} from "@/lib/settings";
 
 type PageProps = {
   searchParams: Promise<{
@@ -37,17 +42,19 @@ export default async function SecondhandPage({ searchParams }: PageProps) {
   const categorySlug = query.category?.trim() || null;
   const platform = query.platform?.trim() || null;
 
-  const [categories, areas, platforms, products, flashSale] = await Promise.all([
-    listCategories(),
-    listStoreAreas(ProductKind.secondhand),
-    listPlatforms(ProductKind.secondhand),
-    listActiveSecondhand({
-      storeArea: area,
-      categorySlug,
-      platform,
-    }),
-    getActiveFlashSalePublic(),
-  ]);
+  const [categories, areas, platforms, products, flashSale, bannerImages] =
+    await Promise.all([
+      listCategories(),
+      listStoreAreas(ProductKind.secondhand),
+      listPlatforms(ProductKind.secondhand),
+      listActiveSecondhand({
+        storeArea: area,
+        categorySlug,
+        platform,
+      }),
+      getActiveFlashSalePublic(),
+      getCollectionBanner(),
+    ]);
 
   const items = products.map((product) => ({
     id: product.id,
@@ -65,6 +72,9 @@ export default async function SecondhandPage({ searchParams }: PageProps) {
   return (
     <div className="section-secondhand">
       <Header active="secondhand" />
+      {bannerImages.length > 0 ? (
+        <CollectionPromoBanner images={bannerImages} />
+      ) : null}
       <main className="container">
         <h1 className="page-title">Collection</h1>
         {flashSale ? (
