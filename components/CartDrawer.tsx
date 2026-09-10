@@ -11,17 +11,9 @@ type CartDrawerProps = {
   count: number;
   loggedIn: boolean;
   items: CartViewItem[];
-  checkoutHref: string | null;
-  xenditEnabled?: boolean;
 };
 
-export function CartDrawer({
-  count,
-  loggedIn,
-  items,
-  checkoutHref,
-  xenditEnabled = false,
-}: CartDrawerProps) {
+export function CartDrawer({ count, loggedIn, items }: CartDrawerProps) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const panelRef = useRef<HTMLElement>(null);
@@ -92,11 +84,7 @@ export function CartDrawer({
                 </button>
               </div>
               <div className={styles.body}>
-                <CartView
-                  items={items}
-                  checkoutHref={checkoutHref}
-                  xenditEnabled={xenditEnabled}
-                />
+                <CartView items={items} />
               </div>
             </aside>
           </div>,

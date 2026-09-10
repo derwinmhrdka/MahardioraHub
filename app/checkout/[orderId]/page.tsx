@@ -6,7 +6,7 @@ import { Header } from "@/components/Header";
 import { QrisCheckout } from "@/components/QrisCheckout";
 import { getOrderForUser } from "@/lib/orders";
 import { getSettings } from "@/lib/settings";
-import styles from "./checkout.module.css";
+import styles from "../checkout.module.css";
 
 type PageProps = {
   params: Promise<{ orderId: string }>;

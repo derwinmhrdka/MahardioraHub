@@ -1,15 +1,8 @@
 import { auth } from "@/auth";
 import { CartDrawer } from "@/components/CartDrawer";
 import { UserMenu } from "@/components/UserMenu";
-import {
-  buildCartWhatsAppMessage,
-  getCartCount,
-  listCartItems,
-} from "@/lib/cart";
+import { getCartCount, listCartItems } from "@/lib/cart";
 import { productImages } from "@/lib/product-images";
-import { salePrice } from "@/lib/pricing";
-import { getSettings } from "@/lib/settings";
-import { xenditConfigured } from "@/lib/xendit";
 import Link from "next/link";
 import { Package, Recycle } from "lucide-react";
 import styles from "./Header.module.css";
@@ -35,11 +28,9 @@ export async function Header({ active = "deals" }: HeaderProps) {
     discountPercent: number;
     imageUrl: string | null;
   }> = [];
-  let checkoutHref: string | null = null;
 
   if (showCart && userId) {
-    const [settings, count, rows] = await Promise.all([
-      getSettings(),
+    const [count, rows] = await Promise.all([
       getCartCount(userId),
       listCartItems(userId),
     ]);
@@ -53,20 +44,6 @@ export async function Header({ active = "deals" }: HeaderProps) {
       discountPercent: row.product.discountPercent,
       imageUrl: productImages(row.product)[0] ?? null,
     }));
-    checkoutHref =
-      cartItems.length > 0
-        ? `https://wa.me/${settings.whatsappNumber}?text=${encodeURIComponent(
-            buildCartWhatsAppMessage({
-              template: settings.whatsappTemplate,
-              items: cartItems.map((item) => ({
-                title: item.title,
-                quantity: item.quantity,
-                id: item.productId,
-                unitPrice: salePrice(item.price, item.discountPercent),
-              })),
-            })
-          )}`
-        : null;
   }
 
   const user = session?.user
@@ -110,8 +87,6 @@ export async function Header({ active = "deals" }: HeaderProps) {
               count={cartCount}
               loggedIn={Boolean(userId)}
               items={cartItems}
-              checkoutHref={checkoutHref}
-              xenditEnabled={xenditConfigured()}
             />
           ) : null}
           <UserMenu user={user} />

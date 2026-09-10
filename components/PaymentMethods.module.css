@@ -1,0 +1,63 @@
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.form {
+  margin: 0;
+}
+
+.form + .form .row {
+  border-top: 1px dashed rgba(17, 17, 17, 0.12);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.7rem 0.65rem;
+  border: 0;
+  background: #fff;
+  color: #111;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.row:hover {
+  background: #faf8f3;
+}
+
+.row:active {
+  background: #f3f0e8;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  border: 1.5px solid #111;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.qris {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.cash {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.label {
+  font-family: var(--font-body-stack);
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.2;
+}

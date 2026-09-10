@@ -129,9 +129,10 @@ enum OrderStatus {
 enum OrderPayMethod {
   invoice
   qris
+  cash
 }
 
-/** Secondhand checkout via Xendit (Invoice / dynamic QRIS). */
+/** Secondhand checkout: QRIS (Xendit) or Cash (WA invoice). */
 model Order {
   id              String         @id @default(cuid())
   userId          String

@@ -4,7 +4,6 @@ import {
   removeCartItemAction,
   updateCartQtyAction,
 } from "@/app/cart/actions";
-import { CartCheckoutActions } from "@/components/CartCheckoutActions";
 import styles from "./CartView.module.css";
 import { formatRupiah } from "@/lib/format";
 import { productImageUrl } from "@/lib/image-url";
@@ -22,15 +21,9 @@ export type CartViewItem = {
 
 type CartViewProps = {
   items: CartViewItem[];
-  checkoutHref: string | null;
-  xenditEnabled?: boolean;
 };
 
-export function CartView({
-  items,
-  checkoutHref,
-  xenditEnabled = false,
-}: CartViewProps) {
+export function CartView({ items }: CartViewProps) {
   if (items.length === 0) {
     return <p className={styles.empty}>Kosong</p>;
   }
@@ -40,8 +33,6 @@ export function CartView({
       sum + salePrice(item.price, item.discountPercent) * item.quantity,
     0
   );
-
-  const canPay = Boolean(checkoutHref) || xenditEnabled;
 
   return (
     <div className={styles.wrap}>
@@ -124,12 +115,9 @@ export function CartView({
 
       <div className={styles.footer}>
         <p className={styles.total}>{formatRupiah(total)}</p>
-        {canPay ? (
-          <CartCheckoutActions
-            whatsappHref={checkoutHref}
-            xenditEnabled={xenditEnabled}
-          />
-        ) : null}
+        <Link href="/checkout" className={styles.checkout}>
+          Checkout
+        </Link>
       </div>
     </div>
   );
