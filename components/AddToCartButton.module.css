@@ -3,6 +3,56 @@
   width: 100%;
 }
 
+.row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.45rem;
+  align-items: stretch;
+  width: 100%;
+}
+
+.qty {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.15rem;
+  border: var(--stroke) solid #111;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: var(--shadow-doodle-sm);
+}
+
+.qtyBtn {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #111;
+  cursor: pointer;
+}
+
+.qtyBtn:hover:not(:disabled) {
+  background: #111;
+  color: #fff;
+}
+
+.qtyBtn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.qtyVal {
+  min-width: 1.4rem;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;

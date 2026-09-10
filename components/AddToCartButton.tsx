@@ -1,8 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useFormStatus } from "react-dom";
-import { ShoppingCart } from "lucide-react";
+import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { addToCartAction } from "@/app/cart/actions";
 import styles from "./AddToCartButton.module.css";
 
@@ -31,25 +32,69 @@ export function AddToCartButton({
 }: AddToCartButtonProps) {
   const returnTo = next || `/secondhand/${productId}`;
   const available = stock > 0;
+  const maxQty = Math.max(1, stock);
+  const [qty, setQty] = useState(1);
+
+  function dec() {
+    setQty((v) => Math.max(1, v - 1));
+  }
+
+  function inc() {
+    setQty((v) => Math.min(maxQty, v + 1));
+  }
 
   if (!available) {
     return (
-      <button type="button" className={styles.btn} disabled>
-        <ShoppingCart size={16} strokeWidth={2.25} aria-hidden />
-        Tambah
-      </button>
+      <div className={styles.row}>
+        <div className={styles.qty} aria-hidden>
+          <button type="button" className={styles.qtyBtn} disabled>
+            <Minus size={12} strokeWidth={2.5} />
+          </button>
+          <span className={styles.qtyVal}>0</span>
+          <button type="button" className={styles.qtyBtn} disabled>
+            <Plus size={12} strokeWidth={2.5} />
+          </button>
+        </div>
+        <button type="button" className={styles.btn} disabled>
+          <ShoppingCart size={16} strokeWidth={2.25} aria-hidden />
+          Tambah
+        </button>
+      </div>
     );
   }
 
   if (!loggedIn) {
     return (
-      <Link
-        href={`/login?next=${encodeURIComponent(returnTo)}`}
-        className={styles.btn}
-      >
-        <ShoppingCart size={16} strokeWidth={2.25} aria-hidden />
-        Tambah
-      </Link>
+      <div className={styles.row}>
+        <div className={styles.qty}>
+          <button
+            type="button"
+            className={styles.qtyBtn}
+            aria-label="Kurang"
+            onClick={dec}
+            disabled={qty <= 1}
+          >
+            <Minus size={12} strokeWidth={2.5} aria-hidden />
+          </button>
+          <span className={styles.qtyVal}>{qty}</span>
+          <button
+            type="button"
+            className={styles.qtyBtn}
+            aria-label="Tambah"
+            onClick={inc}
+            disabled={qty >= maxQty}
+          >
+            <Plus size={12} strokeWidth={2.5} aria-hidden />
+          </button>
+        </div>
+        <Link
+          href={`/login?next=${encodeURIComponent(returnTo)}`}
+          className={styles.btn}
+        >
+          <ShoppingCart size={16} strokeWidth={2.25} aria-hidden />
+          Tambah
+        </Link>
+      </div>
     );
   }
 
@@ -57,7 +102,33 @@ export function AddToCartButton({
     <form action={addToCartAction} className={styles.form}>
       <input type="hidden" name="productId" value={productId} />
       <input type="hidden" name="next" value={returnTo} />
-      <SubmitButton />
+      <input type="hidden" name="quantity" value={qty} />
+      <div className={styles.row}>
+        <div className={styles.qty}>
+          <button
+            type="button"
+            className={styles.qtyBtn}
+            aria-label="Kurang"
+            onClick={dec}
+            disabled={qty <= 1}
+          >
+            <Minus size={12} strokeWidth={2.5} aria-hidden />
+          </button>
+          <span className={styles.qtyVal} aria-live="polite">
+            {qty}
+          </span>
+          <button
+            type="button"
+            className={styles.qtyBtn}
+            aria-label="Tambah qty"
+            onClick={inc}
+            disabled={qty >= maxQty}
+          >
+            <Plus size={12} strokeWidth={2.5} aria-hidden />
+          </button>
+        </div>
+        <SubmitButton />
+      </div>
     </form>
   );
 }

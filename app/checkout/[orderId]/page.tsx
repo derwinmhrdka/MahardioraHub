@@ -45,9 +45,13 @@ export default async function CheckoutQrisPage({ params }: PageProps) {
         <h1 className={styles.title}>QRIS</h1>
         <QrisCheckout
           orderId={order.id}
+          externalId={order.externalId}
           amount={order.amount}
           qrString={order.qrString}
-          expiresAt={order.expiresAt?.toISOString() ?? null}
+          expiresAt={
+            order.expiresAt?.toISOString() ??
+            new Date(order.createdAt.getTime() + 60 * 60 * 1000).toISOString()
+          }
           initialStatus={order.status}
         />
       </main>

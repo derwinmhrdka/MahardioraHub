@@ -45,8 +45,12 @@ export async function addToCartAction(formData: FormData) {
     throw new Error("Invalid product");
   }
 
+  const qtyRaw = Number(formData.get("quantity"));
+  const quantity =
+    Number.isFinite(qtyRaw) && qtyRaw > 0 ? Math.round(qtyRaw) : 1;
+
   try {
-    await addToCart(userId, productId, 1);
+    await addToCart(userId, productId, quantity);
   } catch {
     return;
   }
