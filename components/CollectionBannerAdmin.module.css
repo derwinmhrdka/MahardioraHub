@@ -9,6 +9,19 @@
   gap: 0.5rem;
 }
 
+.check {
+  flex: 0 0 auto;
+}
+
+.check input {
+  width: 1rem !important;
+  height: 1rem !important;
+  min-width: 1rem !important;
+  min-height: 0 !important;
+  max-width: 1rem !important;
+  padding: 0 !important;
+}
+
 .clearBtn {
   display: inline-flex;
   align-items: center;

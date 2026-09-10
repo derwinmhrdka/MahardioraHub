@@ -39,7 +39,7 @@ export function CollectionBannerAdmin({
   return (
     <form action={action} className={`form admin-form ${styles.form}`}>
       <div className={styles.topRow}>
-        <label className="admin-check">
+        <label className={`admin-check ${styles.check}`}>
           <input
             type="checkbox"
             checked={active}
