@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const origin = siteOrigin();
   try {
     const settings = await getSettings();
-    const description = `${settings.siteName} — My Picks & Collection`;
+    const description = `${settings.siteName} — Collection & My Picks`;
     return {
       metadataBase: new URL(origin),
       title: {
@@ -52,7 +52,7 @@ export async function generateMetadata(): Promise<Metadata> {
     return {
       metadataBase: new URL(origin),
       title: "MahardioraHub",
-      description: "My Picks & Collection",
+      description: "Collection & My Picks",
       icons: {
         icon: [{ url: "/icon-store.svg", type: "image/svg+xml" }],
       },

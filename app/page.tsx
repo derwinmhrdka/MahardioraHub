@@ -1,69 +1,101 @@
+import { ProductKind } from "@prisma/client";
+import type { Metadata } from "next";
+import { CollectionPromoBanner } from "@/components/CollectionPromoBanner";
+import { FlashSaleStrip } from "@/components/FlashSaleStrip";
 import { Header } from "@/components/Header";
 import { ProductBrowse } from "@/components/ProductBrowse";
 import { listCategories } from "@/lib/categories";
+import { getActiveFlashSalePublic } from "@/lib/flash-sale";
 import {
-  listActiveDeals,
+  listActiveSecondhand,
   listPlatforms,
   listStoreAreas,
 } from "@/lib/products";
-import { ProductKind } from "@prisma/client";
-import type { Metadata } from "next";
 import { buildShareMetadata } from "@/lib/seo";
-import { getSettings, siteOrigin } from "@/lib/settings";
+import {
+  getCollectionBanner,
+  getSettings,
+  siteOrigin,
+} from "@/lib/settings";
 
 type PageProps = {
-  searchParams: Promise<{ area?: string; platform?: string }>;
+  searchParams: Promise<{
+    area?: string;
+    category?: string;
+    platform?: string;
+  }>;
 };
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   return buildShareMetadata({
     title: settings.siteName,
-    description: `${settings.siteName} — My Picks & Collection`,
+    description: `${settings.siteName} — Collection`,
     url: siteOrigin(),
     siteName: settings.siteName,
   });
 }
 
 export default async function HomePage({ searchParams }: PageProps) {
-  const params = await searchParams;
-  const area = params.area?.trim() || null;
-  const platform = params.platform?.trim() || null;
+  const query = await searchParams;
+  const area = query.area?.trim() || null;
+  const categorySlug = query.category?.trim() || null;
+  const platform = query.platform?.trim() || null;
 
-  const [categories, areas, platforms, products] = await Promise.all([
-    listCategories(),
-    listStoreAreas(ProductKind.deal),
-    listPlatforms(ProductKind.deal),
-    listActiveDeals({ storeArea: area, platform }),
-  ]);
+  const [categories, areas, platforms, products, flashSale, bannerImages] =
+    await Promise.all([
+      listCategories(),
+      listStoreAreas(ProductKind.secondhand),
+      listPlatforms(ProductKind.secondhand),
+      listActiveSecondhand({
+        storeArea: area,
+        categorySlug,
+        platform,
+      }),
+      getActiveFlashSalePublic(),
+      getCollectionBanner(),
+    ]);
 
   const items = products.map((product) => ({
     id: product.id,
     title: product.title,
     price: product.price,
+    discountPercent: product.discountPercent,
+    stock: product.stock,
     shortNote: product.shortNote,
     imageUrl: product.imageUrl,
     categoryName: product.category.name,
     storeArea: product.storeArea,
-    href: `/deals/product/${product.id}`,
+    href: `/secondhand/${product.id}`,
   }));
 
   return (
-    <div className="section-deals">
-      <Header active="deals" />
+    <div className="section-secondhand">
+      <Header active="secondhand" />
+      {bannerImages.length > 0 ? (
+        <CollectionPromoBanner images={bannerImages} />
+      ) : null}
       <main className="container">
-        <h1 className="page-title">My Picks</h1>
+        <h1 className="page-title">Collection</h1>
+        {flashSale ? (
+          <FlashSaleStrip
+            endsAt={flashSale.endsAt}
+            startedAt={flashSale.startedAt}
+            items={flashSale.items}
+          />
+        ) : null}
         <ProductBrowse
-          mode="deals"
-          label="My Picks"
+          mode="secondhand"
+          label="Collection"
           items={items}
           categories={categories}
           areas={areas}
           platforms={platforms}
+          activeCategory={categorySlug}
           activeArea={area}
           activePlatform={platform}
           basePath="/"
-          emptyText="Belum ada picks"
+          emptyText="Belum ada collection"
         />
       </main>
     </div>

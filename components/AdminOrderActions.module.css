@@ -1,0 +1,76 @@
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.row form {
+  margin: 0;
+}
+
+.rejectForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.reason {
+  width: 100%;
+  min-height: 2.15rem;
+  padding: 0.4rem 0.65rem;
+  border: 1.5px solid #111;
+  border-radius: 10px;
+  background: #fff;
+  font-family: var(--font-body-stack);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #111;
+  box-shadow: 1px 1px 0 #111;
+}
+
+.rejectRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.btnOk,
+.btnDanger,
+.btnGhost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  min-height: 2.05rem;
+  padding: 0.3rem 0.75rem;
+  border: 1.5px solid #111;
+  border-radius: 999px;
+  font-family: var(--font-body-stack);
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 1px 1px 0 #111;
+}
+
+.btnOk {
+  background: #111;
+  color: #fff;
+}
+
+.btnDanger {
+  background: #fff;
+  color: #9f1239;
+}
+
+.btnGhost {
+  background: #f7f3eb;
+  color: #111;
+  box-shadow: none;
+}
+
+.btnOk:disabled,
+.btnDanger:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}

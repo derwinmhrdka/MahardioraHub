@@ -64,7 +64,7 @@ export default async function SecondhandItemPage({ params }: PageProps) {
       <Header siteName={settings.siteName} active="secondhand" />
       <main className="container">
         <Link
-          href="/secondhand"
+          href="/"
           className={styles.back}
           aria-label="Kembali"
           title="Kembali"
@@ -110,6 +110,7 @@ export default async function SecondhandItemPage({ params }: PageProps) {
                 next={`/secondhand/${product.id}`}
                 stock={product.stock}
                 loggedIn={Boolean(session?.user?.id)}
+                imageUrl={productImages(product)[0] ?? null}
               />
             </div>
           </div>

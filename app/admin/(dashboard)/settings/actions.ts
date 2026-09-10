@@ -9,6 +9,10 @@ import {
   updateFlashSaleConfig,
 } from "@/lib/flash-sale";
 import { getSettings, updateSettings } from "@/lib/settings";
+import {
+  normalizeBannerHidden,
+  normalizeBannerImages,
+} from "@/lib/collection-banner";
 import { cleanupProductUploadsAndOrphans } from "@/lib/upload-gc";
 import { grantAdminByEmail, revokeAdminByEmail } from "@/lib/users";
 
@@ -32,42 +36,118 @@ export async function updateFlashSaleAction(formData: FormData) {
   }
 
   revalidatePath("/secondhand");
+  revalidatePath("/");
   revalidatePath("/admin/settings");
   redirect("/admin/settings?tab=flash&flashSaved=1");
 }
 
-export async function updateCollectionBannerAction(formData: FormData) {
-  await requireAdmin();
+async function patchBannerSettings(patch: {
+  collectionBannerImages?: string[];
+  collectionBannerHidden?: string[];
+}) {
   const current = await getSettings();
-  const images = String(formData.get("images") ?? "")
-    .split(/[\n,]/)
-    .map((s) => s.trim())
-    .filter(Boolean);
-  const isActive =
-    images.length > 0 && String(formData.get("isActive") ?? "") === "on";
-  const previous = current.collectionBannerImages ?? [];
+  const images =
+    patch.collectionBannerImages ?? current.collectionBannerImages ?? [];
+  const hidden = normalizeBannerHidden(
+    patch.collectionBannerHidden ?? current.collectionBannerHidden ?? [],
+    images
+  );
+  const visible = images.some((url) => !hidden.includes(url));
+  await updateSettings({
+    siteName: current.siteName,
+    whatsappNumber: current.whatsappNumber,
+    whatsappTemplate: current.whatsappTemplate,
+    contactEmail: current.contactEmail,
+    shopeeAffiliateId: current.shopeeAffiliateId,
+    qrisProvider: current.qrisProvider,
+    collectionBannerImages: images,
+    collectionBannerHidden: hidden,
+    collectionBannerActive: visible,
+  });
+}
+
+function revalidateBanner() {
+  revalidatePath("/");
+  revalidatePath("/secondhand");
+  revalidatePath("/admin/settings");
+}
+
+export async function addCollectionBannerAction(formData: FormData) {
+  await requireAdmin();
+  const url = String(formData.get("imageUrl") ?? "").trim();
+  if (!url) {
+    redirect("/admin/settings?tab=banner&bannerError=1");
+  }
 
   try {
-    await updateSettings({
-      siteName: current.siteName,
-      whatsappNumber: current.whatsappNumber,
-      whatsappTemplate: current.whatsappTemplate,
-      contactEmail: current.contactEmail,
-      shopeeAffiliateId: current.shopeeAffiliateId,
-      qrisProvider: current.qrisProvider,
-      collectionBannerActive: isActive,
+    const current = await getSettings();
+    const images = normalizeBannerImages([
+      ...(current.collectionBannerImages ?? []),
+      url,
+    ]);
+    await patchBannerSettings({
       collectionBannerImages: images,
+      collectionBannerHidden: current.collectionBannerHidden ?? [],
     });
-    const kept = new Set(images);
-    await cleanupProductUploadsAndOrphans(
-      previous.filter((url) => !kept.has(url))
-    );
   } catch {
     redirect("/admin/settings?tab=banner&bannerError=1");
   }
 
-  revalidatePath("/secondhand");
-  revalidatePath("/admin/settings");
+  revalidateBanner();
+  redirect("/admin/settings?tab=banner&bannerSaved=1");
+}
+
+export async function toggleCollectionBannerHideAction(formData: FormData) {
+  await requireAdmin();
+  const url = String(formData.get("imageUrl") ?? "").trim();
+  if (!url) {
+    redirect("/admin/settings?tab=banner&bannerError=1");
+  }
+
+  try {
+    const current = await getSettings();
+    const images = normalizeBannerImages(current.collectionBannerImages);
+    const hidden = new Set(
+      normalizeBannerHidden(current.collectionBannerHidden ?? [], images)
+    );
+    if (hidden.has(url)) hidden.delete(url);
+    else hidden.add(url);
+    await patchBannerSettings({
+      collectionBannerImages: images,
+      collectionBannerHidden: Array.from(hidden),
+    });
+  } catch {
+    redirect("/admin/settings?tab=banner&bannerError=1");
+  }
+
+  revalidateBanner();
+  redirect("/admin/settings?tab=banner&bannerSaved=1");
+}
+
+export async function deleteCollectionBannerAction(formData: FormData) {
+  await requireAdmin();
+  const url = String(formData.get("imageUrl") ?? "").trim();
+  if (!url) {
+    redirect("/admin/settings?tab=banner&bannerError=1");
+  }
+
+  try {
+    const current = await getSettings();
+    const previous = current.collectionBannerImages ?? [];
+    const images = previous.filter((item) => item !== url);
+    const hidden = (current.collectionBannerHidden ?? []).filter(
+      (item) => item !== url
+    );
+    await patchBannerSettings({
+      collectionBannerImages: images,
+      collectionBannerHidden: hidden,
+    });
+    await cleanupProductUploadsAndOrphans([url]);
+  } catch {
+    redirect("/admin/settings?tab=banner&bannerError=1");
+  }
+
+  revalidateBanner();
   redirect("/admin/settings?tab=banner&bannerSaved=1");
 }
 

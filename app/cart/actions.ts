@@ -13,12 +13,13 @@ async function requireUserId() {
   const session = await auth();
   const id = session?.user?.id;
   if (!id) {
-    redirect("/login?next=/secondhand");
+    redirect("/login?next=/");
   }
   return id;
 }
 
 function revalidateCartViews(productId?: number) {
+  revalidatePath("/");
   revalidatePath("/secondhand");
   if (productId != null && Number.isFinite(productId)) {
     revalidatePath(`/secondhand/${productId}`);
@@ -35,7 +36,7 @@ export async function addToCartAction(formData: FormData) {
       ? next
       : Number.isFinite(productId)
         ? `/secondhand/${productId}`
-        : "/secondhand";
+        : "/";
 
   if (!userId) {
     redirect(`/login?next=${encodeURIComponent(returnTo)}`);

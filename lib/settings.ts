@@ -1,5 +1,9 @@
 import { OrderPayProvider } from "@prisma/client";
-import { normalizeBannerImages } from "./collection-banner";
+import {
+  normalizeBannerHidden,
+  normalizeBannerImages,
+  visibleBannerImages,
+} from "./collection-banner";
 import { prisma } from "./prisma";
 
 export type SettingInput = {
@@ -11,6 +15,7 @@ export type SettingInput = {
   qrisProvider?: OrderPayProvider;
   collectionBannerActive?: boolean;
   collectionBannerImages?: string[];
+  collectionBannerHidden?: string[];
 };
 
 export {
@@ -36,6 +41,15 @@ export async function updateSettings(input: SettingInput) {
     input.collectionBannerImages !== undefined
       ? normalizeBannerImages(input.collectionBannerImages)
       : undefined;
+  const bannerHidden =
+    input.collectionBannerHidden !== undefined
+      ? normalizeBannerHidden(
+          input.collectionBannerHidden,
+          bannerImages ??
+            (await getSettings()).collectionBannerImages ??
+            []
+        )
+      : undefined;
 
   return prisma.setting.upsert({
     where: { id: 1 },
@@ -49,6 +63,7 @@ export async function updateSettings(input: SettingInput) {
       qrisProvider,
       collectionBannerActive: bannerActive ?? false,
       collectionBannerImages: bannerImages ?? [],
+      collectionBannerHidden: bannerHidden ?? [],
     },
     update: {
       whatsappNumber: input.whatsappNumber,
@@ -63,15 +78,20 @@ export async function updateSettings(input: SettingInput) {
       ...(bannerImages !== undefined
         ? { collectionBannerImages: bannerImages }
         : {}),
+      ...(bannerHidden !== undefined
+        ? { collectionBannerHidden: bannerHidden }
+        : {}),
     },
   });
 }
 
-/** Active Collection promo slides for the public page. */
+/** Visible Collection promo slides for the public page. */
 export async function getCollectionBanner(): Promise<string[]> {
   const settings = await getSettings();
-  if (!settings.collectionBannerActive) return [];
-  return normalizeBannerImages(settings.collectionBannerImages);
+  return visibleBannerImages(
+    settings.collectionBannerImages,
+    settings.collectionBannerHidden ?? []
+  );
 }
 
 const DEFAULT_SITE_ORIGIN = "https://mahardiora-hub.teknodika.com";

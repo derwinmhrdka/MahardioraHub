@@ -89,6 +89,7 @@ export async function createProductAction(formData: FormData) {
   const data = await parseProductForm(formData);
   await createProduct(data);
   revalidatePath("/");
+  revalidatePath("/picks");
   revalidatePath("/secondhand");
   revalidatePath("/admin/products");
   redirect("/admin/products");
@@ -100,6 +101,7 @@ export async function updateProductAction(formData: FormData) {
   const data = await parseProductForm(formData);
   await updateProduct(id, data);
   revalidatePath("/");
+  revalidatePath("/picks");
   revalidatePath("/secondhand");
   revalidatePath(`/deals/product/${id}`);
   revalidatePath(`/secondhand/${id}`);
@@ -112,6 +114,7 @@ export async function hideProductAction(formData: FormData) {
   if (!Number.isFinite(id)) throw new Error("Invalid product id");
   await setProductActive(id, false);
   revalidatePath("/");
+  revalidatePath("/picks");
   revalidatePath("/secondhand");
   revalidatePath("/admin/products");
 }
@@ -121,6 +124,7 @@ export async function showProductAction(formData: FormData) {
   if (!Number.isFinite(id)) throw new Error("Invalid product id");
   await setProductActive(id, true);
   revalidatePath("/");
+  revalidatePath("/picks");
   revalidatePath("/secondhand");
   revalidatePath("/admin/products");
 }
@@ -130,6 +134,7 @@ export async function deleteProductAction(formData: FormData) {
   if (!Number.isFinite(id)) throw new Error("Invalid product id");
   await deleteProduct(id);
   revalidatePath("/");
+  revalidatePath("/picks");
   revalidatePath("/secondhand");
   revalidatePath("/admin/products");
 }
@@ -195,19 +200,27 @@ export async function deleteUploadedImageAction(url: string) {
   // Detach from Collection banner first so GC can unlink the file.
   const settings = await prisma.setting.findUnique({
     where: { id: 1 },
-    select: { collectionBannerImages: true },
+    select: {
+      collectionBannerImages: true,
+      collectionBannerHidden: true,
+    },
   });
   const bannerUrls = settings?.collectionBannerImages ?? [];
   if (bannerUrls.includes(trimmed)) {
     const next = bannerUrls.filter((item) => item !== trimmed);
+    const hidden = (settings?.collectionBannerHidden ?? []).filter(
+      (item) => item !== trimmed
+    );
     await prisma.setting.update({
       where: { id: 1 },
       data: {
         collectionBannerImages: next,
-        ...(next.length === 0 ? { collectionBannerActive: false } : {}),
+        collectionBannerHidden: hidden,
+        collectionBannerActive: next.length > 0 && next.some((u) => !hidden.includes(u)),
       },
     });
     revalidatePath("/secondhand");
+    revalidatePath("/");
     revalidatePath("/admin/settings");
   }
 

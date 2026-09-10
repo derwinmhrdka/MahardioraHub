@@ -33,7 +33,7 @@
 
 .tabs {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0;
   margin: 0 0 0.85rem;
   border: 1.5px solid #111;
@@ -50,11 +50,11 @@
   justify-content: center;
   gap: 0.3rem;
   min-height: 2.35rem;
-  padding: 0.4rem 0.35rem;
+  padding: 0.4rem 0.2rem;
   border-right: 1px solid rgba(17, 17, 17, 0.18);
   color: var(--color-text-muted);
   font-family: var(--font-body-stack);
-  font-size: 0.72rem;
+  font-size: 0.62rem;
   font-weight: 700;
   text-decoration: none;
   text-align: center;
@@ -316,6 +316,14 @@
   color: #15803d;
 }
 
+.cancelReason {
+  margin: 0.15rem 0 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #9f1239;
+  line-height: 1.35;
+}
+
 .btn,
 .btnGhost,
 .btnDanger {
@@ -412,9 +420,16 @@
   display: grid;
   grid-template-columns: 2.8rem 1fr auto;
   gap: 0.5rem;
-  align-items: center;
-  padding: 0.45rem 0.65rem;
+  align-items: start;
+  padding: 0.55rem 0.65rem;
   font-size: 0.8rem;
+}
+
+.itemBody {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
 }
 
 .itemTitle {
@@ -423,7 +438,7 @@
 }
 
 .itemSub {
-  margin: 0.1rem 0 0;
+  margin: 0;
   font-size: 0.7rem;
   color: var(--color-text-muted);
 }
@@ -433,6 +448,33 @@
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+  padding-top: 0.1rem;
+}
+
+.waBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  width: fit-content;
+  margin-top: 0.35rem;
+  padding: 0.28rem 0.55rem;
+  border: 1.5px solid #128c7e;
+  border-radius: 999px;
+  background: #25d366;
+  color: #fff;
+  font-family: var(--font-body-stack);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 1px 1px 0 #128c7e;
+}
+
+.waBtn:hover {
+  background: #20bd5a;
+}
+
+.waBtn svg {
+  flex-shrink: 0;
 }
 
 .totalRow {

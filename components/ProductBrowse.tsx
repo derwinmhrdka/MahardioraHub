@@ -105,14 +105,14 @@ export function ProductBrowse({
 
   function categoryHref(slug: string | null) {
     if (mode === "secondhand") {
-      return withFilters("/secondhand", {
+      return withFilters(basePath, {
         category: slug,
         area: activeArea,
         platform: activePlatform,
       });
     }
     if (!slug) {
-      return withFilters("/", {
+      return withFilters("/picks", {
         area: activeArea,
         platform: activePlatform,
       });
@@ -148,6 +148,7 @@ export function ProductBrowse({
           categories={categories}
           activeSlug={activeCategory}
           mode={mode}
+          basePath={basePath}
           area={activeArea}
           platform={activePlatform}
           query={query}

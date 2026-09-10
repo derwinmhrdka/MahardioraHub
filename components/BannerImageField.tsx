@@ -1,41 +1,31 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import {
   ClipboardPaste,
   Crop,
-  Eye,
-  EyeOff,
   Link2,
   LoaderCircle,
-  Maximize2,
-  Trash2,
   Upload,
+  X,
 } from "lucide-react";
-import {
-  addCollectionBannerAction,
-  deleteCollectionBannerAction,
-  toggleCollectionBannerHideAction,
-} from "@/app/admin/(dashboard)/settings/actions";
+import { deleteUploadedImageAction } from "@/app/admin/(dashboard)/products/actions";
 import { BannerCropDialog } from "@/components/BannerCropDialog";
-import { BannerLightbox } from "@/components/BannerLightbox";
-import {
-  COLLECTION_BANNER_MAX,
-  type CollectionBannerItem,
-} from "@/lib/collection-banner";
-import { productImageUrl } from "@/lib/image-url";
-import formStyles from "./ProductForm.module.css";
-import styles from "./CollectionBannerAdmin.module.css";
+import { COLLECTION_BANNER_MAX } from "@/lib/collection-banner";
+import styles from "./ProductForm.module.css";
+import bannerStyles from "./BannerImageField.module.css";
 
 type ImageMode = "upload" | "url" | "paste";
 
 type CropJob = {
   src: string;
   revoke?: string;
+  replaceIndex?: number;
 };
 
-type CollectionBannerAdminProps = {
-  items: CollectionBannerItem[];
+type BannerImageFieldProps = {
+  urls: string[];
+  onChange: (urls: string[]) => void;
 };
 
 function filesFromClipboard(data: DataTransfer | null): File[] {
@@ -72,7 +62,9 @@ async function uploadCropped(file: File): Promise<string> {
 async function srcFromUrl(url: string): Promise<CropJob> {
   const trimmed = url.trim();
   if (!trimmed) throw new Error("Gagal");
-  if (trimmed.startsWith("/")) return { src: trimmed };
+  if (trimmed.startsWith("/")) {
+    return { src: trimmed };
+  }
   const parsed = new URL(trimmed);
   if (!/^https?:$/i.test(parsed.protocol)) throw new Error("Gagal");
   const res = await fetch(trimmed);
@@ -83,9 +75,10 @@ async function srcFromUrl(url: string): Promise<CropJob> {
   return { src: objectUrl, revoke: objectUrl };
 }
 
-export function CollectionBannerAdmin({ items }: CollectionBannerAdminProps) {
+export function BannerImageField({ urls, onChange }: BannerImageFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const pasteCatcherRef = useRef<HTMLDivElement>(null);
+  const urlsRef = useRef(urls);
   const queueRef = useRef<CropJob[]>([]);
   const [mode, setMode] = useState<ImageMode>("upload");
   const [urlDraft, setUrlDraft] = useState("");
@@ -94,12 +87,14 @@ export function CollectionBannerAdmin({ items }: CollectionBannerAdminProps) {
   const [dragOver, setDragOver] = useState(false);
   const [awaitingPaste, setAwaitingPaste] = useState(false);
   const [crop, setCrop] = useState<CropJob | null>(null);
-  const [viewSrc, setViewSrc] = useState<string | null>(null);
 
-  const full = items.length >= COLLECTION_BANNER_MAX;
+  useEffect(() => {
+    urlsRef.current = urls;
+  }, [urls]);
 
   function openNextFromQueue() {
-    setCrop(queueRef.current.shift() ?? null);
+    const next = queueRef.current.shift() ?? null;
+    setCrop(next);
   }
 
   function enqueueJobs(jobs: CropJob[]) {
@@ -121,11 +116,11 @@ export function CollectionBannerAdmin({ items }: CollectionBannerAdminProps) {
 
   function queueFiles(files: File[]) {
     setError(null);
-    if (full) {
+    const room = COLLECTION_BANNER_MAX - urlsRef.current.length;
+    if (room <= 0) {
       setError("Max");
       return;
     }
-    const room = COLLECTION_BANNER_MAX - items.length;
     const picked = files.slice(0, room);
     if (picked.length === 0) {
       setError("Gagal");
@@ -139,11 +134,30 @@ export function CollectionBannerAdmin({ items }: CollectionBannerAdminProps) {
     );
   }
 
-  function commitUrl(url: string) {
-    const formData = new FormData();
-    formData.set("imageUrl", url);
+  function removeAt(index: number) {
+    const removed = urls[index];
+    onChange(urls.filter((_, i) => i !== index));
+    if (!removed) return;
     startTransition(async () => {
-      await addCollectionBannerAction(formData);
+      try {
+        await deleteUploadedImageAction(removed);
+      } catch {
+        // GC on save still covers leftovers
+      }
+    });
+  }
+
+  function startRecrop(index: number) {
+    const url = urls[index];
+    if (!url) return;
+    setError(null);
+    startTransition(async () => {
+      try {
+        const job = await srcFromUrl(url);
+        enqueueJobs([{ ...job, replaceIndex: index }]);
+      } catch {
+        setError("Gagal");
+      }
     });
   }
 
@@ -153,10 +167,28 @@ export function CollectionBannerAdmin({ items }: CollectionBannerAdminProps) {
     setError(null);
     try {
       const uploaded = await uploadCropped(file);
+      const list = [...urlsRef.current];
+      if (
+        typeof current.replaceIndex === "number" &&
+        current.replaceIndex >= 0 &&
+        current.replaceIndex < list.length
+      ) {
+        const prev = list[current.replaceIndex];
+        list[current.replaceIndex] = uploaded;
+        onChange(list);
+        if (prev && prev !== uploaded) {
+          try {
+            await deleteUploadedImageAction(prev);
+          } catch {
+            // ignore
+          }
+        }
+      } else {
+        onChange(Array.from(new Set([...list, uploaded])));
+      }
       if (current.revoke) URL.revokeObjectURL(current.revoke);
       setCrop(null);
       openNextFromQueue();
-      commitUrl(uploaded);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Gagal");
       if (current.revoke) URL.revokeObjectURL(current.revoke);
@@ -169,7 +201,7 @@ export function CollectionBannerAdmin({ items }: CollectionBannerAdminProps) {
     setError(null);
     const next = urlDraft.trim();
     if (!next) return;
-    if (full) {
+    if (urlsRef.current.length >= COLLECTION_BANNER_MAX) {
       setError("Max");
       return;
     }
@@ -184,8 +216,10 @@ export function CollectionBannerAdmin({ items }: CollectionBannerAdminProps) {
     });
   }
 
+  const full = urls.length >= COLLECTION_BANNER_MAX;
+
   return (
-    <div className={styles.wrap}>
+    <div>
       {crop ? (
         <BannerCropDialog
           src={crop.src}
@@ -193,82 +227,13 @@ export function CollectionBannerAdmin({ items }: CollectionBannerAdminProps) {
           onConfirm={handleCropConfirm}
         />
       ) : null}
-      {viewSrc ? (
-        <BannerLightbox src={viewSrc} onClose={() => setViewSrc(null)} />
-      ) : null}
-
-      {items.length > 0 ? (
-        <ul className={styles.list} aria-label="Banner">
-          {items.map((item) => {
-            const thumb = productImageUrl(item.imageUrl, 480) ?? item.imageUrl;
-            return (
-              <li
-                key={item.imageUrl}
-                className={`${styles.card} ${item.isHidden ? styles.cardHidden : ""}`}
-              >
-                <button
-                  type="button"
-                  className={styles.preview}
-                  aria-label="View"
-                  title="View"
-                  onClick={() => setViewSrc(item.imageUrl)}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={thumb} alt="" />
-                </button>
-                <div className={styles.cardActions}>
-                  <button
-                    type="button"
-                    className={styles.iconBtn}
-                    aria-label="View"
-                    title="View"
-                    onClick={() => setViewSrc(item.imageUrl)}
-                  >
-                    <Maximize2 size={14} strokeWidth={2.25} aria-hidden />
-                  </button>
-                  <form action={toggleCollectionBannerHideAction}>
-                    <input type="hidden" name="imageUrl" value={item.imageUrl} />
-                    <button
-                      type="submit"
-                      className={styles.iconBtn}
-                      aria-label={item.isHidden ? "Show" : "Hide"}
-                      title={item.isHidden ? "Show" : "Hide"}
-                      disabled={pending}
-                    >
-                      {item.isHidden ? (
-                        <Eye size={14} strokeWidth={2.25} aria-hidden />
-                      ) : (
-                        <EyeOff size={14} strokeWidth={2.25} aria-hidden />
-                      )}
-                    </button>
-                  </form>
-                  <form action={deleteCollectionBannerAction}>
-                    <input type="hidden" name="imageUrl" value={item.imageUrl} />
-                    <button
-                      type="submit"
-                      className={`${styles.iconBtn} ${styles.iconDanger}`}
-                      aria-label="Hapus"
-                      title="Hapus"
-                      disabled={pending}
-                    >
-                      <Trash2 size={14} strokeWidth={2.25} aria-hidden />
-                    </button>
-                  </form>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      ) : (
-        <p className={styles.empty}>Belum ada banner</p>
-      )}
 
       <input
         ref={inputRef}
         type="file"
         accept="image/jpeg,image/png,image/webp,image/gif"
         multiple
-        className={formStyles.fileHidden}
+        className={styles.fileHidden}
         disabled={pending || full}
         aria-hidden
         tabIndex={-1}
@@ -280,15 +245,15 @@ export function CollectionBannerAdmin({ items }: CollectionBannerAdminProps) {
         }}
       />
 
-      <div className={formStyles.mediaPanel}>
-        <div className={formStyles.modeTabs} role="tablist" aria-label="Sumber">
+      <div className={styles.mediaPanel}>
+        <div className={styles.modeTabs} role="tablist" aria-label="Sumber">
           <button
             type="button"
             role="tab"
             aria-label="Upload"
             title="Upload"
             aria-selected={mode === "upload"}
-            className={`${formStyles.modeTab} ${mode === "upload" ? formStyles.modeTabOn : ""}`}
+            className={`${styles.modeTab} ${mode === "upload" ? styles.modeTabOn : ""}`}
             onClick={() => setMode("upload")}
           >
             <Upload size={14} strokeWidth={2.25} aria-hidden />
@@ -299,7 +264,7 @@ export function CollectionBannerAdmin({ items }: CollectionBannerAdminProps) {
             aria-label="URL"
             title="URL"
             aria-selected={mode === "url"}
-            className={`${formStyles.modeTab} ${mode === "url" ? formStyles.modeTabOn : ""}`}
+            className={`${styles.modeTab} ${mode === "url" ? styles.modeTabOn : ""}`}
             onClick={() => setMode("url")}
           >
             <Link2 size={14} strokeWidth={2.25} aria-hidden />
@@ -310,18 +275,50 @@ export function CollectionBannerAdmin({ items }: CollectionBannerAdminProps) {
             aria-label="Paste"
             title="Paste"
             aria-selected={mode === "paste"}
-            className={`${formStyles.modeTab} ${mode === "paste" ? formStyles.modeTabOn : ""}`}
+            className={`${styles.modeTab} ${mode === "paste" ? styles.modeTabOn : ""}`}
             onClick={() => setMode("paste")}
           >
             <ClipboardPaste size={14} strokeWidth={2.25} aria-hidden />
           </button>
         </div>
 
-        <div className={formStyles.mediaBody} role="tabpanel">
+        {urls.length > 0 ? (
+          <div
+            className={`${styles.gallery} ${bannerStyles.gallery}`}
+            aria-label="Banner"
+          >
+            {urls.map((url, index) => (
+              <div key={`${url}-${index}`} className={styles.galleryItem}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={url} alt="" draggable={false} />
+                <button
+                  type="button"
+                  className={bannerStyles.cropBtn}
+                  aria-label="Crop"
+                  title="Crop"
+                  onClick={() => startRecrop(index)}
+                >
+                  <Crop size={12} strokeWidth={2.5} aria-hidden />
+                </button>
+                <button
+                  type="button"
+                  className={styles.galleryRemove}
+                  aria-label="Hapus"
+                  title="Hapus"
+                  onClick={() => removeAt(index)}
+                >
+                  <X size={12} strokeWidth={2.5} aria-hidden />
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : null}
+
+        <div className={styles.mediaBody} role="tabpanel">
           {mode === "upload" ? (
             <button
               type="button"
-              className={`${formStyles.mediaArea} ${dragOver ? formStyles.mediaAreaHot : ""}`}
+              className={`${styles.mediaArea} ${dragOver ? styles.mediaAreaHot : ""}`}
               disabled={pending || full}
               aria-label="Upload"
               title="Upload"
@@ -349,7 +346,7 @@ export function CollectionBannerAdmin({ items }: CollectionBannerAdminProps) {
                 <LoaderCircle
                   size={22}
                   strokeWidth={2.25}
-                  className={formStyles.spin}
+                  className={styles.spin}
                   aria-hidden
                 />
               ) : (
@@ -359,8 +356,8 @@ export function CollectionBannerAdmin({ items }: CollectionBannerAdminProps) {
           ) : null}
 
           {mode === "url" ? (
-            <div className={formStyles.mediaArea}>
-              <div className={formStyles.mediaAreaUrl}>
+            <div className={styles.mediaArea}>
+              <div className={styles.mediaAreaUrl}>
                 <Link2 size={18} strokeWidth={2.25} aria-hidden />
                 <input
                   type="text"
@@ -379,7 +376,7 @@ export function CollectionBannerAdmin({ items }: CollectionBannerAdminProps) {
                 />
                 <button
                   type="button"
-                  className={formStyles.mediaAreaAction}
+                  className={styles.mediaAreaAction}
                   aria-label="Crop"
                   title="Crop"
                   onClick={addUrl}
@@ -393,13 +390,13 @@ export function CollectionBannerAdmin({ items }: CollectionBannerAdminProps) {
 
           {mode === "paste" ? (
             <div
-              className={`${formStyles.mediaArea} ${formStyles.mediaPasteWrap} ${
-                awaitingPaste ? formStyles.mediaAreaHot : ""
+              className={`${styles.mediaArea} ${styles.mediaPasteWrap} ${
+                awaitingPaste ? styles.mediaAreaHot : ""
               }`}
             >
               <div
                 ref={pasteCatcherRef}
-                className={formStyles.pasteCatcher}
+                className={styles.pasteCatcher}
                 contentEditable={!pending && !full}
                 suppressContentEditableWarning
                 role="textbox"
@@ -414,7 +411,7 @@ export function CollectionBannerAdmin({ items }: CollectionBannerAdminProps) {
               />
               <button
                 type="button"
-                className={formStyles.mediaPasteBtn}
+                className={styles.mediaPasteBtn}
                 disabled={pending || full}
                 aria-label="Paste"
                 title="Paste"
@@ -424,7 +421,7 @@ export function CollectionBannerAdmin({ items }: CollectionBannerAdminProps) {
                   <LoaderCircle
                     size={22}
                     strokeWidth={2.25}
-                    className={formStyles.spin}
+                    className={styles.spin}
                     aria-hidden
                   />
                 ) : (

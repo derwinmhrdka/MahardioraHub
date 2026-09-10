@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { AdminNav } from "@/components/AdminNav";
 import { auth } from "@/auth";
+import { countAdminProgressOrders } from "@/lib/orders";
 import { getSettings } from "@/lib/settings";
 import styles from "./admin.module.css";
 
@@ -18,12 +19,15 @@ export default async function AdminDashboardLayout({
     redirect("/");
   }
 
+  const progressCount = await countAdminProgressOrders();
+
   return (
     <div className={styles.shell}>
       <AdminNav
         siteName={settings.siteName}
         userImage={session.user.image}
         userName={session.user.name || session.user.email}
+        progressCount={progressCount}
       />
       <main className={styles.main}>{children}</main>
     </div>

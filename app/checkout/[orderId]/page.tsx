@@ -16,14 +16,14 @@ type PageProps = {
 export default async function CheckoutQrisPage({ params }: PageProps) {
   const session = await auth();
   if (!session?.user?.id) {
-    redirect("/login?next=/secondhand");
+    redirect("/login?next=/");
   }
 
   const { orderId } = await params;
   const order = await getOrderForUser(orderId, session.user.id);
   if (!order || order.payMethod !== "qris") notFound();
 
-  if (order.status === "paid") {
+  if (order.status === "paid" || order.status === "completed") {
     redirect(`/checkout/success?order=${order.id}`);
   }
 

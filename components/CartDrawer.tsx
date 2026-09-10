@@ -41,7 +41,7 @@ export function CartDrawer({ count, loggedIn, items }: CartDrawerProps) {
   if (!loggedIn) {
     return (
       <Link
-        href="/login?next=/secondhand"
+        href="/login?next=/"
         className={styles.trigger}
         aria-label="Cart"
         title="Cart"
@@ -97,6 +97,7 @@ export function CartDrawer({ count, loggedIn, items }: CartDrawerProps) {
       <button
         type="button"
         className={styles.trigger}
+        data-cart-target
         aria-label="Cart"
         title="Cart"
         aria-expanded={open}

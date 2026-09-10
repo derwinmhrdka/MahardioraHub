@@ -32,7 +32,9 @@ type AdminProductListProps = {
 };
 
 function tabHref(tab: AdminTab) {
-  return tab === "deal" ? "/admin/products" : "/admin/products?tab=secondhand";
+  return tab === "secondhand"
+    ? "/admin/products"
+    : "/admin/products?tab=deal";
 }
 
 export function AdminProductList({
@@ -55,16 +57,6 @@ export function AdminProductList({
 
       <div className={styles.tabs} role="tablist" aria-label="Jenis">
         <Link
-          href={tabHref("deal")}
-          role="tab"
-          aria-selected={activeTab === "deal"}
-          aria-label="My Picks"
-          title="My Picks"
-          className={`${styles.tab} ${activeTab === "deal" ? styles.tabOn : ""}`}
-        >
-          <Package size={14} strokeWidth={2.25} aria-hidden />
-        </Link>
-        <Link
           href={tabHref("secondhand")}
           role="tab"
           aria-selected={activeTab === "secondhand"}
@@ -73,6 +65,16 @@ export function AdminProductList({
           className={`${styles.tab} ${activeTab === "secondhand" ? styles.tabOn : ""}`}
         >
           <Recycle size={14} strokeWidth={2.25} aria-hidden />
+        </Link>
+        <Link
+          href={tabHref("deal")}
+          role="tab"
+          aria-selected={activeTab === "deal"}
+          aria-label="My Picks"
+          title="My Picks"
+          className={`${styles.tab} ${activeTab === "deal" ? styles.tabOn : ""}`}
+        >
+          <Package size={14} strokeWidth={2.25} aria-hidden />
         </Link>
       </div>
 

@@ -263,27 +263,22 @@ export async function getOrderForUser(orderId: string, userId: string) {
   });
 }
 
-export async function listOrdersForUser(
-  userId: string,
-  tab: "pending" | "completed" | "cancel"
-) {
+export type OrderListTab = "pending" | "progress" | "completed" | "cancel";
+
+function statusesForTab(tab: OrderListTab): OrderStatus[] {
+  if (tab === "pending") return [OrderStatus.pending];
+  if (tab === "progress") return [OrderStatus.paid];
+  if (tab === "completed") return [OrderStatus.completed];
+  return [OrderStatus.cancelled, OrderStatus.expired, OrderStatus.failed];
+}
+
+export async function listOrdersForUser(userId: string, tab: OrderListTab) {
   if (tab === "pending") {
     await expireOverdueQrisOrders(userId);
   }
 
-  const statuses =
-    tab === "pending"
-      ? [OrderStatus.pending]
-      : tab === "completed"
-        ? [OrderStatus.paid]
-        : [
-            OrderStatus.cancelled,
-            OrderStatus.expired,
-            OrderStatus.failed,
-          ];
-
   return prisma.order.findMany({
-    where: { userId, status: { in: statuses } },
+    where: { userId, status: { in: statusesForTab(tab) } },
     orderBy: { createdAt: "desc" },
     include: { items: true },
   });
@@ -293,6 +288,87 @@ export async function countPendingOrders(userId: string) {
   await expireOverdueQrisOrders(userId);
   return prisma.order.count({
     where: { userId, status: OrderStatus.pending },
+  });
+}
+
+export async function countProgressOrders(userId: string) {
+  return prisma.order.count({
+    where: { userId, status: OrderStatus.paid },
+  });
+}
+
+const adminOrderInclude = {
+  items: true,
+  user: { select: { id: true, name: true, email: true, image: true } },
+} satisfies Prisma.OrderInclude;
+
+export async function listOrdersForAdmin(tab: OrderListTab) {
+  return prisma.order.findMany({
+    where: { status: { in: statusesForTab(tab) } },
+    orderBy: { createdAt: "desc" },
+    include: adminOrderInclude,
+  });
+}
+
+export async function countAdminProgressOrders() {
+  return prisma.order.count({
+    where: { status: OrderStatus.paid },
+  });
+}
+
+export async function getOrderForAdmin(orderId: string) {
+  return prisma.order.findUnique({
+    where: { id: orderId },
+    include: adminOrderInclude,
+  });
+}
+
+/** Admin: paid → completed. */
+export async function acceptOrder(orderId: string) {
+  const order = await prisma.order.findUnique({ where: { id: orderId } });
+  if (!order || order.status !== OrderStatus.paid) return order;
+
+  return prisma.order.update({
+    where: { id: orderId },
+    data: { status: OrderStatus.completed },
+    include: adminOrderInclude,
+  });
+}
+
+/** Admin: paid → cancelled + reason; restore stock. */
+export async function rejectOrder(orderId: string, reason: string) {
+  const cancelReason = reason.trim().slice(0, 500);
+  if (!cancelReason) return null;
+
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: { items: true },
+  });
+  if (!order || order.status !== OrderStatus.paid) return order;
+
+  return prisma.$transaction(async (tx) => {
+    const current = await tx.order.findUnique({
+      where: { id: orderId },
+      include: { items: true },
+    });
+    if (!current || current.status !== OrderStatus.paid) return current;
+
+    for (const item of current.items) {
+      await tx.product.update({
+        where: { id: item.productId },
+        data: { stock: { increment: item.quantity } },
+      });
+    }
+
+    return tx.order.update({
+      where: { id: orderId },
+      data: {
+        status: OrderStatus.cancelled,
+        cancelReason,
+        qrString: null,
+      },
+      include: adminOrderInclude,
+    });
   });
 }
 
@@ -369,7 +445,12 @@ export async function markOrderPaid(input: {
   });
 
   if (!order) return null;
-  if (order.status === OrderStatus.paid) return order;
+  if (
+    order.status === OrderStatus.paid ||
+    order.status === OrderStatus.completed
+  ) {
+    return order;
+  }
   if (
     order.status === OrderStatus.cancelled ||
     order.status === OrderStatus.expired ||
@@ -380,7 +461,13 @@ export async function markOrderPaid(input: {
 
   return prisma.$transaction(async (tx) => {
     const current = await tx.order.findUnique({ where: { id: order.id } });
-    if (!current || current.status === OrderStatus.paid) return current;
+    if (
+      !current ||
+      current.status === OrderStatus.paid ||
+      current.status === OrderStatus.completed
+    ) {
+      return current;
+    }
     if (
       current.status === OrderStatus.cancelled ||
       current.status === OrderStatus.expired ||

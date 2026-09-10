@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  ClipboardList,
   Home,
   LogOut,
   Package,
@@ -16,17 +17,24 @@ type AdminNavProps = {
   siteName: string;
   userImage?: string | null;
   userName?: string | null;
+  progressCount?: number;
 };
 
 function navActive(pathname: string) {
   if (pathname.startsWith("/admin/settings")) return "settings";
+  if (pathname.startsWith("/admin/orders")) return "orders";
   if (pathname.startsWith("/admin/products") || pathname === "/admin") {
     return "products";
   }
   return null;
 }
 
-export function AdminNav({ siteName, userImage, userName }: AdminNavProps) {
+export function AdminNav({
+  siteName,
+  userImage,
+  userName,
+  progressCount = 0,
+}: AdminNavProps) {
   const pathname = usePathname();
   const active = navActive(pathname);
   const initial = (userName || "?").slice(0, 1).toUpperCase();
@@ -98,6 +106,21 @@ export function AdminNav({ siteName, userImage, userName }: AdminNavProps) {
         >
           <Package size={14} strokeWidth={2.25} aria-hidden />
           <span>Produk</span>
+        </Link>
+        <Link
+          href="/admin/orders"
+          className={`${styles.tab} ${active === "orders" ? styles.tabOn : ""}`}
+          aria-current={active === "orders" ? "page" : undefined}
+        >
+          <span className={styles.tabIcon}>
+            <ClipboardList size={14} strokeWidth={2.25} aria-hidden />
+            {progressCount > 0 ? (
+              <span className={styles.badge} aria-label={`${progressCount} pesanan`}>
+                {progressCount > 9 ? "9+" : progressCount}
+              </span>
+            ) : null}
+          </span>
+          <span>Pesanan</span>
         </Link>
         <Link
           href="/admin/settings"

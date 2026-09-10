@@ -1,0 +1,24 @@
+.gallery > div {
+  flex: 0 0 7.5rem;
+  width: 7.5rem;
+  height: 5rem;
+  cursor: default;
+}
+
+.cropBtn {
+  position: absolute;
+  left: 0.2rem;
+  top: 0.2rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.72);
+  color: #fff;
+  cursor: pointer;
+}

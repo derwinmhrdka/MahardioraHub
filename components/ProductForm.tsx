@@ -52,7 +52,7 @@ export function ProductForm({
   submitLabel = "Simpan",
 }: ProductFormProps) {
   const [kind, setKind] = useState<ProductKind>(
-    defaults.kind ?? ProductKind.deal
+    defaults.kind ?? ProductKind.secondhand
   );
   const [link, setLink] = useState(defaults.affiliateLink ?? "");
   const [title, setTitle] = useState(defaults.title ?? "");
@@ -156,8 +156,8 @@ export function ProductForm({
           onChange={(e) => setKind(e.target.value as ProductKind)}
           required
         >
-          <option value={ProductKind.deal}>My Picks</option>
           <option value={ProductKind.secondhand}>Collection</option>
+          <option value={ProductKind.deal}>My Picks</option>
         </select>
       </div>
 

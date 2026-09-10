@@ -59,7 +59,7 @@ export async function Header({ active = "secondhand" }: HeaderProps) {
     <header className={styles.header}>
       <div className={styles.inner}>
         <Link
-          href={active === "deals" ? "/" : "/secondhand"}
+          href={active === "deals" ? "/picks" : "/"}
           className={styles.brand}
         >
           <span className={styles.brandName}>Mahardiora</span>
@@ -69,21 +69,21 @@ export async function Header({ active = "secondhand" }: HeaderProps) {
           <nav className={styles.nav} aria-label="Main">
             <Link
               href="/"
-              aria-current={active === "deals" ? "page" : undefined}
-              aria-label="My Picks"
-              title="My Picks"
-            >
-              <Package size={12} strokeWidth={2.25} aria-hidden />
-              <span>My Picks</span>
-            </Link>
-            <Link
-              href="/secondhand"
               aria-current={active === "secondhand" ? "page" : undefined}
               aria-label="Collection"
               title="Collection"
             >
               <Recycle size={12} strokeWidth={2.25} aria-hidden />
               <span>Collection</span>
+            </Link>
+            <Link
+              href="/picks"
+              aria-current={active === "deals" ? "page" : undefined}
+              aria-label="My Picks"
+              title="My Picks"
+            >
+              <Package size={12} strokeWidth={2.25} aria-hidden />
+              <span>My Picks</span>
             </Link>
           </nav>
           {showCart ? (

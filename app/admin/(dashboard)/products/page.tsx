@@ -19,7 +19,7 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const products = await listAllProducts();
   const activeTab =
-    params.tab === "secondhand" ? "secondhand" : "deal";
+    params.tab === "deal" ? "deal" : "secondhand";
 
   const items = products.map((product) => ({
     id: product.id,

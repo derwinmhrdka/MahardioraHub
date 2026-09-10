@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import { useFormStatus } from "react-dom";
 import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { addToCartAction } from "@/app/cart/actions";
+import { flyToCart } from "@/lib/cart-fly";
+import { productImageUrl } from "@/lib/image-url";
 import styles from "./AddToCartButton.module.css";
 
 type AddToCartButtonProps = {
@@ -12,28 +13,22 @@ type AddToCartButtonProps = {
   next?: string;
   stock?: number;
   loggedIn?: boolean;
+  imageUrl?: string | null;
 };
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <button type="submit" className={styles.btn} disabled={pending}>
-      <ShoppingCart size={16} strokeWidth={2.25} aria-hidden />
-      {pending ? "..." : "Tambah"}
-    </button>
-  );
-}
 
 export function AddToCartButton({
   productId,
   next,
   stock = 0,
   loggedIn = true,
+  imageUrl = null,
 }: AddToCartButtonProps) {
   const returnTo = next || `/secondhand/${productId}`;
   const available = stock > 0;
   const maxQty = Math.max(1, stock);
   const [qty, setQty] = useState(1);
+  const [pending, startTransition] = useTransition();
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   function dec() {
     setQty((v) => Math.max(1, v - 1));
@@ -99,7 +94,15 @@ export function AddToCartButton({
   }
 
   return (
-    <form action={addToCartAction} className={styles.form}>
+    <form
+      className={styles.form}
+      action={(formData) => {
+        flyToCart(btnRef.current, productImageUrl(imageUrl, 96) ?? imageUrl);
+        startTransition(async () => {
+          await addToCartAction(formData);
+        });
+      }}
+    >
       <input type="hidden" name="productId" value={productId} />
       <input type="hidden" name="next" value={returnTo} />
       <input type="hidden" name="quantity" value={qty} />
@@ -110,7 +113,7 @@ export function AddToCartButton({
             className={styles.qtyBtn}
             aria-label="Kurang"
             onClick={dec}
-            disabled={qty <= 1}
+            disabled={qty <= 1 || pending}
           >
             <Minus size={12} strokeWidth={2.5} aria-hidden />
           </button>
@@ -122,12 +125,20 @@ export function AddToCartButton({
             className={styles.qtyBtn}
             aria-label="Tambah qty"
             onClick={inc}
-            disabled={qty >= maxQty}
+            disabled={qty >= maxQty || pending}
           >
             <Plus size={12} strokeWidth={2.5} aria-hidden />
           </button>
         </div>
-        <SubmitButton />
+        <button
+          ref={btnRef}
+          type="submit"
+          className={styles.btn}
+          disabled={pending}
+        >
+          <ShoppingCart size={16} strokeWidth={2.25} aria-hidden />
+          {pending ? "..." : "Tambah"}
+        </button>
       </div>
     </form>
   );

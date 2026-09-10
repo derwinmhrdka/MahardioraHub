@@ -1,8 +1,22 @@
 import Link from "next/link";
-import { Plus, Shield, ShieldOff, Trash2, UserRound } from "lucide-react";
+import {
+  CreditCard,
+  Flame,
+  Image as ImageIcon,
+  MessageCircle,
+  Plus,
+  Settings2,
+  Shield,
+  ShieldOff,
+  Tags,
+  Trash2,
+  UserRound,
+  Users,
+} from "lucide-react";
 import { CollectionBannerAdmin } from "@/components/CollectionBannerAdmin";
 import { FlashSaleAdmin } from "@/components/FlashSaleAdmin";
 import { listCategories } from "@/lib/categories";
+import { listBannerItems } from "@/lib/collection-banner";
 import {
   getFlashSaleAdmin,
   listSecondhandForFlashSale,
@@ -18,7 +32,6 @@ import {
   deleteCategoryAction,
   makeAdminAction,
   revokeAdminAction,
-  updateCollectionBannerAction,
   updateSettingsAction,
 } from "./actions";
 import styles from "./settings.module.css";
@@ -31,6 +44,20 @@ type Tab =
   | "flash"
   | "payment"
   | "banner";
+
+const TABS: Array<{
+  id: Tab;
+  label: string;
+  Icon: typeof Settings2;
+}> = [
+  { id: "general", label: "General", Icon: Settings2 },
+  { id: "kontak", label: "Kontak", Icon: MessageCircle },
+  { id: "payment", label: "Payment", Icon: CreditCard },
+  { id: "kategori", label: "Kategori", Icon: Tags },
+  { id: "banner", label: "Banner", Icon: ImageIcon },
+  { id: "flash", label: "Flash", Icon: Flame },
+  { id: "user", label: "User", Icon: Users },
+];
 
 type PageProps = {
   searchParams: Promise<{
@@ -48,15 +75,8 @@ type PageProps = {
 };
 
 function parseTab(raw: string | undefined): Tab {
-  if (
-    raw === "kontak" ||
-    raw === "kategori" ||
-    raw === "user" ||
-    raw === "flash" ||
-    raw === "payment" ||
-    raw === "banner"
-  ) {
-    return raw;
+  if (TABS.some((item) => item.id === raw)) {
+    return raw as Tab;
   }
   return "general";
 }
@@ -91,286 +111,166 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
   const xenditOk = xenditConfigured();
 
   return (
-    <>
-      <h1 className="admin-title">Settings</h1>
+    <div className={styles.page}>
+      <header className={styles.head}>
+        <h1 className={styles.title}>Settings</h1>
+      </header>
 
-      <div className={styles.tabs} role="tablist" aria-label="Settings">
-        <Link
-          href="/admin/settings?tab=general"
-          role="tab"
-          aria-selected={tab === "general"}
-          className={`${styles.tab} ${tab === "general" ? styles.tabOn : ""}`}
-        >
-          General
-        </Link>
-        <Link
-          href="/admin/settings?tab=kontak"
-          role="tab"
-          aria-selected={tab === "kontak"}
-          className={`${styles.tab} ${tab === "kontak" ? styles.tabOn : ""}`}
-        >
-          Kontak
-        </Link>
-        <Link
-          href="/admin/settings?tab=payment"
-          role="tab"
-          aria-selected={tab === "payment"}
-          className={`${styles.tab} ${tab === "payment" ? styles.tabOn : ""}`}
-        >
-          Payment
-        </Link>
-        <Link
-          href="/admin/settings?tab=kategori"
-          role="tab"
-          aria-selected={tab === "kategori"}
-          className={`${styles.tab} ${tab === "kategori" ? styles.tabOn : ""}`}
-        >
-          Kategori
-        </Link>
-        <Link
-          href="/admin/settings?tab=flash"
-          role="tab"
-          aria-selected={tab === "flash"}
-          className={`${styles.tab} ${tab === "flash" ? styles.tabOn : ""}`}
-        >
-          Flash
-        </Link>
-        <Link
-          href="/admin/settings?tab=banner"
-          role="tab"
-          aria-selected={tab === "banner"}
-          className={`${styles.tab} ${tab === "banner" ? styles.tabOn : ""}`}
-        >
-          Banner
-        </Link>
-        <Link
-          href="/admin/settings?tab=user"
-          role="tab"
-          aria-selected={tab === "user"}
-          className={`${styles.tab} ${tab === "user" ? styles.tabOn : ""}`}
-        >
-          User
-        </Link>
-      </div>
-
-      {showSaved ? <p className="success">OK</p> : null}
-      {showError ? <p className="error">Gagal</p> : null}
-
-      {tab === "general" ? (
-        <form action={updateSettingsAction} className="form admin-form">
-          <input type="hidden" name="section" value="general" />
-          <div className="form-row">
-            <label htmlFor="siteName">Site</label>
-            <input
-              id="siteName"
-              name="siteName"
-              defaultValue={settings.siteName}
-              required
-            />
-          </div>
-          <div className="form-row">
-            <label htmlFor="shopeeAffiliateId">Affiliate ID</label>
-            <input
-              id="shopeeAffiliateId"
-              name="shopeeAffiliateId"
-              defaultValue={settings.shopeeAffiliateId ?? ""}
-              inputMode="numeric"
-            />
-          </div>
-          <div className="form-actions">
-            <button type="submit" className="btn btn-block">
-              Simpan
-            </button>
-          </div>
-        </form>
-      ) : null}
-
-      {tab === "kontak" ? (
-        <form action={updateSettingsAction} className="form admin-form">
-          <input type="hidden" name="section" value="kontak" />
-          <div className="form-row">
-            <label htmlFor="whatsappNumber">WhatsApp</label>
-            <input
-              id="whatsappNumber"
-              name="whatsappNumber"
-              defaultValue={settings.whatsappNumber}
-              required
-              inputMode="numeric"
-            />
-          </div>
-          <div className="form-row">
-            <label htmlFor="whatsappTemplate">Chat</label>
-            <textarea
-              id="whatsappTemplate"
-              name="whatsappTemplate"
-              rows={3}
-              maxLength={1000}
-              defaultValue={settings.whatsappTemplate}
-              required
-            />
-          </div>
-          <div className="form-row">
-            <label htmlFor="contactEmail">Email</label>
-            <input
-              id="contactEmail"
-              name="contactEmail"
-              type="email"
-              defaultValue={settings.contactEmail ?? ""}
-            />
-          </div>
-          <div className="form-actions">
-            <button type="submit" className="btn btn-block">
-              Simpan
-            </button>
-          </div>
-        </form>
-      ) : null}
-
-      {tab === "payment" ? (
-        <form action={updateSettingsAction} className="form admin-form">
-          <input type="hidden" name="section" value="payment" />
-          <div className={styles.payBlock}>
-            <p className={styles.payLabel}>QRIS</p>
-            <div className={styles.payList} role="radiogroup" aria-label="QRIS">
-              <label className={styles.payOption}>
-                <input
-                  type="radio"
-                  name="qrisProvider"
-                  value="midtrans"
-                  defaultChecked={settings.qrisProvider === "midtrans"}
-                />
-                <span className={styles.payName}>Midtrans</span>
-                <span className={styles.payMeta}>
-                  {midtransOk ? "OK" : "—"}
-                </span>
-              </label>
-              <label className={styles.payOption}>
-                <input
-                  type="radio"
-                  name="qrisProvider"
-                  value="xendit"
-                  defaultChecked={settings.qrisProvider === "xendit"}
-                />
-                <span className={styles.payName}>Xendit</span>
-                <span className={styles.payMeta}>{xenditOk ? "OK" : "—"}</span>
-              </label>
-            </div>
-          </div>
-          <div className="form-actions">
-            <button type="submit" className="btn btn-block">
-              Simpan
-            </button>
-          </div>
-        </form>
-      ) : null}
-
-      {tab === "kategori" ? (
-        <section aria-label="Kategori">
-          <ul className={styles.catList}>
-            {categories.length === 0 ? (
-              <li className={styles.catEmpty}>—</li>
-            ) : (
-              categories.map((category) => (
-                <li key={category.id} className={styles.catRow}>
-                  <span className={styles.catName}>{category.name}</span>
-                  <form action={deleteCategoryAction}>
-                    <input type="hidden" name="id" value={category.id} />
-                    <button
-                      type="submit"
-                      className={styles.iconBtn}
-                      aria-label="Hapus"
-                      title="Hapus"
-                    >
-                      <Trash2 size={14} strokeWidth={2.25} aria-hidden />
-                    </button>
-                  </form>
-                </li>
-              ))
-            )}
-          </ul>
-
-          <form action={createCategoryAction} className={styles.addRow}>
-            <input
-              name="name"
-              placeholder="Nama"
-              aria-label="Kategori"
-              required
-            />
-            <button
-              type="submit"
-              className={styles.iconBtn}
-              aria-label="Tambah"
-              title="Tambah"
+      <nav className={styles.tabs} role="tablist" aria-label="Settings">
+        {TABS.map(({ id, label, Icon }, index) => {
+          const on = tab === id;
+          return (
+            <Link
+              key={id}
+              href={`/admin/settings?tab=${id}`}
+              role="tab"
+              aria-selected={on}
+              aria-label={label}
+              title={label}
+              className={`${styles.tab} ${on ? styles.tabOn : ""}`}
+              style={{ animationDelay: `${index * 35}ms` }}
             >
-              <Plus size={16} strokeWidth={2.25} aria-hidden />
-            </button>
+              <span className={styles.tabIcon} aria-hidden>
+                <Icon size={15} strokeWidth={2.35} />
+              </span>
+              <span className={styles.tabLabel}>{label}</span>
+            </Link>
+          );
+        })}
+      </nav>
+
+      <div className={styles.panel}>
+        {showSaved ? <p className={styles.noticeOk}>OK</p> : null}
+        {showError ? <p className={styles.noticeErr}>Gagal</p> : null}
+
+        {tab === "general" ? (
+          <form action={updateSettingsAction} className="form admin-form">
+            <input type="hidden" name="section" value="general" />
+            <div className="form-row">
+              <label htmlFor="siteName">Site</label>
+              <input
+                id="siteName"
+                name="siteName"
+                defaultValue={settings.siteName}
+                required
+              />
+            </div>
+            <div className="form-row">
+              <label htmlFor="shopeeAffiliateId">Affiliate ID</label>
+              <input
+                id="shopeeAffiliateId"
+                name="shopeeAffiliateId"
+                defaultValue={settings.shopeeAffiliateId ?? ""}
+                inputMode="numeric"
+              />
+            </div>
+            <div className="form-actions">
+              <button type="submit" className="btn btn-block">
+                Simpan
+              </button>
+            </div>
           </form>
-        </section>
-      ) : null}
+        ) : null}
 
-      {tab === "flash" && flashSale ? (
-        <FlashSaleAdmin
-          isActive={flashSale.isActive}
-          durationMinutes={flashSale.durationMinutes}
-          endsAt={flashSale.endsAt?.toISOString() ?? null}
-          selectedIds={flashSale.items.map((item) => item.productId)}
-          products={flashProducts.map((product) => ({
-            id: product.id,
-            title: product.title,
-            price: product.price,
-            discountPercent: product.discountPercent,
-            imageUrl: productImages(product)[0] ?? null,
-            stock: product.stock,
-          }))}
-        />
-      ) : null}
+        {tab === "kontak" ? (
+          <form action={updateSettingsAction} className="form admin-form">
+            <input type="hidden" name="section" value="kontak" />
+            <div className="form-row">
+              <label htmlFor="whatsappNumber">WhatsApp</label>
+              <input
+                id="whatsappNumber"
+                name="whatsappNumber"
+                defaultValue={settings.whatsappNumber}
+                required
+                inputMode="numeric"
+              />
+            </div>
+            <div className="form-row">
+              <label htmlFor="whatsappTemplate">Chat</label>
+              <textarea
+                id="whatsappTemplate"
+                name="whatsappTemplate"
+                rows={3}
+                maxLength={1000}
+                defaultValue={settings.whatsappTemplate}
+                required
+              />
+            </div>
+            <div className="form-row">
+              <label htmlFor="contactEmail">Email</label>
+              <input
+                id="contactEmail"
+                name="contactEmail"
+                type="email"
+                defaultValue={settings.contactEmail ?? ""}
+              />
+            </div>
+            <div className="form-actions">
+              <button type="submit" className="btn btn-block">
+                Simpan
+              </button>
+            </div>
+          </form>
+        ) : null}
 
-      {tab === "banner" ? (
-        <CollectionBannerAdmin
-          isActive={Boolean(settings.collectionBannerActive)}
-          images={settings.collectionBannerImages ?? []}
-          action={updateCollectionBannerAction}
-        />
-      ) : null}
+        {tab === "payment" ? (
+          <form action={updateSettingsAction} className="form admin-form">
+            <input type="hidden" name="section" value="payment" />
+            <div className={styles.payBlock}>
+              <p className={styles.payLabel}>QRIS</p>
+              <div className={styles.payList} role="radiogroup" aria-label="QRIS">
+                <label className={styles.payOption}>
+                  <input
+                    type="radio"
+                    name="qrisProvider"
+                    value="midtrans"
+                    defaultChecked={settings.qrisProvider === "midtrans"}
+                  />
+                  <span className={styles.payName}>Midtrans</span>
+                  <span className={styles.payMeta}>
+                    {midtransOk ? "OK" : "—"}
+                  </span>
+                </label>
+                <label className={styles.payOption}>
+                  <input
+                    type="radio"
+                    name="qrisProvider"
+                    value="xendit"
+                    defaultChecked={settings.qrisProvider === "xendit"}
+                  />
+                  <span className={styles.payName}>Xendit</span>
+                  <span className={styles.payMeta}>
+                    {xenditOk ? "OK" : "—"}
+                  </span>
+                </label>
+              </div>
+            </div>
+            <div className="form-actions">
+              <button type="submit" className="btn btn-block">
+                Simpan
+              </button>
+            </div>
+          </form>
+        ) : null}
 
-      {tab === "user" ? (
-        <section aria-label="User" className={styles.userStack}>
-          <div className={styles.userBlock}>
-            <h2 className={styles.userHead}>
-              <Shield size={14} strokeWidth={2.25} aria-hidden />
-              Admin
-            </h2>
-
-            <ul className={styles.userList}>
-              {admins.length === 0 ? (
+        {tab === "kategori" ? (
+          <section aria-label="Kategori">
+            <ul className={styles.catList}>
+              {categories.length === 0 ? (
                 <li className={styles.catEmpty}>—</li>
               ) : (
-                admins.map((admin) => (
-                  <li key={admin.email} className={styles.userRow}>
-                    <span className={styles.userAvatar} aria-hidden>
-                      {admin.image ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={admin.image}
-                          alt=""
-                          referrerPolicy="no-referrer"
-                        />
-                      ) : (
-                        <UserRound size={14} strokeWidth={2.25} />
-                      )}
-                    </span>
-                    <span className={styles.userMeta}>
-                      <span className={styles.userEmail}>{admin.email}</span>
-                    </span>
-                    <form action={revokeAdminAction}>
-                      <input type="hidden" name="email" value={admin.email} />
+                categories.map((category) => (
+                  <li key={category.id} className={styles.catRow}>
+                    <span className={styles.catName}>{category.name}</span>
+                    <form action={deleteCategoryAction}>
+                      <input type="hidden" name="id" value={category.id} />
                       <button
                         type="submit"
-                        className={`${styles.iconBtn} ${styles.iconWarn}`}
-                        aria-label="Revoke"
-                        title="Revoke"
+                        className={styles.iconBtn}
+                        aria-label="Hapus"
+                        title="Hapus"
                       >
-                        <ShieldOff size={14} strokeWidth={2.25} aria-hidden />
+                        <Trash2 size={14} strokeWidth={2.25} aria-hidden />
                       </button>
                     </form>
                   </li>
@@ -378,70 +278,165 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
               )}
             </ul>
 
-            <form action={addAdminAction} className={styles.addRow}>
+            <form action={createCategoryAction} className={styles.addRow}>
               <input
-                name="email"
-                type="email"
-                placeholder="email"
-                aria-label="Email"
+                name="name"
+                placeholder="Nama"
+                aria-label="Kategori"
                 required
               />
               <button
                 type="submit"
                 className={styles.iconBtn}
-                aria-label="Admin"
-                title="Admin"
+                aria-label="Tambah"
+                title="Tambah"
               >
-                <Shield size={16} strokeWidth={2.25} aria-hidden />
+                <Plus size={16} strokeWidth={2.25} aria-hidden />
               </button>
             </form>
-          </div>
+          </section>
+        ) : null}
 
-          <div className={styles.userBlock}>
-            <h2 className={styles.userHead}>
-              <UserRound size={14} strokeWidth={2.25} aria-hidden />
-              Visitor
-            </h2>
+        {tab === "flash" && flashSale ? (
+          <FlashSaleAdmin
+            isActive={flashSale.isActive}
+            durationMinutes={flashSale.durationMinutes}
+            endsAt={flashSale.endsAt?.toISOString() ?? null}
+            selectedIds={flashSale.items.map((item) => item.productId)}
+            products={flashProducts.map((product) => ({
+              id: product.id,
+              title: product.title,
+              price: product.price,
+              discountPercent: product.discountPercent,
+              imageUrl: productImages(product)[0] ?? null,
+              stock: product.stock,
+            }))}
+          />
+        ) : null}
 
-            <ul className={styles.userList}>
-              {visitors.length === 0 ? (
-                <li className={styles.catEmpty}>—</li>
-              ) : (
-                visitors.map((visitor) => (
-                  <li key={visitor.id} className={styles.userRow}>
-                    <span className={styles.userAvatar} aria-hidden>
-                      {visitor.image ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={visitor.image}
-                          alt=""
-                          referrerPolicy="no-referrer"
+        {tab === "banner" ? (
+          <CollectionBannerAdmin
+            items={listBannerItems(
+              settings.collectionBannerImages ?? [],
+              settings.collectionBannerHidden ?? []
+            )}
+          />
+        ) : null}
+
+        {tab === "user" ? (
+          <section aria-label="User" className={styles.userStack}>
+            <div className={styles.userBlock}>
+              <h2 className={styles.userHead}>
+                <Shield size={14} strokeWidth={2.25} aria-hidden />
+                Admin
+              </h2>
+
+              <ul className={styles.userList}>
+                {admins.length === 0 ? (
+                  <li className={styles.catEmpty}>—</li>
+                ) : (
+                  admins.map((admin) => (
+                    <li key={admin.email} className={styles.userRow}>
+                      <span className={styles.userAvatar} aria-hidden>
+                        {admin.image ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={admin.image}
+                            alt=""
+                            referrerPolicy="no-referrer"
+                          />
+                        ) : (
+                          <UserRound size={14} strokeWidth={2.25} />
+                        )}
+                      </span>
+                      <span className={styles.userMeta}>
+                        <span className={styles.userEmail}>{admin.email}</span>
+                      </span>
+                      <form action={revokeAdminAction}>
+                        <input type="hidden" name="email" value={admin.email} />
+                        <button
+                          type="submit"
+                          className={`${styles.iconBtn} ${styles.iconWarn}`}
+                          aria-label="Revoke"
+                          title="Revoke"
+                        >
+                          <ShieldOff size={14} strokeWidth={2.25} aria-hidden />
+                        </button>
+                      </form>
+                    </li>
+                  ))
+                )}
+              </ul>
+
+              <form action={addAdminAction} className={styles.addRow}>
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="email"
+                  aria-label="Email"
+                  required
+                />
+                <button
+                  type="submit"
+                  className={styles.iconBtn}
+                  aria-label="Admin"
+                  title="Admin"
+                >
+                  <Shield size={16} strokeWidth={2.25} aria-hidden />
+                </button>
+              </form>
+            </div>
+
+            <div className={styles.userBlock}>
+              <h2 className={styles.userHead}>
+                <UserRound size={14} strokeWidth={2.25} aria-hidden />
+                Visitor
+              </h2>
+
+              <ul className={styles.userList}>
+                {visitors.length === 0 ? (
+                  <li className={styles.catEmpty}>—</li>
+                ) : (
+                  visitors.map((visitor) => (
+                    <li key={visitor.id} className={styles.userRow}>
+                      <span className={styles.userAvatar} aria-hidden>
+                        {visitor.image ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={visitor.image}
+                            alt=""
+                            referrerPolicy="no-referrer"
+                          />
+                        ) : (
+                          <UserRound size={14} strokeWidth={2.25} />
+                        )}
+                      </span>
+                      <span className={styles.userMeta}>
+                        <span className={styles.userEmail}>{visitor.email}</span>
+                      </span>
+                      <form action={makeAdminAction}>
+                        <input
+                          type="hidden"
+                          name="email"
+                          value={visitor.email}
                         />
-                      ) : (
-                        <UserRound size={14} strokeWidth={2.25} />
-                      )}
-                    </span>
-                    <span className={styles.userMeta}>
-                      <span className={styles.userEmail}>{visitor.email}</span>
-                    </span>
-                    <form action={makeAdminAction}>
-                      <input type="hidden" name="email" value={visitor.email} />
-                      <button
-                        type="submit"
-                        className={styles.iconBtn}
-                        aria-label="Admin"
-                        title="Admin"
-                      >
-                        <Shield size={14} strokeWidth={2.25} aria-hidden />
-                      </button>
-                    </form>
-                  </li>
-                ))
-              )}
-            </ul>
-          </div>
-        </section>
-      ) : null}
-    </>
+                        <button
+                          type="submit"
+                          className={styles.iconBtn}
+                          aria-label="Admin"
+                          title="Admin"
+                        >
+                          <Shield size={14} strokeWidth={2.25} aria-hidden />
+                        </button>
+                      </form>
+                    </li>
+                  ))
+                )}
+              </ul>
+            </div>
+          </section>
+        ) : null}
+      </div>
+    </div>
   );
 }

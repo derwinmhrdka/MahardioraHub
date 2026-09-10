@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { BannerLightbox } from "@/components/BannerLightbox";
 import { productImageUrl } from "@/lib/image-url";
 import styles from "./CollectionPromoBanner.module.css";
 
@@ -14,6 +15,7 @@ export function CollectionPromoBanner({ images }: CollectionPromoBannerProps) {
   const slides = images.map((url) => url.trim()).filter(Boolean);
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [viewSrc, setViewSrc] = useState<string | null>(null);
   const touchX = useRef<number | null>(null);
 
   useEffect(() => {
@@ -21,12 +23,12 @@ export function CollectionPromoBanner({ images }: CollectionPromoBannerProps) {
   }, [slides.length, slides[0]]);
 
   useEffect(() => {
-    if (slides.length < 2 || paused) return;
+    if (slides.length < 2 || paused || viewSrc) return;
     const id = window.setInterval(() => {
       setIndex((prev) => (prev + 1) % slides.length);
     }, SLIDE_MS);
     return () => window.clearInterval(id);
-  }, [slides.length, paused]);
+  }, [slides.length, paused, viewSrc]);
 
   if (slides.length === 0) return null;
 
@@ -34,6 +36,8 @@ export function CollectionPromoBanner({ images }: CollectionPromoBannerProps) {
     const len = slides.length;
     setIndex(((next % len) + len) % len);
   }
+
+  const current = slides[index] ?? slides[0];
 
   return (
     <section
@@ -58,7 +62,19 @@ export function CollectionPromoBanner({ images }: CollectionPromoBannerProps) {
         go(delta < 0 ? index + 1 : index - 1);
       }}
     >
-      <div className={styles.frame}>
+      {viewSrc ? (
+        <BannerLightbox src={viewSrc} onClose={() => setViewSrc(null)} />
+      ) : null}
+
+      <button
+        type="button"
+        className={styles.frame}
+        aria-label="View"
+        title="View"
+        onClick={() => {
+          if (current) setViewSrc(current);
+        }}
+      >
         <div
           className={styles.track}
           style={{ transform: `translate3d(-${index * 100}%, 0, 0)` }}
@@ -82,7 +98,7 @@ export function CollectionPromoBanner({ images }: CollectionPromoBannerProps) {
             );
           })}
         </div>
-      </div>
+      </button>
 
       {slides.length > 1 ? (
         <div className={styles.dots} role="tablist" aria-label="Slide">

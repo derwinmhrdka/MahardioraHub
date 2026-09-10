@@ -56,7 +56,7 @@ export default async function DealProductPage({ params }: PageProps) {
       <Header siteName={settings.siteName} active="deals" />
       <main className="container">
         <Link
-          href="/"
+          href="/picks"
           className={styles.back}
           aria-label="Kembali"
           title="Kembali"

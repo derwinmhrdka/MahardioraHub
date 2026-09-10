@@ -1,41 +1,127 @@
-.tabs {
+.page {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  margin: 0 0 0.85rem;
-  border: var(--stroke) solid var(--color-border);
-  border-radius: 12px;
-  background: var(--color-accent-soft);
-  overflow: hidden;
-  box-shadow: var(--shadow-doodle-sm);
+  gap: 0.85rem;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-body-stack);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #111;
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
 }
 
 .tab {
   display: flex;
   align-items: center;
-  min-height: 2.35rem;
-  padding: 0.5rem 0.75rem;
-  border-bottom: var(--stroke) solid var(--color-border);
-  color: var(--color-text-muted);
-  font-family: var(--font-body-stack);
-  font-size: 0.78rem;
-  font-weight: 700;
+  gap: 0.45rem;
+  min-height: 2.55rem;
+  padding: 0.45rem 0.65rem;
+  border: 2px solid #111;
+  border-radius: 11px;
+  background: var(--color-surface);
+  color: #6b7280;
   text-decoration: none;
+  box-shadow: 2px 2px 0 transparent;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+  animation: tabIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.tab:last-child {
-  border-bottom: 0;
+.tabIcon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 8px;
+  background: rgba(17, 17, 17, 0.06);
+  color: inherit;
+}
+
+.tabLabel {
+  min-width: 0;
+  font-family: var(--font-body-stack);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tab:hover {
-  background: rgba(255, 255, 255, 0.55);
   color: #111;
+  transform: translate(-1px, -1px);
+  box-shadow: 2px 2px 0 #111;
+}
+
+.tab:hover .tabIcon {
+  background: rgba(17, 17, 17, 0.1);
 }
 
 .tabOn {
+  background: #111;
+  color: #fff;
+  box-shadow: 3px 3px 0 #111;
+}
+
+.tabOn .tabIcon {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.tabOn:hover {
+  color: #fff;
+  transform: none;
+  box-shadow: 3px 3px 0 #111;
+}
+
+.panel {
+  margin: 0;
+  padding: 0.85rem 0.8rem 1rem;
+  border: 2px solid #111;
+  border-radius: 14px;
   background: var(--color-surface);
-  color: #111;
-  box-shadow: inset 3px 0 0 #111;
+  box-shadow: 4px 4px 0 #111;
+  animation: panelIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.noticeOk,
+.noticeErr {
+  margin: 0 0 0.65rem;
+  font-family: var(--font-body-stack);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.noticeOk {
+  color: #15803d;
+}
+
+.noticeErr {
+  color: #b91c1c;
 }
 
 .payBlock {
@@ -48,7 +134,7 @@
   margin: 0;
   font-family: var(--font-body-stack);
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--color-text);
 }
 
@@ -63,10 +149,10 @@
   align-items: center;
   gap: 0.55rem;
   padding: 0.55rem 0.65rem;
-  border: var(--stroke) solid var(--color-border);
+  border: 2px solid #111;
   border-radius: 10px;
   background: var(--color-surface);
-  box-shadow: var(--shadow-doodle-sm);
+  box-shadow: 2px 2px 0 #111;
   cursor: pointer;
   font-family: var(--font-body-stack);
   font-size: 0.85rem;
@@ -119,10 +205,10 @@
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.45rem 0.55rem;
-  border: var(--stroke) solid var(--color-border);
+  border: 2px solid #111;
   border-radius: 10px;
   background: var(--color-surface);
-  box-shadow: var(--shadow-doodle-sm);
+  box-shadow: 2px 2px 0 #111;
 }
 
 .catName {
@@ -151,12 +237,12 @@
   width: 2.15rem;
   height: 2.15rem;
   padding: 0;
-  border: var(--stroke) solid var(--color-border);
+  border: 2px solid #111;
   border-radius: 10px;
   background: var(--color-surface);
   color: #111;
   cursor: pointer;
-  box-shadow: 1px 1px 0 #111;
+  box-shadow: 2px 2px 0 #111;
 }
 
 .iconBtn:hover {
@@ -187,7 +273,7 @@
 .userBlock + .userBlock {
   margin-top: 0.15rem;
   padding-top: 1rem;
-  border-top: var(--stroke) dashed #111;
+  border-top: 2px dashed #111;
 }
 
 .userHead {
@@ -213,7 +299,7 @@
   width: 1.85rem;
   height: 1.85rem;
   overflow: hidden;
-  border: 1px solid #111;
+  border: 2px solid #111;
   border-radius: 999px;
   background: #f7f3eb;
 }
@@ -240,4 +326,47 @@
 
 .userRow form {
   margin: 0;
+}
+
+@keyframes tabIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes panelIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (min-width: 520px) {
+  .tabs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab,
+  .panel {
+    animation: none;
+  }
+
+  .tab {
+    transition: none;
+  }
+
+  .tab:hover {
+    transform: none;
+  }
 }

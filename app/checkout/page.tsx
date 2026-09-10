@@ -31,7 +31,7 @@ export default async function CheckoutPaymentPage() {
   }
 
   if (rows.length === 0) {
-    redirect("/secondhand");
+    redirect("/");
   }
 
   const items = rows.map((row) => {
@@ -54,7 +54,7 @@ export default async function CheckoutPaymentPage() {
       <main className={`container ${styles.main}`}>
         <div className={styles.top}>
           <Link
-            href="/secondhand"
+            href="/"
             className={styles.back}
             aria-label="Kembali"
             title="Kembali"

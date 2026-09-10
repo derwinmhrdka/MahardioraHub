@@ -25,6 +25,7 @@ type CategoryChipsProps = {
   categories: Category[];
   activeSlug?: string | null;
   mode?: "deals" | "secondhand";
+  basePath?: string;
   area?: string | null;
   platform?: string | null;
   query?: string;
@@ -45,6 +46,7 @@ export function CategoryChips({
   categories,
   activeSlug = null,
   mode = "deals",
+  basePath = mode === "secondhand" ? "/" : "/picks",
   area = null,
   platform = null,
   query = "",
@@ -56,8 +58,8 @@ export function CategoryChips({
 
   const allHref =
     mode === "secondhand"
-      ? withFilters("/secondhand", { area, platform })
-      : withFilters("/", { area, platform });
+      ? withFilters(basePath, { area, platform })
+      : withFilters("/picks", { area, platform });
 
   useEffect(() => {
     if (!open) return;
@@ -144,7 +146,7 @@ export function CategoryChips({
           const label = category.name.split(/\s+/)[0] ?? category.name;
           const href =
             mode === "secondhand"
-              ? withFilters("/secondhand", {
+              ? withFilters(basePath, {
                   category: category.slug,
                   area,
                   platform,

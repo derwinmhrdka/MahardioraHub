@@ -56,9 +56,10 @@ model Setting {
   contactEmail           String?
   shopeeAffiliateId      String? // used by admin optional an_redir link helper
   qrisProvider           OrderPayProvider @default(midtrans)
-  /** Promo banner on Collection (/secondhand). Ratio 3:1 (e.g. 1200×400). */
+  /** Promo banner on Collection. Ratio 3:2 (e.g. 1200×800). */
   collectionBannerActive Boolean          @default(false)
   collectionBannerImages String[]         @default([])
+  collectionBannerHidden String[]         @default([])
 }
 
 /** Singleton flash sale config + timed product picks (secondhand only). */
@@ -126,6 +127,7 @@ model CartItem {
 enum OrderStatus {
   pending
   paid
+  completed
   expired
   failed
   cancelled
@@ -158,6 +160,7 @@ model Order {
   qrString        String?
   paidAt          DateTime?
   expiresAt       DateTime?
+  cancelReason    String?
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   items           OrderItem[]

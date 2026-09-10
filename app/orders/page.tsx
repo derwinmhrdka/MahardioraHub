@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   Clock3,
   ImageOff,
+  Loader,
 } from "lucide-react";
 import { auth } from "@/auth";
 import { CancelOrderButton } from "@/components/CancelOrderButton";
@@ -15,47 +16,43 @@ import { formatRupiah } from "@/lib/format";
 import { productImageUrl } from "@/lib/image-url";
 import {
   countPendingOrders,
+  countProgressOrders,
   listOrdersForUser,
+  type OrderListTab,
 } from "@/lib/orders";
 import { prisma } from "@/lib/prisma";
 import { productImages } from "@/lib/product-images";
 import { getSettings } from "@/lib/settings";
 import styles from "./orders.module.css";
 
-type Tab = "pending" | "completed" | "cancel";
-
 type PageProps = {
   searchParams: Promise<{ tab?: string; cancelled?: string }>;
 };
 
-function parseTab(raw: string | undefined): Tab {
+function parseTab(raw: string | undefined): OrderListTab {
+  if (raw === "progress" || raw === "in-progress") return "progress";
   if (raw === "completed" || raw === "selesai") return "completed";
   if (raw === "cancel" || raw === "cancelled") return "cancel";
   if (raw === "payment") return "pending";
   return "pending";
 }
 
-function emptyCopy(tab: Tab) {
+function emptyCopy(tab: OrderListTab) {
   if (tab === "pending") {
-    return {
-      label: "Belum ada payment",
-      Icon: Clock3,
-    };
+    return { label: "Belum ada pending", Icon: Clock3 };
+  }
+  if (tab === "progress") {
+    return { label: "Belum ada in progress", Icon: Loader };
   }
   if (tab === "completed") {
-    return {
-      label: "Belum ada completed",
-      Icon: CheckCircle2,
-    };
+    return { label: "Belum ada completed", Icon: CheckCircle2 };
   }
-  return {
-    label: "Belum ada cancel",
-    Icon: Ban,
-  };
+  return { label: "Belum ada cancel", Icon: Ban };
 }
 
 function statusMeta(status: string) {
-  if (status === "paid") return "Paid";
+  if (status === "paid") return "In Progress";
+  if (status === "completed") return "Completed";
   if (status === "cancelled") return "Cancelled";
   if (status === "expired") return "Expired";
   if (status === "failed") return "Failed";
@@ -72,10 +69,11 @@ export default async function OrdersPage({ searchParams }: PageProps) {
   const tab = parseTab(params.tab);
   const userId = session.user.id;
 
-  const [settings, orders, pendingCount] = await Promise.all([
+  const [settings, orders, pendingCount, progressCount] = await Promise.all([
     getSettings(),
     listOrdersForUser(userId, tab),
     countPendingOrders(userId),
+    countProgressOrders(userId),
   ]);
 
   const productIds = [
@@ -101,7 +99,7 @@ export default async function OrdersPage({ searchParams }: PageProps) {
       <main className={`container ${styles.main}`}>
         <div className={styles.top}>
           <Link
-            href="/secondhand"
+            href="/"
             className={styles.back}
             aria-label="Kembali"
             title="Kembali"
@@ -125,6 +123,22 @@ export default async function OrdersPage({ searchParams }: PageProps) {
                 aria-label={`${pendingCount} pending`}
               >
                 {pendingCount > 9 ? "9+" : pendingCount}
+              </span>
+            ) : null}
+          </Link>
+          <Link
+            href="/orders?tab=progress"
+            role="tab"
+            aria-selected={tab === "progress"}
+            className={`${styles.tab} ${tab === "progress" ? styles.tabOn : ""}`}
+          >
+            Progress
+            {progressCount > 0 ? (
+              <span
+                className={styles.badge}
+                aria-label={`${progressCount} in progress`}
+              >
+                {progressCount > 9 ? "9+" : progressCount}
               </span>
             ) : null}
           </Link>
@@ -183,6 +197,9 @@ export default async function OrdersPage({ searchParams }: PageProps) {
                         </span>
                       )}
                     </div>
+                    {order.cancelReason ? (
+                      <p className={styles.cancelReason}>{order.cancelReason}</p>
+                    ) : null}
                     <ul className={styles.products}>
                       {order.items.map((item) => {
                         const src = productImageUrl(
@@ -237,7 +254,9 @@ export default async function OrdersPage({ searchParams }: PageProps) {
                         href={`/orders/${order.id}`}
                         className={styles.btnGhost}
                       >
-                        {order.status === "paid" ? "Invoice" : "Detail"}
+                        {order.status === "paid" || order.status === "completed"
+                          ? "Invoice"
+                          : "Detail"}
                       </Link>
                     )}
                   </div>
