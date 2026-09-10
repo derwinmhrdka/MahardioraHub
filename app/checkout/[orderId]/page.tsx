@@ -27,7 +27,15 @@ export default async function CheckoutQrisPage({ params }: PageProps) {
     redirect(`/checkout/success?order=${order.id}`);
   }
 
-  if (!order.qrString) notFound();
+  if (
+    order.status === "cancelled" ||
+    order.status === "expired" ||
+    order.status === "failed"
+  ) {
+    redirect(`/orders/${order.id}`);
+  }
+
+  if (order.status !== "pending" || !order.qrString) notFound();
 
   const settings = await getSettings();
 
@@ -53,7 +61,7 @@ export default async function CheckoutQrisPage({ params }: PageProps) {
             order.expiresAt?.toISOString() ??
             new Date(order.createdAt.getTime() + 60 * 60 * 1000).toISOString()
           }
-          initialStatus={order.status}
+          initialStatus="pending"
           canSimulate={qrisCanSimulate(order.payProvider)}
         />
       </main>
