@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogIn, LogOut, Shield } from "lucide-react";
+import { LogIn, LogOut, Receipt, Shield } from "lucide-react";
 import { signOutAction } from "@/app/login/actions";
 import styles from "./UserMenu.module.css";
 
@@ -84,6 +84,15 @@ export function UserMenu({ user }: UserMenuProps) {
       {open ? (
         <div className={styles.menu} role="menu">
           <p className={styles.roleLabel}>{isAdmin ? "Admin" : "Visitor"}</p>
+          <Link
+            href="/orders"
+            className={styles.item}
+            role="menuitem"
+            onClick={() => setOpen(false)}
+          >
+            <Receipt size={14} strokeWidth={2.25} aria-hidden />
+            Order
+          </Link>
           {isAdmin ? (
             <Link
               href="/admin/products"

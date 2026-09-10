@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
+  markOrderCancelled,
   markOrderExpired,
   markOrderFailed,
   markOrderPaid,
@@ -54,7 +55,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
-  if (status === "deny" || status === "cancel") {
+  if (status === "cancel") {
+    if (externalId) await markOrderCancelled(externalId);
+    return NextResponse.json({ ok: true });
+  }
+
+  if (status === "deny") {
     if (externalId) await markOrderFailed(externalId);
     return NextResponse.json({ ok: true });
   }

@@ -51,6 +51,18 @@ async function midtransFetch<T>(path: string, init?: RequestInit): Promise<T> {
   return data;
 }
 
+/** Cancel pending transaction (invalidates QRIS). Uses order_id or transaction_id. */
+export async function cancelMidtransTransaction(orderOrTxnId: string) {
+  return midtransFetch<{
+    status_code: string;
+    status_message: string;
+    transaction_status?: string;
+  }>(`/v2/${encodeURIComponent(orderOrTxnId)}/cancel`, {
+    method: "POST",
+    body: "{}",
+  });
+}
+
 export type MidtransQrisCharge = {
   status_code: string;
   status_message: string;

@@ -207,8 +207,8 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
       {tab === "payment" ? (
         <form action={updateSettingsAction} className="form admin-form">
           <input type="hidden" name="section" value="payment" />
-          <div className="form-row">
-            <label>QRIS</label>
+          <div className={styles.payBlock}>
+            <p className={styles.payLabel}>QRIS</p>
             <div className={styles.payList} role="radiogroup" aria-label="QRIS">
               <label className={styles.payOption}>
                 <input
@@ -217,7 +217,7 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
                   value="midtrans"
                   defaultChecked={settings.qrisProvider === "midtrans"}
                 />
-                Midtrans
+                <span className={styles.payName}>Midtrans</span>
                 <span className={styles.payMeta}>
                   {midtransOk ? "OK" : "—"}
                 </span>
@@ -229,7 +229,7 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
                   value="xendit"
                   defaultChecked={settings.qrisProvider === "xendit"}
                 />
-                Xendit
+                <span className={styles.payName}>Xendit</span>
                 <span className={styles.payMeta}>{xenditOk ? "OK" : "—"}</span>
               </label>
             </div>

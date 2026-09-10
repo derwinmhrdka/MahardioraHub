@@ -36,7 +36,7 @@ export default async function CheckoutQrisPage({ params }: PageProps) {
       <Header siteName={settings.siteName} active="secondhand" />
       <main className={`container ${styles.main}`}>
         <Link
-          href="/secondhand"
+          href="/orders?tab=payment"
           className={styles.back}
           aria-label="Kembali"
           title="Kembali"

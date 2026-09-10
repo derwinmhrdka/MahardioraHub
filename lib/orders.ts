@@ -1,6 +1,7 @@
 import { OrderPayMethod, OrderPayProvider, OrderStatus, Prisma } from "@prisma/client";
 import { listCartItems } from "@/lib/cart";
 import {
+  cancelMidtransTransaction,
   createMidtransQris,
   parseMidtransExpireTime,
 } from "@/lib/midtrans";
@@ -76,7 +77,39 @@ async function clearCartForOrder(
   }
 }
 
+/** Pending QRIS that is still within expiresAt (auto-expire if past). */
+export async function getActivePendingQrisOrder(userId: string) {
+  const order = await prisma.order.findFirst({
+    where: {
+      userId,
+      payMethod: OrderPayMethod.qris,
+      status: OrderStatus.pending,
+    },
+    orderBy: { createdAt: "desc" },
+    include: { items: true },
+  });
+  if (!order) return null;
+
+  if (order.expiresAt && order.expiresAt.getTime() <= Date.now()) {
+    await prisma.order.update({
+      where: { id: order.id },
+      data: { status: OrderStatus.expired },
+    });
+    return null;
+  }
+
+  if (!order.qrString) return null;
+  return order;
+}
+
+/**
+ * Reuse active pending QRIS if any; otherwise create new QR from cart.
+ * Returning to payment must not mint a second QR.
+ */
 export async function createQrisCheckout(input: { userId: string }) {
+  const existing = await getActivePendingQrisOrder(input.userId);
+  if (existing) return existing;
+
   const draft = await buildOrderDraft(input.userId);
   const externalId = makeExternalId("qris");
   const provider = await getQrisProvider();
@@ -109,6 +142,7 @@ export async function createQrisCheckout(input: { userId: string }) {
           qrString: qr.qr_string,
           expiresAt: parseMidtransExpireTime(qr.expire_time),
         },
+        include: { items: true },
       });
     }
 
@@ -124,6 +158,7 @@ export async function createQrisCheckout(input: { userId: string }) {
         qrString: qr.qr_string,
         expiresAt: qr.expires_at ? new Date(qr.expires_at) : null,
       },
+      include: { items: true },
     });
   } catch (err) {
     await prisma.order.update({
@@ -228,6 +263,73 @@ export async function getOrderForUser(orderId: string, userId: string) {
   });
 }
 
+export async function listOrdersForUser(
+  userId: string,
+  tab: "payment" | "selesai"
+) {
+  const statuses =
+    tab === "payment"
+      ? [OrderStatus.pending]
+      : [
+          OrderStatus.paid,
+          OrderStatus.cancelled,
+          OrderStatus.expired,
+          OrderStatus.failed,
+        ];
+
+  const orders = await prisma.order.findMany({
+    where: { userId, status: { in: statuses } },
+    orderBy: { createdAt: "desc" },
+    include: { items: true },
+  });
+
+  if (tab !== "payment") return orders;
+
+  const now = Date.now();
+  const active = [];
+  for (const order of orders) {
+    if (
+      order.payMethod === OrderPayMethod.qris &&
+      order.expiresAt &&
+      order.expiresAt.getTime() <= now
+    ) {
+      await prisma.order.update({
+        where: { id: order.id },
+        data: { status: OrderStatus.expired },
+      });
+      continue;
+    }
+    active.push(order);
+  }
+  return active;
+}
+
+/**
+ * Cancel pending order and invalidate PSP QR when possible.
+ */
+export async function cancelUserOrder(orderId: string, userId: string) {
+  const order = await getOrderForUser(orderId, userId);
+  if (!order) return null;
+  if (order.status !== OrderStatus.pending) return order;
+
+  if (order.payProvider === OrderPayProvider.midtrans) {
+    try {
+      await cancelMidtransTransaction(order.externalId);
+    } catch {
+      // Still cancel locally if PSP already expired/cancelled
+    }
+  }
+
+  return prisma.order.update({
+    where: { id: order.id },
+    data: {
+      status: OrderStatus.cancelled,
+      qrString: null,
+    },
+    include: { items: true },
+  });
+}
+
 /**
  * Mark order paid once: decrement stock + clear matching cart lines.
  * Idempotent.
@@ -250,10 +352,24 @@ export async function markOrderPaid(input: {
 
   if (!order) return null;
   if (order.status === OrderStatus.paid) return order;
+  if (
+    order.status === OrderStatus.cancelled ||
+    order.status === OrderStatus.expired ||
+    order.status === OrderStatus.failed
+  ) {
+    return order;
+  }
 
   return prisma.$transaction(async (tx) => {
     const current = await tx.order.findUnique({ where: { id: order.id } });
     if (!current || current.status === OrderStatus.paid) return current;
+    if (
+      current.status === OrderStatus.cancelled ||
+      current.status === OrderStatus.expired ||
+      current.status === OrderStatus.failed
+    ) {
+      return current;
+    }
 
     const updated = await tx.order.update({
       where: { id: order.id },
@@ -301,5 +417,15 @@ export async function markOrderFailed(externalId: string) {
       status: OrderStatus.pending,
     },
     data: { status: OrderStatus.failed },
+  });
+}
+
+export async function markOrderCancelled(externalId: string) {
+  return prisma.order.updateMany({
+    where: {
+      externalId,
+      status: OrderStatus.pending,
+    },
+    data: { status: OrderStatus.cancelled, qrString: null },
   });
 }

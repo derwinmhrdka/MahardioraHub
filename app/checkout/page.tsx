@@ -10,6 +10,7 @@ import { productImageUrl } from "@/lib/image-url";
 import { productImages } from "@/lib/product-images";
 import { salePrice } from "@/lib/pricing";
 import { getSettings } from "@/lib/settings";
+import { getActivePendingQrisOrder } from "@/lib/orders";
 import { qrisConfigured } from "@/lib/qris-provider";
 import styles from "./checkout.module.css";
 
@@ -19,10 +20,15 @@ export default async function CheckoutPaymentPage() {
     redirect("/login?next=/checkout");
   }
 
-  const [settings, rows] = await Promise.all([
+  const [settings, rows, pendingQris] = await Promise.all([
     getSettings(),
     listCartItems(session.user.id),
+    getActivePendingQrisOrder(session.user.id),
   ]);
+
+  if (pendingQris) {
+    redirect(`/checkout/${pendingQris.id}`);
+  }
 
   if (rows.length === 0) {
     redirect("/secondhand");

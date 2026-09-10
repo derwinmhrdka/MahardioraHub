@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/auth";
 import { Header } from "@/components/Header";
+import { PaymentSuccessMark } from "@/components/PaymentSuccessMark";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { formatRupiah } from "@/lib/format";
 import {
@@ -27,7 +28,6 @@ export default async function CheckoutSuccessPage({ searchParams }: PageProps) {
         ? await getOrderByExternalId(params.ext)
         : null;
 
-  // Prefer owned order when both exist / guest redirect with ext
   if (order && session?.user?.id && order.userId !== session.user.id) {
     order = null;
   }
@@ -59,14 +59,20 @@ export default async function CheckoutSuccessPage({ searchParams }: PageProps) {
       <Header siteName={settings.siteName} active="secondhand" />
       <main className={`container ${styles.main}`}>
         <div className={styles.card}>
-          <p>Success</p>
-          {amount != null ? <p>{formatRupiah(amount)}</p> : null}
+          <PaymentSuccessMark
+            amountLabel={amount != null ? formatRupiah(amount) : null}
+          />
           <div className={styles.cardActions}>
             {waHref ? (
               <a href={waHref} className={styles.waBtn}>
                 <WhatsAppIcon size={16} />
                 Konfirmasi
               </a>
+            ) : null}
+            {order ? (
+              <Link href={`/orders/${order.id}`} className={styles.linkGhost}>
+                Invoice
+              </Link>
             ) : null}
             <Link href="/secondhand" className={styles.link}>
               Secondhand

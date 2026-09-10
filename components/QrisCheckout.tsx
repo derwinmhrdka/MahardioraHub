@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Check, Copy, RefreshCw } from "lucide-react";
+import { cancelOrderAction } from "@/app/orders/actions";
 import { formatRupiah } from "@/lib/format";
 import styles from "./QrisCheckout.module.css";
 
@@ -208,15 +209,24 @@ export function QrisCheckout({
           ID
         </button>
 
+        {status === "pending" ? (
+          <form action={cancelOrderAction}>
+            <input type="hidden" name="orderId" value={orderId} />
+            <button type="submit" className={styles.btnGhost}>
+              Cancel
+            </button>
+          </form>
+        ) : null}
+
         {status === "expired" || status === "failed" ? (
           <Link href="/checkout" className={styles.btn}>
             Ulang
           </Link>
-        ) : (
-          <Link href="/checkout" className={styles.btnGhost}>
-            Ganti
-          </Link>
-        )}
+        ) : null}
+
+        <Link href="/orders?tab=payment" className={styles.btnGhost}>
+          Order
+        </Link>
       </div>
     </div>
   );

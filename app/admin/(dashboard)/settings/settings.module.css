@@ -38,6 +38,20 @@
   box-shadow: inset 3px 0 0 #111;
 }
 
+.payBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.payLabel {
+  margin: 0;
+  font-family: var(--font-body-stack);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
 .payList {
   display: flex;
   flex-direction: column;
@@ -59,9 +73,20 @@
   font-weight: 700;
 }
 
-.payOption input {
+.payOption input[type="radio"] {
+  flex: 0 0 auto;
+  width: 1rem;
+  height: 1rem;
+  min-height: 0;
   margin: 0;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
   accent-color: #111;
+}
+
+.payName {
+  min-width: 0;
 }
 
 .payMeta {

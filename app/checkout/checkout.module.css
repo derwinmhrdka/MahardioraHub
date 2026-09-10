@@ -212,6 +212,22 @@
   color: #fff;
 }
 
+.linkGhost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.4rem;
+  padding: 0.45rem 1rem;
+  border: var(--stroke) solid #111;
+  border-radius: 999px;
+  background: #fff;
+  color: #111;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 2px 2px 0 #111;
+}
+
 .waBtn {
   background: #25d366;
   color: #111;
