@@ -327,8 +327,8 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
 
       {tab === "banner" ? (
         <CollectionBannerAdmin
-          isActive={settings.collectionBannerActive}
-          images={settings.collectionBannerImages}
+          isActive={Boolean(settings.collectionBannerActive)}
+          images={settings.collectionBannerImages ?? []}
           action={updateCollectionBannerAction}
         />
       ) : null}

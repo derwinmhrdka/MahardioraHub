@@ -16,12 +16,14 @@ type CollectionBannerAdminProps = {
 };
 
 export function CollectionBannerAdmin({
-  isActive,
-  images,
+  isActive = false,
+  images = [],
   action,
 }: CollectionBannerAdminProps) {
-  const [active, setActive] = useState(isActive);
-  const [urls, setUrls] = useState(images);
+  const [active, setActive] = useState(Boolean(isActive));
+  const [urls, setUrls] = useState<string[]>(
+    Array.isArray(images) ? images.filter(Boolean) : []
+  );
   const [pending, startTransition] = useTransition();
 
   function clearAll() {
