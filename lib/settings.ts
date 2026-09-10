@@ -1,3 +1,4 @@
+import { OrderPayProvider } from "@prisma/client";
 import { prisma } from "./prisma";
 
 export type SettingInput = {
@@ -6,6 +7,7 @@ export type SettingInput = {
   siteName: string;
   contactEmail?: string | null;
   shopeeAffiliateId?: string | null;
+  qrisProvider?: OrderPayProvider;
 };
 
 const DEFAULT_WA_TEMPLATE = "Halo, saya tertarik dengan produk ini.";
@@ -19,6 +21,7 @@ export async function getSettings() {
 }
 
 export async function updateSettings(input: SettingInput) {
+  const qrisProvider = input.qrisProvider ?? OrderPayProvider.midtrans;
   return prisma.setting.upsert({
     where: { id: 1 },
     create: {
@@ -28,6 +31,7 @@ export async function updateSettings(input: SettingInput) {
       siteName: input.siteName,
       contactEmail: input.contactEmail || null,
       shopeeAffiliateId: input.shopeeAffiliateId || null,
+      qrisProvider,
     },
     update: {
       whatsappNumber: input.whatsappNumber,
@@ -35,6 +39,7 @@ export async function updateSettings(input: SettingInput) {
       siteName: input.siteName,
       contactEmail: input.contactEmail || null,
       shopeeAffiliateId: input.shopeeAffiliateId || null,
+      qrisProvider,
     },
   });
 }

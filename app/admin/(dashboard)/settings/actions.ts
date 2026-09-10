@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { OrderPayProvider } from "@prisma/client";
 import { createCategory, deleteCategory } from "@/lib/categories";
 import { requireAdmin } from "@/lib/auth";
 import {
@@ -44,6 +45,7 @@ export async function updateSettingsAction(formData: FormData) {
   let whatsappTemplate = current.whatsappTemplate;
   let contactEmail = current.contactEmail;
   let shopeeAffiliateId = current.shopeeAffiliateId;
+  let qrisProvider = current.qrisProvider;
 
   if (section === "general") {
     siteName = String(formData.get("siteName") ?? "").trim();
@@ -63,6 +65,10 @@ export async function updateSettingsAction(formData: FormData) {
     if (!whatsappNumber || !whatsappTemplate) {
       throw new Error("WhatsApp number and chat template are required");
     }
+  } else if (section === "payment") {
+    const raw = String(formData.get("qrisProvider") ?? "").trim().toLowerCase();
+    qrisProvider =
+      raw === "xendit" ? OrderPayProvider.xendit : OrderPayProvider.midtrans;
   }
 
   await updateSettings({
@@ -71,15 +77,22 @@ export async function updateSettingsAction(formData: FormData) {
     whatsappTemplate,
     contactEmail,
     shopeeAffiliateId,
+    qrisProvider,
   });
 
   revalidatePath("/");
   revalidatePath("/secondhand");
+  revalidatePath("/checkout");
   revalidatePath("/admin/settings");
   revalidatePath("/admin/products/new");
-  redirect(
-    `/admin/settings?tab=${section === "kontak" ? "kontak" : "general"}&saved=1`
-  );
+
+  const tab =
+    section === "kontak"
+      ? "kontak"
+      : section === "payment"
+        ? "payment"
+        : "general";
+  redirect(`/admin/settings?tab=${tab}&saved=1`);
 }
 
 function revalidateCategoryPaths() {

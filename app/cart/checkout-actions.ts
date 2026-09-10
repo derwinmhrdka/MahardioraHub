@@ -8,11 +8,11 @@ import {
   createQrisCheckout,
 } from "@/lib/orders";
 import { getSettings } from "@/lib/settings";
-import { xenditConfigured } from "@/lib/xendit";
+import { qrisConfigured } from "@/lib/qris-provider";
 
 export async function checkoutQrisAction() {
-  if (!xenditConfigured()) {
-    throw new Error("Xendit belum dikonfigurasi");
+  if (!(await qrisConfigured())) {
+    throw new Error("QRIS belum dikonfigurasi");
   }
   const session = await auth();
   const userId = session?.user?.id;

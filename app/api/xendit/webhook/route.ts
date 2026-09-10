@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
     status === "COMPLETED" ||
     status === "SUCCEEDED"
   ) {
-    await markOrderPaid({ externalId, xenditId });
+    await markOrderPaid({ externalId, pspId: xenditId });
     return NextResponse.json({ ok: true });
   }
 

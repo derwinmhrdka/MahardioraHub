@@ -9,7 +9,7 @@ import {
 import styles from "./PaymentMethods.module.css";
 
 type PaymentMethodsProps = {
-  xenditEnabled: boolean;
+  qrisEnabled: boolean;
 };
 
 function PendingLabel({ label }: { label: string }) {
@@ -17,10 +17,10 @@ function PendingLabel({ label }: { label: string }) {
   return <>{pending ? "..." : label}</>;
 }
 
-export function PaymentMethods({ xenditEnabled }: PaymentMethodsProps) {
+export function PaymentMethods({ qrisEnabled }: PaymentMethodsProps) {
   return (
     <div className={styles.list}>
-      {xenditEnabled ? (
+      {qrisEnabled ? (
         <form action={checkoutQrisAction} className={styles.form}>
           <button type="submit" className={styles.row}>
             <span className={`${styles.icon} ${styles.qris}`} aria-hidden>

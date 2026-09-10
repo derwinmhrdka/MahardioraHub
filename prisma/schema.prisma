@@ -49,12 +49,13 @@ model Click {
 }
 
 model Setting {
-  id                Int     @id
+  id                Int              @id
   whatsappNumber    String
-  whatsappTemplate  String  @default("Halo, saya tertarik dengan produk ini.")
+  whatsappTemplate  String           @default("Halo, saya tertarik dengan produk ini.")
   siteName          String
   contactEmail      String?
   shopeeAffiliateId String? // used by admin optional an_redir link helper
+  qrisProvider      OrderPayProvider @default(midtrans)
 }
 
 /** Singleton flash sale config + timed product picks (secondhand only). */
@@ -132,27 +133,33 @@ enum OrderPayMethod {
   cash
 }
 
-/** Secondhand checkout: QRIS (Xendit) or Cash (WA invoice). */
+enum OrderPayProvider {
+  xendit
+  midtrans
+}
+
+/** Secondhand checkout: QRIS (Midtrans/Xendit) or Cash (WA invoice). */
 model Order {
-  id              String         @id @default(cuid())
+  id              String            @id @default(cuid())
   userId          String
-  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status          OrderStatus    @default(pending)
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status          OrderStatus       @default(pending)
   payMethod       OrderPayMethod
+  payProvider     OrderPayProvider?
   amount          Int
-  currency        String         @default("IDR")
-  externalId      String         @unique
-  xenditId        String?
+  currency        String            @default("IDR")
+  externalId      String            @unique
+  pspId           String?
   invoiceUrl      String?
   qrString        String?
   paidAt          DateTime?
   expiresAt       DateTime?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
   items           OrderItem[]
 
   @@index([userId, status])
-  @@index([xenditId])
+  @@index([pspId])
 }
 
 model OrderItem {

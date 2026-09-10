@@ -6,9 +6,11 @@ import {
   getFlashSaleAdmin,
   listSecondhandForFlashSale,
 } from "@/lib/flash-sale";
+import { midtransConfigured } from "@/lib/midtrans";
 import { productImages } from "@/lib/product-images";
 import { getSettings } from "@/lib/settings";
 import { listAdminAllowlist, listVisitorUsers } from "@/lib/users";
+import { xenditConfigured } from "@/lib/xendit";
 import {
   addAdminAction,
   createCategoryAction,
@@ -19,7 +21,7 @@ import {
 } from "./actions";
 import styles from "./settings.module.css";
 
-type Tab = "general" | "kontak" | "kategori" | "user" | "flash";
+type Tab = "general" | "kontak" | "kategori" | "user" | "flash" | "payment";
 
 type PageProps = {
   searchParams: Promise<{
@@ -39,7 +41,8 @@ function parseTab(raw: string | undefined): Tab {
     raw === "kontak" ||
     raw === "kategori" ||
     raw === "user" ||
-    raw === "flash"
+    raw === "flash" ||
+    raw === "payment"
   ) {
     return raw;
   }
@@ -60,7 +63,8 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
     ]);
 
   const showSaved =
-    (params.saved && (tab === "general" || tab === "kontak")) ||
+    (params.saved &&
+      (tab === "general" || tab === "kontak" || tab === "payment")) ||
     (params.catSaved && tab === "kategori") ||
     (params.userSaved && tab === "user") ||
     (params.flashSaved && tab === "flash");
@@ -68,6 +72,9 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
     (params.catError && tab === "kategori") ||
     (params.userError && tab === "user") ||
     (params.flashError && tab === "flash");
+
+  const midtransOk = midtransConfigured();
+  const xenditOk = xenditConfigured();
 
   return (
     <>
@@ -89,6 +96,14 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
           className={`${styles.tab} ${tab === "kontak" ? styles.tabOn : ""}`}
         >
           Kontak
+        </Link>
+        <Link
+          href="/admin/settings?tab=payment"
+          role="tab"
+          aria-selected={tab === "payment"}
+          className={`${styles.tab} ${tab === "payment" ? styles.tabOn : ""}`}
+        >
+          Payment
         </Link>
         <Link
           href="/admin/settings?tab=kategori"
@@ -189,6 +204,44 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
         </form>
       ) : null}
 
+      {tab === "payment" ? (
+        <form action={updateSettingsAction} className="form admin-form">
+          <input type="hidden" name="section" value="payment" />
+          <div className="form-row">
+            <label>QRIS</label>
+            <div className={styles.payList} role="radiogroup" aria-label="QRIS">
+              <label className={styles.payOption}>
+                <input
+                  type="radio"
+                  name="qrisProvider"
+                  value="midtrans"
+                  defaultChecked={settings.qrisProvider === "midtrans"}
+                />
+                Midtrans
+                <span className={styles.payMeta}>
+                  {midtransOk ? "OK" : "—"}
+                </span>
+              </label>
+              <label className={styles.payOption}>
+                <input
+                  type="radio"
+                  name="qrisProvider"
+                  value="xendit"
+                  defaultChecked={settings.qrisProvider === "xendit"}
+                />
+                Xendit
+                <span className={styles.payMeta}>{xenditOk ? "OK" : "—"}</span>
+              </label>
+            </div>
+          </div>
+          <div className="form-actions">
+            <button type="submit" className="btn btn-block">
+              Simpan
+            </button>
+          </div>
+        </form>
+      ) : null}
+
       {tab === "kategori" ? (
         <section aria-label="Kategori">
           <ul className={styles.catList}>
@@ -251,7 +304,7 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
       ) : null}
 
       {tab === "user" ? (
-        <section aria-label="User" className={styles.userPanel}>
+        <section aria-label="User" className={styles.userStack}>
           <div className={styles.userBlock}>
             <h2 className={styles.userHead}>
               <Shield size={14} strokeWidth={2.25} aria-hidden />

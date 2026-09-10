@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { getOrderForUser, markOrderPaid } from "@/lib/orders";
+import { isMidtransSandbox } from "@/lib/midtrans";
 import { isXenditTestMode, simulateXenditQrPayment } from "@/lib/xendit";
 
 type RouteContext = {
@@ -8,14 +9,10 @@ type RouteContext = {
 };
 
 /**
- * Dev helper: hit Xendit QR simulate then mark order paid locally
+ * Dev helper: simulate QRIS pay then mark order paid locally
  * (webhook may not reach localhost).
  */
 export async function POST(_req: NextRequest, context: RouteContext) {
-  if (!isXenditTestMode()) {
-    return NextResponse.json({ error: "Test mode only" }, { status: 403 });
-  }
-
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) {
@@ -37,14 +34,33 @@ export async function POST(_req: NextRequest, context: RouteContext) {
     );
   }
 
+  const provider = order.payProvider ?? "midtrans";
+
   try {
-    const payment = await simulateXenditQrPayment({
-      externalId: order.externalId,
-      amount: order.amount,
-    });
+    if (provider === "xendit") {
+      if (!isXenditTestMode()) {
+        return NextResponse.json({ error: "Test mode only" }, { status: 403 });
+      }
+      const payment = await simulateXenditQrPayment({
+        externalId: order.externalId,
+        amount: order.amount,
+      });
+      await markOrderPaid({
+        externalId: order.externalId,
+        pspId: payment.qr_code?.id ?? order.pspId,
+        orderId: order.id,
+      });
+      return NextResponse.json({ status: "paid" });
+    }
+
+    if (!isMidtransSandbox()) {
+      return NextResponse.json({ error: "Sandbox only" }, { status: 403 });
+    }
+
+    // Midtrans sandbox: mark paid locally (dashboard simulator also hits webhook).
     await markOrderPaid({
       externalId: order.externalId,
-      xenditId: payment.qr_code?.id ?? order.xenditId,
+      pspId: order.pspId,
       orderId: order.id,
     });
     return NextResponse.json({ status: "paid" });

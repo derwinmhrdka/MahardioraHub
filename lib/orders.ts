@@ -1,7 +1,12 @@
-import { OrderPayMethod, OrderStatus, Prisma } from "@prisma/client";
+import { OrderPayMethod, OrderPayProvider, OrderStatus, Prisma } from "@prisma/client";
 import { listCartItems } from "@/lib/cart";
+import {
+  createMidtransQris,
+  parseMidtransExpireTime,
+} from "@/lib/midtrans";
 import { prisma } from "@/lib/prisma";
 import { salePrice } from "@/lib/pricing";
+import { getQrisProvider } from "@/lib/qris-provider";
 import { createXenditDynamicQris } from "@/lib/xendit";
 import { productPageUrl } from "@/lib/settings";
 
@@ -35,13 +40,15 @@ async function createPendingOrder(
   userId: string,
   payMethod: OrderPayMethod,
   externalId: string,
-  draft: Awaited<ReturnType<typeof buildOrderDraft>>
+  draft: Awaited<ReturnType<typeof buildOrderDraft>>,
+  payProvider?: OrderPayProvider | null
 ) {
   return prisma.order.create({
     data: {
       userId,
       status: OrderStatus.pending,
       payMethod,
+      payProvider: payProvider ?? null,
       amount: draft.amount,
       externalId,
       items: {
@@ -72,14 +79,39 @@ async function clearCartForOrder(
 export async function createQrisCheckout(input: { userId: string }) {
   const draft = await buildOrderDraft(input.userId);
   const externalId = makeExternalId("qris");
+  const provider = await getQrisProvider();
+  const payProvider =
+    provider === "xendit"
+      ? OrderPayProvider.xendit
+      : OrderPayProvider.midtrans;
+
   const order = await createPendingOrder(
     input.userId,
     OrderPayMethod.qris,
     externalId,
-    draft
+    draft,
+    payProvider
   );
 
   try {
+    if (provider === "midtrans") {
+      const qr = await createMidtransQris({
+        orderId: externalId,
+        amount: draft.amount,
+      });
+      if (!qr.qr_string) {
+        throw new Error("Midtrans QR string missing");
+      }
+      return prisma.order.update({
+        where: { id: order.id },
+        data: {
+          pspId: qr.transaction_id,
+          qrString: qr.qr_string,
+          expiresAt: parseMidtransExpireTime(qr.expire_time),
+        },
+      });
+    }
+
     const qr = await createXenditDynamicQris({
       externalId,
       amount: draft.amount,
@@ -88,7 +120,7 @@ export async function createQrisCheckout(input: { userId: string }) {
     return prisma.order.update({
       where: { id: order.id },
       data: {
-        xenditId: qr.id,
+        pspId: qr.id,
         qrString: qr.qr_string,
         expiresAt: qr.expires_at ? new Date(qr.expires_at) : null,
       },
@@ -202,12 +234,12 @@ export async function getOrderForUser(orderId: string, userId: string) {
  */
 export async function markOrderPaid(input: {
   externalId?: string | null;
-  xenditId?: string | null;
+  pspId?: string | null;
   orderId?: string | null;
 }) {
   const filters: Prisma.OrderWhereInput[] = [];
   if (input.externalId) filters.push({ externalId: input.externalId });
-  if (input.xenditId) filters.push({ xenditId: input.xenditId });
+  if (input.pspId) filters.push({ pspId: input.pspId });
   if (input.orderId) filters.push({ id: input.orderId });
   if (filters.length === 0) return null;
 
@@ -259,5 +291,15 @@ export async function markOrderExpired(externalId: string) {
       status: OrderStatus.pending,
     },
     data: { status: OrderStatus.expired },
+  });
+}
+
+export async function markOrderFailed(externalId: string) {
+  return prisma.order.updateMany({
+    where: {
+      externalId,
+      status: OrderStatus.pending,
+    },
+    data: { status: OrderStatus.failed },
   });
 }

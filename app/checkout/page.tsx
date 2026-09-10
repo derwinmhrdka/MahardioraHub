@@ -10,7 +10,7 @@ import { productImageUrl } from "@/lib/image-url";
 import { productImages } from "@/lib/product-images";
 import { salePrice } from "@/lib/pricing";
 import { getSettings } from "@/lib/settings";
-import { xenditConfigured } from "@/lib/xendit";
+import { qrisConfigured } from "@/lib/qris-provider";
 import styles from "./checkout.module.css";
 
 export default async function CheckoutPaymentPage() {
@@ -91,7 +91,7 @@ export default async function CheckoutPaymentPage() {
           <div className={styles.panelHead}>
             <span>Bayar</span>
           </div>
-          <PaymentMethods xenditEnabled={xenditConfigured()} />
+          <PaymentMethods qrisEnabled={await qrisConfigured()} />
         </section>
 
         <div className={styles.bar}>
