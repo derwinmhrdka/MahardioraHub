@@ -14,6 +14,7 @@ type QrisCheckoutProps = {
   qrString: string;
   expiresAt: string | null;
   initialStatus: "pending" | "paid" | "expired" | "failed";
+  canSimulate?: boolean;
 };
 
 function formatRemain(ms: number) {
@@ -30,12 +31,14 @@ export function QrisCheckout({
   qrString,
   expiresAt,
   initialStatus,
+  canSimulate = false,
 }: QrisCheckoutProps) {
   const router = useRouter();
   const [status, setStatus] = useState(initialStatus);
   const [now, setNow] = useState(() => Date.now());
   const [copied, setCopied] = useState(false);
   const [checking, setChecking] = useState(false);
+  const [simulating, setSimulating] = useState(false);
 
   const endMs = useMemo(() => {
     if (expiresAt) return new Date(expiresAt).getTime();
@@ -101,21 +104,43 @@ export function QrisCheckout({
     }
   }
 
+  async function simulatePay() {
+    if (!canSimulate || status !== "pending") return;
+    setSimulating(true);
+    try {
+      const res = await fetch(`/api/checkout/${orderId}/simulate`, {
+        method: "POST",
+        cache: "no-store",
+      });
+      if (!res.ok) return;
+      const data = (await res.json()) as { status?: string };
+      if (data.status === "paid") {
+        setStatus("paid");
+        router.replace(`/checkout/success?order=${orderId}`);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setSimulating(false);
+    }
+  }
+
   return (
     <div className={styles.wrap}>
       <p className={styles.amount}>{formatRupiah(amount)}</p>
 
-      {status === "pending" ? (
-        <div
-          className={`${styles.timer} ${urgent ? styles.timerUrgent : ""}`}
-          aria-live="polite"
-        >
-          <span className={styles.timerLabel}>Exp</span>
-          <span className={styles.timerValue}>{formatRemain(remainMs)}</span>
-        </div>
-      ) : null}
-
-      <p className={styles.hint}>Scan QRIS</p>
+      <div className={styles.qrHead}>
+        <p className={styles.hint}>Scan QRIS</p>
+        {status === "pending" ? (
+          <span
+            className={`${styles.timer} ${urgent ? styles.timerUrgent : ""}`}
+            aria-live="polite"
+            aria-label={`Sisa ${formatRemain(remainMs)}`}
+          >
+            {formatRemain(remainMs)}
+          </span>
+        ) : null}
+      </div>
 
       <div className={styles.qrFrame}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -149,10 +174,23 @@ export function QrisCheckout({
       </p>
 
       <div className={styles.actions}>
-        {status === "pending" ? (
+        {status === "pending" && canSimulate ? (
           <button
             type="button"
             className={styles.btn}
+            onClick={() => void simulatePay()}
+            disabled={simulating}
+            title="Simulate bayar (test)"
+            aria-label="Simulate"
+          >
+            {simulating ? "..." : "Sim"}
+          </button>
+        ) : null}
+
+        {status === "pending" ? (
+          <button
+            type="button"
+            className={canSimulate ? styles.btnGhost : styles.btn}
             onClick={() => void checkStatus()}
             disabled={checking}
           >

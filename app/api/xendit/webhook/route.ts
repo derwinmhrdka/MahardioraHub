@@ -9,6 +9,11 @@ type XenditPayload = {
   external_id?: string;
   status?: string;
   amount?: number;
+  // QR payment callback nests ids under qr_code
+  qr_code?: {
+    id?: string;
+    external_id?: string;
+  };
   // invoice webhook sometimes nests differently
   data?: {
     id?: string;
@@ -35,8 +40,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const externalId = body.external_id ?? body.data?.external_id ?? null;
-  const xenditId = body.id ?? body.data?.id ?? null;
+  // QR payment: external_id is under qr_code; top-level id is qrpy_* (payment)
+  const externalId =
+    body.external_id ??
+    body.qr_code?.external_id ??
+    body.data?.external_id ??
+    null;
+  const xenditId =
+    body.qr_code?.id ?? body.id ?? body.data?.id ?? null;
   const status = (body.status ?? body.data?.status ?? "").toUpperCase();
 
   if (

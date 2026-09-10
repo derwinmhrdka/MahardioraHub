@@ -6,6 +6,7 @@ import { Header } from "@/components/Header";
 import { QrisCheckout } from "@/components/QrisCheckout";
 import { getOrderForUser } from "@/lib/orders";
 import { getSettings } from "@/lib/settings";
+import { isXenditTestMode } from "@/lib/xendit";
 import styles from "../checkout.module.css";
 
 type PageProps = {
@@ -53,6 +54,7 @@ export default async function CheckoutQrisPage({ params }: PageProps) {
             new Date(order.createdAt.getTime() + 60 * 60 * 1000).toISOString()
           }
           initialStatus={order.status}
+          canSimulate={isXenditTestMode()}
         />
       </main>
     </div>

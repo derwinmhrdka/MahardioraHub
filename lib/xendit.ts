@@ -41,6 +41,12 @@ export function xenditConfigured() {
   return Boolean(process.env.XENDIT_SECRET_KEY?.trim());
 }
 
+/** Test secret keys start with xnd_development_ */
+export function isXenditTestMode() {
+  const key = process.env.XENDIT_SECRET_KEY?.trim() ?? "";
+  return key.startsWith("xnd_development_");
+}
+
 export function verifyXenditCallbackToken(headerToken: string | null) {
   const expected = process.env.XENDIT_CALLBACK_TOKEN?.trim();
   if (!expected) return true; // allow if unset in early test (log warning)
@@ -119,5 +125,21 @@ export async function createXenditDynamicQris(input: {
       amount: input.amount,
       callback_url: `${origin}/api/xendit/webhook`,
     }),
+  });
+}
+
+/** Test mode only — simulates a successful QR payment. */
+export async function simulateXenditQrPayment(input: {
+  externalId: string;
+  amount: number;
+}) {
+  return xenditFetch<{
+    id: string;
+    amount: number;
+    status: string;
+    qr_code?: { external_id?: string; id?: string };
+  }>(`/qr_codes/${encodeURIComponent(input.externalId)}/payments/simulate`, {
+    method: "POST",
+    body: JSON.stringify({ amount: input.amount }),
   });
 }
