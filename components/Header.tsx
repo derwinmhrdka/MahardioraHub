@@ -12,8 +12,8 @@ type HeaderProps = {
   active?: "deals" | "secondhand";
 };
 
-export async function Header({ active = "deals" }: HeaderProps) {
-  const subtitle = active === "secondhand" ? "Second Stuff" : "Product Hub";
+export async function Header({ active = "secondhand" }: HeaderProps) {
+  const subtitle = active === "secondhand" ? "Collection" : "My Picks";
   const showCart = active === "secondhand";
   const session = await auth();
   const userId = session?.user?.id;
@@ -59,7 +59,7 @@ export async function Header({ active = "deals" }: HeaderProps) {
     <header className={styles.header}>
       <div className={styles.inner}>
         <Link
-          href={active === "secondhand" ? "/secondhand" : "/"}
+          href={active === "deals" ? "/" : "/secondhand"}
           className={styles.brand}
         >
           <span className={styles.brandName}>Mahardiora</span>
@@ -72,14 +72,14 @@ export async function Header({ active = "deals" }: HeaderProps) {
               aria-current={active === "deals" ? "page" : undefined}
             >
               <Package size={12} strokeWidth={2} aria-hidden />
-              Deals
+              My Picks
             </Link>
             <Link
               href="/secondhand"
               aria-current={active === "secondhand" ? "page" : undefined}
             >
               <Recycle size={12} strokeWidth={2} aria-hidden />
-              Used
+              Collection
             </Link>
           </nav>
           {showCart ? (

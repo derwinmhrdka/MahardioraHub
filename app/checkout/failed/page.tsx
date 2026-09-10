@@ -12,8 +12,8 @@ export default async function CheckoutFailedPage() {
       <main className={`container ${styles.main}`}>
         <div className={styles.card}>
           <p>Failed</p>
-          <Link href="/secondhand" className={styles.link}>
-            Secondhand
+          <Link href="/orders?tab=cancel" className={styles.link}>
+            Order
           </Link>
         </div>
       </main>

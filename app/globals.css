@@ -27,8 +27,8 @@
   --radius: 14px;
   --radius-sm: 10px;
   --stroke: 2px;
-  --font-display-stack: var(--font-display), "Comic Sans MS", cursive;
-  --font-body-stack: var(--font-body), "Segoe UI", system-ui, sans-serif;
+  --font-display-stack: "Caveat", "Comic Sans MS", cursive;
+  --font-body-stack: "Nunito", "Segoe UI", system-ui, sans-serif;
   --font: var(--font-body-stack);
   --text-brand: 1.65rem;
   --text-nav: 0.92rem;

@@ -156,8 +156,8 @@ export function ProductForm({
           onChange={(e) => setKind(e.target.value as ProductKind)}
           required
         >
-          <option value={ProductKind.deal}>Deal</option>
-          <option value={ProductKind.secondhand}>Secondhand</option>
+          <option value={ProductKind.deal}>My Picks</option>
+          <option value={ProductKind.secondhand}>Collection</option>
         </select>
       </div>
 

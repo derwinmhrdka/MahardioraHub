@@ -24,8 +24,8 @@ type PageProps = {
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   return buildShareMetadata({
-    title: "Secondhand",
-    description: `${settings.siteName} — barang bekas`,
+    title: "Collection",
+    description: `${settings.siteName} — Collection`,
     url: `${siteOrigin()}/secondhand`,
     siteName: settings.siteName,
   });
@@ -66,7 +66,7 @@ export default async function SecondhandPage({ searchParams }: PageProps) {
     <div className="section-secondhand">
       <Header active="secondhand" />
       <main className="container">
-        <h1 className="page-title">Secondhand</h1>
+        <h1 className="page-title">Collection</h1>
         {flashSale ? (
           <FlashSaleStrip
             endsAt={flashSale.endsAt}
@@ -76,7 +76,7 @@ export default async function SecondhandPage({ searchParams }: PageProps) {
         ) : null}
         <ProductBrowse
           mode="secondhand"
-          label="Secondhand"
+          label="Collection"
           items={items}
           categories={categories}
           areas={areas}
@@ -85,7 +85,7 @@ export default async function SecondhandPage({ searchParams }: PageProps) {
           activeArea={area}
           activePlatform={platform}
           basePath="/secondhand"
-          emptyText="Belum ada item"
+          emptyText="Belum ada collection"
         />
       </main>
     </div>

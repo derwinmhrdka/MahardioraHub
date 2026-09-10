@@ -58,8 +58,8 @@ export function AdminProductList({
           href={tabHref("deal")}
           role="tab"
           aria-selected={activeTab === "deal"}
-          aria-label="Deal"
-          title="Deal"
+          aria-label="My Picks"
+          title="My Picks"
           className={`${styles.tab} ${activeTab === "deal" ? styles.tabOn : ""}`}
         >
           <Package size={14} strokeWidth={2.25} aria-hidden />
@@ -68,8 +68,8 @@ export function AdminProductList({
           href={tabHref("secondhand")}
           role="tab"
           aria-selected={activeTab === "secondhand"}
-          aria-label="Secondhand"
-          title="Secondhand"
+          aria-label="Collection"
+          title="Collection"
           className={`${styles.tab} ${activeTab === "secondhand" ? styles.tabOn : ""}`}
         >
           <Recycle size={14} strokeWidth={2.25} aria-hidden />

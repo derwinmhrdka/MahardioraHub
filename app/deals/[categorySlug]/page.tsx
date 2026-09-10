@@ -62,7 +62,7 @@ export default async function CategoryDealsPage({
           activeArea={area}
           activePlatform={platform}
           basePath={basePath}
-          emptyText="Belum ada deals di sini"
+          emptyText="Belum ada picks"
         />
       </main>
     </div>

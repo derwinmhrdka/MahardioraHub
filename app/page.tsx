@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   return buildShareMetadata({
     title: settings.siteName,
-    description: `${settings.siteName} — deals & secondhand`,
+    description: `${settings.siteName} — My Picks & Collection`,
     url: siteOrigin(),
     siteName: settings.siteName,
   });
@@ -52,10 +52,10 @@ export default async function HomePage({ searchParams }: PageProps) {
     <div className="section-deals">
       <Header active="deals" />
       <main className="container">
-        <h1 className="page-title">Deals</h1>
+        <h1 className="page-title">My Picks</h1>
         <ProductBrowse
           mode="deals"
-          label="Deals"
+          label="My Picks"
           items={items}
           categories={categories}
           areas={areas}
@@ -63,7 +63,7 @@ export default async function HomePage({ searchParams }: PageProps) {
           activeArea={area}
           activePlatform={platform}
           basePath="/"
-          emptyText="Belum ada deals"
+          emptyText="Belum ada picks"
         />
       </main>
     </div>

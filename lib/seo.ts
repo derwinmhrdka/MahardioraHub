@@ -33,7 +33,7 @@ type ShareMetaInput = {
 export function buildShareMetadata(input: ShareMetaInput): Metadata {
   const description =
     productNotePreview(input.description) ||
-    `${input.siteName} — deals & secondhand`;
+    `${input.siteName} — My Picks & Collection`;
   const image =
     absoluteMediaUrl(input.imageUrl, 800) ?? absoluteUrl("/opengraph-image");
   const images = [

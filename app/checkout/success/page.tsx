@@ -70,13 +70,14 @@ export default async function CheckoutSuccessPage({ searchParams }: PageProps) {
               </a>
             ) : null}
             {order ? (
-              <Link href={`/orders/${order.id}`} className={styles.linkGhost}>
+              <Link href={`/orders/${order.id}`} className={styles.link}>
                 Invoice
               </Link>
-            ) : null}
-            <Link href="/secondhand" className={styles.link}>
-              Secondhand
-            </Link>
+            ) : (
+              <Link href="/orders?tab=completed" className={styles.link}>
+                Order
+              </Link>
+            )}
           </div>
         </div>
       </main>

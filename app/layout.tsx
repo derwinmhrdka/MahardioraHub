@@ -1,20 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Caveat, Nunito } from "next/font/google";
+import "@fontsource/caveat/latin-700.css";
+import "@fontsource/nunito/latin-400.css";
+import "@fontsource/nunito/latin-700.css";
+import "@fontsource/nunito/latin-800.css";
 import { SplashScreen } from "@/components/SplashScreen";
 import { getSettings, siteOrigin } from "@/lib/settings";
 import "./globals.css";
-
-const caveat = Caveat({
-  subsets: ["latin"],
-  variable: "--font-display",
-  display: "swap",
-});
-
-const nunito = Nunito({
-  subsets: ["latin"],
-  variable: "--font-body",
-  display: "swap",
-});
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const origin = siteOrigin();
   try {
     const settings = await getSettings();
-    const description = `${settings.siteName} — deals & secondhand`;
+    const description = `${settings.siteName} — My Picks & Collection`;
     return {
       metadataBase: new URL(origin),
       title: {
@@ -61,7 +52,7 @@ export async function generateMetadata(): Promise<Metadata> {
     return {
       metadataBase: new URL(origin),
       title: "MahardioraHub",
-      description: "Deals & secondhand",
+      description: "My Picks & Collection",
       icons: {
         icon: [{ url: "/icon-store.svg", type: "image/svg+xml" }],
       },
@@ -83,7 +74,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="id" className={`${caveat.variable} ${nunito.variable}`}>
+    <html lang="id">
       <body>
         <SplashScreen siteName={siteName} />
         {children}

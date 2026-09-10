@@ -6,7 +6,6 @@ import {
   CheckCircle2,
   Clock3,
   ImageOff,
-  PackageOpen,
 } from "lucide-react";
 import { auth } from "@/auth";
 import { CancelOrderButton } from "@/components/CancelOrderButton";
@@ -155,12 +154,6 @@ export default async function OrdersPage({ searchParams }: PageProps) {
               <EmptyIcon size={28} strokeWidth={1.75} />
             </span>
             <p className={styles.emptyLabel}>{empty.label}</p>
-            {tab === "pending" ? (
-              <Link href="/secondhand" className={styles.emptyCta}>
-                <PackageOpen size={14} strokeWidth={2.25} aria-hidden />
-                Secondhand
-              </Link>
-            ) : null}
           </div>
         ) : (
           <ul className={styles.list}>
