@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useRef, useState, useTransition, type FormEvent } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Check,
@@ -131,7 +130,9 @@ export function BankTransferCheckout({
         setPreview(data.proofUrl);
         selectedFileRef.current = null;
         markSafe();
-        router.refresh();
+        router.replace(
+          showOrdersLink ? "/orders?tab=progress" : `/orders/${orderId}`
+        );
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Gagal mengirim bukti"
@@ -328,25 +329,14 @@ export function BankTransferCheckout({
         </p>
       </section>
 
-      <div className={styles.footer}>
-        {submitted ? null : (
+      {!submitted ? (
+        <div className={styles.footer}>
           <CancelOrderButton
             orderId={orderId}
             className={styles.btnSecondary}
           />
-        )}
-        <div className={styles.links}>
-          {showOrdersLink ? (
-            <Link href="/orders?tab=pending" className={styles.linkBtn}>
-              Lihat order
-            </Link>
-          ) : (
-            <Link href={`/orders/${orderId}`} className={styles.linkBtn}>
-              Invoice
-            </Link>
-          )}
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }

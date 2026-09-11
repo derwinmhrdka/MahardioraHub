@@ -1,6 +1,7 @@
 .main {
   max-width: 420px;
-  padding-bottom: 5.5rem;
+  /* Room for fixed total bar so last pay option (Cash) stays reachable */
+  padding-bottom: calc(7.25rem + env(safe-area-inset-bottom, 0px));
 }
 
 .top {

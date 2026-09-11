@@ -155,13 +155,7 @@ export function AdminOrderList({
                   </p>
                 ) : null}
 
-                {order.paymentProofUrl ? (
-                  <div className={styles.proof}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={order.paymentProofUrl} alt="" />
-                    <span>Ada bukti</span>
-                  </div>
-                ) : activeTab === "pending" ? (
+                {activeTab === "pending" && !order.paymentProofUrl ? (
                   <p className={styles.noProof}>Belum upload bukti</p>
                 ) : null}
 

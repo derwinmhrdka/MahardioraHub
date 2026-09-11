@@ -178,30 +178,6 @@
   color: var(--color-text-muted);
 }
 
-.proof {
-  display: grid;
-  grid-template-columns: 4.5rem 1fr;
-  align-items: center;
-  gap: 0.55rem;
-  padding: 0.35rem;
-  border: 1.5px solid #111;
-  border-radius: 12px;
-  background: #faf8f3;
-  text-decoration: none;
-  color: #111;
-  font-size: 0.72rem;
-  font-weight: 800;
-}
-
-.proof img {
-  width: 4.5rem;
-  height: 4.5rem;
-  object-fit: cover;
-  border-radius: 8px;
-  border: 1px solid #111;
-  background: #fff;
-}
-
 .noProof {
   margin: 0;
   font-size: 0.72rem;

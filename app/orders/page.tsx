@@ -168,7 +168,10 @@ export default async function OrdersPage({ searchParams }: PageProps) {
                             tab === "pending" ? styles.statusPending : ""
                           }`}
                         >
-                          {orderStatusLabel(order.status)}
+                          {orderStatusLabel(order.status, {
+                            payMethod: order.payMethod,
+                            hasPaymentProof: Boolean(order.paymentProofUrl),
+                          })}
                         </p>
                         <p className={styles.invMini}>{order.externalId}</p>
                       </div>
@@ -229,15 +232,13 @@ export default async function OrdersPage({ searchParams }: PageProps) {
                     {tab === "pending" ? (
                       <>
                         {order.payMethod === "qris" ||
-                        order.payMethod === "bank_transfer" ? (
+                        (order.payMethod === "bank_transfer" &&
+                          !order.paymentProofUrl) ? (
                           <Link
                             href={`/checkout/${order.id}`}
                             className={styles.btn}
                           >
-                            {order.payMethod === "bank_transfer" &&
-                            order.paymentProofUrl
-                              ? "Bukti"
-                              : "Bayar"}
+                            Bayar
                           </Link>
                         ) : null}
                         <CancelOrderButton orderId={order.id} />

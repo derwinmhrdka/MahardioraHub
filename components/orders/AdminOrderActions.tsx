@@ -85,9 +85,9 @@ export function AdminOrderActions({
             type="button"
             className={styles.btnGhost}
             onClick={() => setRejectOpen(false)}
-            aria-label="Batal"
+            aria-label="Kembali"
           >
-            Batal
+            Kembali
           </button>
         </div>
       </form>

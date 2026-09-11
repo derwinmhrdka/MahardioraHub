@@ -13,6 +13,7 @@ import { formatRupiah } from "@/lib/format";
 import { productImageUrl } from "@/lib/image-url";
 import { getGuestId } from "@/lib/cart-owner";
 import {
+  canDownloadInvoice,
   formatOrderDateTime,
   orderBackTab,
   orderStatusLabelShort,
@@ -33,7 +34,6 @@ type PageProps = {
   params: Promise<{ orderId: string }>;
   searchParams: Promise<{ contact?: string }>;
 };
-
 
 function sellerWhatsAppHref(input: {
   whatsappNumber: string;
@@ -114,19 +114,30 @@ export default async function OrderDetailPage({
     products.map((p) => [p.id, productImages(p)[0] ?? null])
   );
 
+  const displayOpts = {
+    payMethod: order.payMethod,
+    hasPaymentProof: Boolean(order.paymentProofUrl),
+  };
   const isPending = order.status === "pending";
+  const awaitingBankReview =
+    isPending &&
+    order.payMethod === "bank_transfer" &&
+    Boolean(order.paymentProofUrl);
   const isInvoice =
     order.status === "paid" || order.status === "completed";
   const showCashContact =
     Boolean(isOwner) &&
+    !isAdmin &&
     order.payMethod === "cash" &&
     (isPending || isInvoice);
-  const showPaidContact = isInvoice && Boolean(isOwner);
+  const showPaidContact =
+    isInvoice && Boolean(isOwner) && !isAdmin;
   const showContact = showCashContact || showPaidContact;
   const autoOpenContact = showCashContact && query.contact === "1";
   const expiresAt =
     order.expiresAt?.toISOString() ??
     new Date(order.createdAt.getTime() + 60 * 60 * 1000).toISOString();
+  const allowInvoiceDownload = canDownloadInvoice(order.status);
 
   const waHref = showContact
     ? order.payMethod === "cash"
@@ -163,9 +174,12 @@ export default async function OrderDetailPage({
     : null;
 
   const backHref = isAdmin
-    ? `/admin/orders?tab=${orderBackTab(order.status)}`
+    ? `/admin/orders?tab=${orderBackTab(order.status, {
+        ...displayOpts,
+        forAdmin: true,
+      })}`
     : isLoggedIn
-      ? `/orders?tab=${orderBackTab(order.status)}`
+      ? `/orders?tab=${orderBackTab(order.status, displayOpts)}`
       : "/";
 
   return (
@@ -182,7 +196,11 @@ export default async function OrderDetailPage({
             <ArrowLeft size={16} strokeWidth={2.5} aria-hidden />
           </Link>
           <h1 className={styles.title}>Invoice</h1>
-          <DownloadInvoiceButton className={styles.downloadBtn} />
+          {allowInvoiceDownload ? (
+            <DownloadInvoiceButton className={styles.downloadBtn} />
+          ) : (
+            <span className={styles.downloadBtnSpacer} aria-hidden />
+          )}
         </div>
 
         {autoOpenContact && waHref ? <OpenWhatsAppOnce href={waHref} /> : null}
@@ -197,12 +215,13 @@ export default async function OrderDetailPage({
               width={160}
               height={184}
             />
+            <p className={styles.printDoc}>Invoice</p>
           </div>
 
           <div className={styles.panel}>
-            <div className={styles.panelHead}>
-              <span>{orderStatusLabelShort(order.status)}</span>
-              {isPending && isOwner ? (
+            <div className={`${styles.panelHead} ${styles.screenOnlyStatus}`}>
+              <span>{orderStatusLabelShort(order.status, displayOpts)}</span>
+              {isPending && isOwner && !awaitingBankReview ? (
                 <span className={styles.noPrint}>
                   <OrderCountdown expiresAt={expiresAt} />
                 </span>
@@ -270,7 +289,7 @@ export default async function OrderDetailPage({
                 );
                 return (
                   <li key={item.id} className={styles.item}>
-                    <div className={styles.thumb}>
+                    <div className={`${styles.thumb} ${styles.noPrint}`}>
                       {src ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={src} alt="" />
@@ -312,8 +331,6 @@ export default async function OrderDetailPage({
               </a>
             ) : null}
 
-            <DownloadInvoiceButton className={styles.downloadBtnBlock} />
-
             {isAdmin &&
             order.payMethod === "bank_transfer" &&
             order.paymentProofUrl ? (
@@ -331,9 +348,7 @@ export default async function OrderDetailPage({
               </div>
             ) : null}
 
-            {isAdmin &&
-            order.status === "paid" &&
-            order.payMethod !== "bank_transfer" ? (
+            {isAdmin && order.status === "paid" ? (
               <div className={styles.adminActions}>
                 <AdminOrderActions orderId={order.id} fullWidth />
               </div>
@@ -352,18 +367,19 @@ export default async function OrderDetailPage({
               </div>
             ) : null}
 
-            {isPending && isOwner ? (
+            {isPending && isOwner && !isAdmin ? (
               <div className={styles.actions}>
-                {order.payMethod === "qris" ||
-                order.payMethod === "bank_transfer" ? (
+                {(order.payMethod === "qris" ||
+                  (order.payMethod === "bank_transfer" &&
+                    !order.paymentProofUrl)) &&
+                !awaitingBankReview ? (
                   <Link href={`/checkout/${order.id}`} className={styles.btn}>
-                    {order.payMethod === "bank_transfer" &&
-                    order.paymentProofUrl
-                      ? "Lihat bukti"
-                      : "Bayar"}
+                    Bayar
                   </Link>
                 ) : null}
-                <CancelOrderButton orderId={order.id} />
+                {!awaitingBankReview ? (
+                  <CancelOrderButton orderId={order.id} />
+                ) : null}
               </div>
             ) : null}
           </div>

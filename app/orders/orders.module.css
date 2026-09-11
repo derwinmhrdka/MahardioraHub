@@ -621,6 +621,12 @@
   background: #faf8f3;
 }
 
+.downloadBtnSpacer {
+  width: 5.5rem;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
 .downloadBtnBlock {
   display: inline-flex;
   align-items: center;
@@ -650,10 +656,10 @@
 
 .printLogo {
   display: block;
-  width: 7.5rem;
+  width: 5.5rem;
   height: auto;
   object-fit: contain;
-  margin: 0 auto 0.5rem;
+  margin: 0 auto 0.35rem;
 }
 
 .printSite {
@@ -669,11 +675,19 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #666;
+  text-align: center;
 }
 
 @media print {
   @page {
+    size: A4;
     margin: 12mm;
+  }
+
+  html,
+  body {
+    height: auto !important;
+    background: #fff !important;
   }
 
   .invoicePage {
@@ -682,32 +696,57 @@
 
   .invoicePage :global(header),
   .invoicePage :global(nav),
-  .noPrint {
+  .noPrint,
+  .screenOnlyStatus {
     display: none !important;
   }
 
   .invoicePage .main {
     max-width: none;
-    padding: 0;
-    margin: 0;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 
   .printBrand {
     display: block;
-    margin-bottom: 0.85rem;
+    margin: 0 0 0.75rem;
   }
 
   .detail {
-    gap: 0.75rem;
+    gap: 0.65rem;
   }
 
   .panel {
-    box-shadow: none;
-    break-inside: avoid;
+    box-shadow: none !important;
+    break-inside: auto;
+    page-break-inside: auto;
   }
 
-  .thumb img {
-    max-width: 48px;
+  .item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: flex-start;
+    gap: 0.55rem;
+  }
+
+  .thumb {
+    display: none !important;
+  }
+
+  .itemTitle {
+    font-size: 0.9rem;
+  }
+
+  .itemSub,
+  .itemPrice,
+  .totalRow,
+  .invValue,
+  .metaGrid dd {
+    font-size: 0.85rem;
+  }
+
+  .invoiceMeta {
+    padding-top: 0.55rem;
   }
 }
 

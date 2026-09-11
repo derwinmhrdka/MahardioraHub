@@ -16,9 +16,31 @@ export function parseAdminOrderListTab(raw: string | undefined): OrderListTab {
   return "progress";
 }
 
+type OrderDisplayOpts = {
+  payMethod?: string | null;
+  hasPaymentProof?: boolean;
+};
+
+/** Bank transfer with proof is treated as in-progress for the buyer. */
+export function isBuyerBankInReview(
+  status: string,
+  opts?: OrderDisplayOpts
+): boolean {
+  return (
+    status === "pending" &&
+    opts?.payMethod === "bank_transfer" &&
+    Boolean(opts?.hasPaymentProof)
+  );
+}
+
 /** Buyer-facing status text (list + detail). */
-export function orderStatusLabel(status: string): string {
-  if (status === "paid") return "In Progress";
+export function orderStatusLabel(
+  status: string,
+  opts?: OrderDisplayOpts
+): string {
+  if (isBuyerBankInReview(status, opts) || status === "paid") {
+    return "In Progress";
+  }
   if (status === "completed") return "Completed";
   if (status === "cancelled") return "Cancelled";
   if (status === "expired") return "Expired";
@@ -27,9 +49,13 @@ export function orderStatusLabel(status: string): string {
 }
 
 /** Slightly shorter pending label for order detail header. */
-export function orderStatusLabelShort(status: string): string {
+export function orderStatusLabelShort(
+  status: string,
+  opts?: OrderDisplayOpts
+): string {
+  if (isBuyerBankInReview(status, opts)) return "In Progress";
   if (status === "pending") return "Pending";
-  return orderStatusLabel(status);
+  return orderStatusLabel(status, opts);
 }
 
 export function payMethodLabel(method: string): string {
@@ -40,11 +66,24 @@ export function payMethodLabel(method: string): string {
 }
 
 /** Map order status → list tab query value. */
-export function orderBackTab(status: string): OrderListTab {
+export function orderBackTab(
+  status: string,
+  opts?: OrderDisplayOpts & { forAdmin?: boolean }
+): OrderListTab {
+  if (!opts?.forAdmin && isBuyerBankInReview(status, opts)) {
+    return "progress";
+  }
   if (status === "pending") return "pending";
   if (status === "paid") return "progress";
   if (status === "completed") return "completed";
   return "cancel";
+}
+
+/** Invoice PDF/print is for active or finished orders, not cancelled ones. */
+export function canDownloadInvoice(status: string): boolean {
+  return (
+    status === "pending" || status === "paid" || status === "completed"
+  );
 }
 
 export function formatOrderDateTime(date: Date): string {

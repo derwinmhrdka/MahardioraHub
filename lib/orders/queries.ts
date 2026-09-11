@@ -90,6 +90,40 @@ function statusesForTab(tab: OrderListTab): OrderStatus[] {
   return [OrderStatus.cancelled, OrderStatus.expired, OrderStatus.failed];
 }
 
+/** Buyer: bank transfer + proof waits in Progress (admin review), not Pending. */
+const buyerBankAwaitingReview: Prisma.OrderWhereInput = {
+  status: OrderStatus.pending,
+  payMethod: OrderPayMethod.bank_transfer,
+  paymentProofUrl: { not: null },
+};
+
+function ownerOrdersWhere(
+  owner: CheckoutOwner,
+  tab: OrderListTab
+): Prisma.OrderWhereInput {
+  const base = ownerOrderWhere(owner);
+  if (tab === "pending") {
+    return {
+      ...base,
+      status: OrderStatus.pending,
+      OR: [
+        { payMethod: { not: OrderPayMethod.bank_transfer } },
+        { paymentProofUrl: null },
+      ],
+    };
+  }
+  if (tab === "progress") {
+    return {
+      ...base,
+      OR: [{ status: OrderStatus.paid }, buyerBankAwaitingReview],
+    };
+  }
+  return {
+    ...base,
+    status: { in: statusesForTab(tab) },
+  };
+}
+
 export async function listOrdersForOwner(owner: CheckoutOwner, tab: OrderListTab) {
   if (tab === "pending") {
     await expireOverdueQrisOrders(owner);
@@ -97,10 +131,7 @@ export async function listOrdersForOwner(owner: CheckoutOwner, tab: OrderListTab
   }
 
   return prisma.order.findMany({
-    where: {
-      ...ownerOrderWhere(owner),
-      status: { in: statusesForTab(tab) },
-    },
+    where: ownerOrdersWhere(owner, tab),
     orderBy: { createdAt: "desc" },
     include: { items: true },
   });
@@ -110,19 +141,13 @@ export async function countPendingOrdersForOwner(owner: CheckoutOwner) {
   await expireOverdueQrisOrders(owner);
   await expireOverdueBankTransferOrders(owner);
   return prisma.order.count({
-    where: {
-      ...ownerOrderWhere(owner),
-      status: OrderStatus.pending,
-    },
+    where: ownerOrdersWhere(owner, "pending"),
   });
 }
 
 export async function countProgressOrdersForOwner(owner: CheckoutOwner) {
   return prisma.order.count({
-    where: {
-      ...ownerOrderWhere(owner),
-      status: OrderStatus.paid,
-    },
+    where: ownerOrdersWhere(owner, "progress"),
   });
 }
 
