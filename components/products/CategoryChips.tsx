@@ -5,6 +5,7 @@ import Link from "next/link";
 import clsx from "clsx";
 import {
   Baby,
+  CalendarClock,
   Home,
   LayoutGrid,
   Search,
@@ -28,6 +29,8 @@ type CategoryChipsProps = {
   basePath?: string;
   area?: string | null;
   platform?: string | null;
+  activePreOrder?: boolean;
+  showPreOrder?: boolean;
   query?: string;
   onQueryChange?: (query: string) => void;
 };
@@ -49,6 +52,8 @@ export function CategoryChips({
   basePath = mode === "secondhand" ? "/" : "/picks",
   area = null,
   platform = null,
+  activePreOrder = false,
+  showPreOrder = false,
   query = "",
   onQueryChange,
 }: CategoryChipsProps) {
@@ -60,6 +65,11 @@ export function CategoryChips({
     mode === "secondhand"
       ? withFilters(basePath, { area, platform })
       : withFilters("/picks", { area, platform });
+
+  const preOrderHref =
+    mode === "secondhand"
+      ? withFilters(basePath, { area, platform, preOrder: true })
+      : allHref;
 
   useEffect(() => {
     if (!open) return;
@@ -135,12 +145,29 @@ export function CategoryChips({
       >
         <Link
           href={allHref}
-          className={clsx(styles.chip, activeSlug == null && styles.active)}
+          className={clsx(
+            styles.chip,
+            activeSlug == null && !activePreOrder && styles.active
+          )}
           tabIndex={open ? -1 : undefined}
         >
           <LayoutGrid size={10} strokeWidth={2} aria-hidden />
           Semua
         </Link>
+        {showPreOrder && mode === "secondhand" ? (
+          <Link
+            href={preOrderHref}
+            className={clsx(
+              styles.chip,
+              styles.chipPreOrder,
+              activePreOrder && styles.active
+            )}
+            tabIndex={open ? -1 : undefined}
+          >
+            <CalendarClock size={10} strokeWidth={2} aria-hidden />
+            Pre Order
+          </Link>
+        ) : null}
         {categories.map((category) => {
           const Icon = iconForSlug(category.slug);
           const label = category.name.split(/\s+/)[0] ?? category.name;
@@ -159,7 +186,9 @@ export function CategoryChips({
               href={href}
               className={clsx(
                 styles.chip,
-                activeSlug === category.slug && styles.active
+                !activePreOrder &&
+                  activeSlug === category.slug &&
+                  styles.active
               )}
               tabIndex={open ? -1 : undefined}
             >

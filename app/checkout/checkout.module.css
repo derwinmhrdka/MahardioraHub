@@ -1,7 +1,12 @@
 .main {
   max-width: 420px;
-  /* Room for fixed total bar so last pay option (Cash) stays reachable */
-  padding-bottom: calc(7.25rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* Reserves space under payment options; padding on .main loses to .container shorthand */
+.barSpacer {
+  height: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+  flex-shrink: 0;
+  pointer-events: none;
 }
 
 .top {

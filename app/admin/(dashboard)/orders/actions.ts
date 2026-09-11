@@ -32,18 +32,17 @@ export async function acceptOrderAction(formData: FormData) {
 export async function confirmBankTransferAction(formData: FormData) {
   await requireAdmin();
   const orderId = String(formData.get("orderId") ?? "").trim();
-  if (!orderId) redirect("/admin/orders?tab=pending");
+  if (!orderId) redirect("/admin/orders?tab=progress");
 
   const order = await confirmBankTransferPayment(orderId);
-  if (!order || order.status !== "paid") {
-    redirect(`/admin/orders?tab=pending&confirmError=1&order=${orderId}`);
+  if (!order || order.status !== "completed") {
+    redirect(`/admin/orders?tab=progress&confirmError=1&order=${orderId}`);
   }
 
   revalidatePath("/admin/orders");
   revalidatePath("/orders");
   revalidatePath(`/orders/${orderId}`);
-  // Bank transfer: single approval lands in Progress (not Pending).
-  redirect(`/admin/orders?tab=progress&confirmed=1`);
+  redirect(`/admin/orders?tab=completed&confirmed=1`);
 }
 
 export async function rejectOrderAction(formData: FormData) {
@@ -64,9 +63,9 @@ export async function rejectPendingBankTransferAction(formData: FormData) {
   await requireAdmin();
   const orderId = String(formData.get("orderId") ?? "").trim();
   const reason = String(formData.get("reason") ?? "").trim();
-  if (!orderId) redirect("/admin/orders?tab=pending");
+  if (!orderId) redirect("/admin/orders?tab=progress");
   if (!reason)
-    redirect(`/admin/orders?tab=pending&rejectError=1&order=${orderId}`);
+    redirect(`/admin/orders?tab=progress&rejectError=1&order=${orderId}`);
 
   await rejectPendingBankTransfer(orderId, reason);
   revalidatePath("/admin/orders");

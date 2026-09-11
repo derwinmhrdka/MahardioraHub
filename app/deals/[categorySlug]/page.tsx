@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { ProductKind } from "@prisma/client";
 import { ProductBrowse } from "@/components/ProductBrowse";
 import { SiteHeader } from "@/components/SiteHeader";
-import { getCategoryBySlug, listCategories } from "@/lib/categories";
+import { getCategoryBySlug, listCatalogCategories } from "@/lib/categories";
 import {
   listDealsByCategory,
   listPlatforms,
@@ -31,7 +31,7 @@ export default async function CategoryDealsPage({
   const basePath = `/deals/${category.slug}`;
 
   const [categories, areas, platforms, products] = await Promise.all([
-    listCategories(),
+    listCatalogCategories(ProductKind.deal),
     listStoreAreas(ProductKind.deal),
     listPlatforms(ProductKind.deal),
     listDealsByCategory(categorySlug, { storeArea: area, platform }),

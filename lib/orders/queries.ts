@@ -90,8 +90,8 @@ function statusesForTab(tab: OrderListTab): OrderStatus[] {
   return [OrderStatus.cancelled, OrderStatus.expired, OrderStatus.failed];
 }
 
-/** Buyer: bank transfer + proof waits in Progress (admin review), not Pending. */
-const buyerBankAwaitingReview: Prisma.OrderWhereInput = {
+/** Bank transfer + proof awaits admin review (Progress for buyer & admin). */
+const bankAwaitingReview: Prisma.OrderWhereInput = {
   status: OrderStatus.pending,
   payMethod: OrderPayMethod.bank_transfer,
   paymentProofUrl: { not: null },
@@ -115,7 +115,7 @@ function ownerOrdersWhere(
   if (tab === "progress") {
     return {
       ...base,
-      OR: [{ status: OrderStatus.paid }, buyerBankAwaitingReview],
+      OR: [{ status: OrderStatus.paid }, bankAwaitingReview],
     };
   }
   return {
@@ -161,10 +161,16 @@ export async function listOrdersForAdmin(tab: OrderListTab) {
   const where: Prisma.OrderWhereInput =
     tab === "pending"
       ? {
+          // Waiting for buyer to upload proof
           status: OrderStatus.pending,
           payMethod: OrderPayMethod.bank_transfer,
+          paymentProofUrl: null,
         }
-      : { status: { in: statusesForTab(tab) } };
+      : tab === "progress"
+        ? {
+            OR: [{ status: OrderStatus.paid }, bankAwaitingReview],
+          }
+        : { status: { in: statusesForTab(tab) } };
 
   return prisma.order.findMany({
     where,
@@ -175,7 +181,9 @@ export async function listOrdersForAdmin(tab: OrderListTab) {
 
 export async function countAdminProgressOrders() {
   return prisma.order.count({
-    where: { status: OrderStatus.paid },
+    where: {
+      OR: [{ status: OrderStatus.paid }, bankAwaitingReview],
+    },
   });
 }
 
@@ -184,7 +192,7 @@ export async function countAdminPendingBankTransfers() {
     where: {
       status: OrderStatus.pending,
       payMethod: OrderPayMethod.bank_transfer,
-      paymentProofUrl: { not: null },
+      paymentProofUrl: null,
     },
   });
 }

@@ -681,7 +681,7 @@
 @media print {
   @page {
     size: A4;
-    margin: 12mm;
+    margin: 10mm;
   }
 
   .invoicePage {
@@ -705,17 +705,23 @@
 
   .printBrand {
     display: block;
-    margin: 0 0 0.75rem;
+    margin: 0 0 0.5rem;
+  }
+
+  .printLogo {
+    width: 3.75rem;
+    max-height: 3.75rem;
+    object-fit: contain;
   }
 
   .detail {
-    gap: 0.65rem;
+    gap: 0.5rem;
   }
 
   .panel {
     box-shadow: none !important;
-    break-inside: auto;
-    page-break-inside: auto;
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 
   .item {
@@ -730,7 +736,7 @@
   }
 
   .itemTitle {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
   }
 
   .itemSub,
@@ -738,11 +744,15 @@
   .totalRow,
   .invValue,
   .metaGrid dd {
-    font-size: 0.85rem;
+    font-size: 0.82rem;
   }
 
   .invoiceMeta {
-    padding-top: 0.55rem;
+    padding-top: 0.45rem;
+  }
+
+  .panelHead {
+    padding: 0.35rem 0.55rem;
   }
 }
 

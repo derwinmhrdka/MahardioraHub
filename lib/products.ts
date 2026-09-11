@@ -122,12 +122,24 @@ export async function listActiveSecondhand(filters: ProductListFilters = {}) {
 export async function listStoreAreas(kind?: ProductKind) {
   return unstable_cache(
     async () => {
+      const where: Prisma.ProductWhereInput = {
+        isActive: true,
+        storeArea: { not: null },
+        ...(kind ? { kind } : {}),
+      };
+
+      if (kind === ProductKind.secondhand) {
+        const { listExpiredPreOrderProductIds } = await import(
+          "@/lib/pre-order"
+        );
+        const expiredIds = await listExpiredPreOrderProductIds();
+        if (expiredIds.length > 0) {
+          where.id = { notIn: expiredIds };
+        }
+      }
+
       const rows = await prisma.product.findMany({
-        where: {
-          isActive: true,
-          storeArea: { not: null },
-          ...(kind ? { kind } : {}),
-        },
+        where,
         select: { storeArea: true },
         distinct: ["storeArea"],
         orderBy: { storeArea: "asc" },
@@ -145,12 +157,24 @@ export async function listStoreAreas(kind?: ProductKind) {
 export async function listPlatforms(kind?: ProductKind) {
   return unstable_cache(
     async () => {
+      const where: Prisma.ProductWhereInput = {
+        isActive: true,
+        shopName: { not: null },
+        ...(kind ? { kind } : {}),
+      };
+
+      if (kind === ProductKind.secondhand) {
+        const { listExpiredPreOrderProductIds } = await import(
+          "@/lib/pre-order"
+        );
+        const expiredIds = await listExpiredPreOrderProductIds();
+        if (expiredIds.length > 0) {
+          where.id = { notIn: expiredIds };
+        }
+      }
+
       const rows = await prisma.product.findMany({
-        where: {
-          isActive: true,
-          shopName: { not: null },
-          ...(kind ? { kind } : {}),
-        },
+        where,
         select: { shopName: true },
         distinct: ["shopName"],
         orderBy: { shopName: "asc" },

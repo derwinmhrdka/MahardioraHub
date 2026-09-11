@@ -70,7 +70,7 @@ export function orderBackTab(
   status: string,
   opts?: OrderDisplayOpts & { forAdmin?: boolean }
 ): OrderListTab {
-  if (!opts?.forAdmin && isBuyerBankInReview(status, opts)) {
+  if (isBuyerBankInReview(status, opts)) {
     return "progress";
   }
   if (status === "pending") return "pending";
@@ -104,7 +104,7 @@ export function buyerEmptyCopy(tab: OrderListTab): string {
 }
 
 export function adminEmptyCopy(tab: OrderListTab): string {
-  if (tab === "pending") return "Belum ada transfer menunggu";
+  if (tab === "pending") return "Belum ada transfer menunggu bukti";
   if (tab === "progress") return "Belum ada pesanan";
   if (tab === "completed") return "Belum ada completed";
   return "Belum ada cancel";

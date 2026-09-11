@@ -1,6 +1,5 @@
 import { ProductBrowse } from "@/components/ProductBrowse";
-import { SiteHeader } from "@/components/SiteHeader";
-import { listCategories } from "@/lib/categories";
+import { listCatalogCategories } from "@/lib/categories";
 import {
   listActiveDeals,
   listPlatforms,
@@ -33,7 +32,7 @@ export default async function PicksPage({ searchParams }: PageProps) {
   const platform = params.platform?.trim() || null;
 
   const [categories, areas, platforms, products] = await Promise.all([
-    listCategories(),
+    listCatalogCategories(ProductKind.deal),
     listStoreAreas(ProductKind.deal),
     listPlatforms(ProductKind.deal),
     listActiveDeals({ storeArea: area, platform }),
@@ -51,23 +50,20 @@ export default async function PicksPage({ searchParams }: PageProps) {
   }));
 
   return (
-    <div className="section-deals">
-      <SiteHeader active="deals" />
-      <main className="container">
-        <h1 className="page-title">My Picks</h1>
-        <ProductBrowse
-          mode="deals"
-          label="My Picks"
-          items={items}
-          categories={categories}
-          areas={areas}
-          platforms={platforms}
-          activeArea={area}
-          activePlatform={platform}
-          basePath="/picks"
-          emptyText="Belum ada picks"
-        />
-      </main>
-    </div>
+    <main className="container">
+      <h1 className="page-title">My Picks</h1>
+      <ProductBrowse
+        mode="deals"
+        label="My Picks"
+        items={items}
+        categories={categories}
+        areas={areas}
+        platforms={platforms}
+        activeArea={area}
+        activePlatform={platform}
+        basePath="/picks"
+        emptyText="Belum ada picks"
+      />
+    </main>
   );
 }

@@ -136,6 +136,8 @@ export default async function CheckoutPaymentPage() {
           }}
         />
 
+        <div className={styles.barSpacer} aria-hidden />
+
         <div className={styles.bar}>
           <div className={styles.barMeta}>
             <span className={styles.barLabel}>Total</span>

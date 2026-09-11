@@ -184,9 +184,11 @@ export default async function OrderDetailPage({
 
   return (
     <div className={`section-secondhand ${styles.invoicePage}`}>
-      <Header siteName={settings.siteName} active="secondhand" />
+      <div className={`${styles.noPrint} no-print`}>
+        <Header siteName={settings.siteName} active="secondhand" />
+      </div>
       <main className={`container ${styles.main}`}>
-        <div className={`${styles.top} ${styles.noPrint}`}>
+        <div className={`${styles.top} ${styles.noPrint} no-print`}>
           <Link
             href={backHref}
             className={styles.back}
@@ -219,10 +221,10 @@ export default async function OrderDetailPage({
           </div>
 
           <div className={styles.panel}>
-            <div className={`${styles.panelHead} ${styles.screenOnlyStatus}`}>
+            <div className={`${styles.panelHead} ${styles.screenOnlyStatus} no-print`}>
               <span>{orderStatusLabelShort(order.status, displayOpts)}</span>
               {isPending && isOwner && !awaitingBankReview ? (
-                <span className={styles.noPrint}>
+                <span className={`${styles.noPrint} no-print`}>
                   <OrderCountdown expiresAt={expiresAt} />
                 </span>
               ) : null}
@@ -289,7 +291,7 @@ export default async function OrderDetailPage({
                 );
                 return (
                   <li key={item.id} className={styles.item}>
-                    <div className={`${styles.thumb} ${styles.noPrint}`}>
+                    <div className={`${styles.thumb} ${styles.noPrint} no-print`}>
                       {src ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={src} alt="" />
@@ -316,7 +318,7 @@ export default async function OrderDetailPage({
             </div>
           </div>
 
-          <div className={`${styles.actionStack} ${styles.noPrint}`}>
+          <div className={`${styles.actionStack} ${styles.noPrint} no-print`}>
             {waHref ? (
               <a
                 href={waHref}

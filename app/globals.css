@@ -638,3 +638,46 @@ tr:last-child td {
   font-size: var(--text-body);
   font-weight: 600;
 }
+
+/* Invoice PDF: only #invoice-receipt; body min-height:100vh otherwise makes a blank 2nd page */
+@media print {
+  html,
+  body {
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+    background-image: none !important;
+    background-attachment: scroll !important;
+  }
+
+  html.printing-invoice body * {
+    display: none !important;
+  }
+
+  /* Collapse wrappers so only the receipt contributes page height */
+  html.printing-invoice body *:has(#invoice-receipt) {
+    display: contents !important;
+  }
+
+  html.printing-invoice #invoice-receipt {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.55rem !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  html.printing-invoice #invoice-receipt * {
+    display: revert !important;
+  }
+
+  html.printing-invoice #invoice-receipt .no-print,
+  html.printing-invoice #invoice-receipt .no-print * {
+    display: none !important;
+  }
+}

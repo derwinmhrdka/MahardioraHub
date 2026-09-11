@@ -4,7 +4,7 @@ import { markOrderPaid } from "@/lib/orders/paid";
 import { prisma } from "@/lib/prisma";
 import { cleanupRemovedUploads } from "@/lib/upload-gc";
 
-/** Admin: pending bank transfer → paid (Progress) in one step. */
+/** Admin: pending bank transfer + proof → completed in one approval. */
 export async function confirmBankTransferPayment(orderId: string) {
   const order = await prisma.order.findUnique({ where: { id: orderId } });
   if (!order) return null;
@@ -12,8 +12,12 @@ export async function confirmBankTransferPayment(orderId: string) {
   if (order.status !== OrderStatus.pending) return order;
   if (!order.paymentProofUrl) return order;
 
-  // One approval: proof accepted + order enters Progress (paid).
-  return markOrderPaid({ orderId: order.id });
+  const paid = await markOrderPaid({ orderId: order.id });
+  if (!paid) return null;
+  if (paid.status === OrderStatus.completed) return paid;
+  if (paid.status !== OrderStatus.paid) return paid;
+
+  return acceptOrder(paid.id);
 }
 
 /** Admin: reject pending bank transfer (restore nothing — stock never decremented). */

@@ -42,6 +42,8 @@ type ProductBrowseProps = {
   activeCategory?: string | null;
   activeArea?: string | null;
   activePlatform?: string | null;
+  activePreOrder?: boolean;
+  showPreOrderChip?: boolean;
   basePath: string;
   emptyText: string;
 };
@@ -56,6 +58,8 @@ export function ProductBrowse({
   activeCategory = null,
   activeArea = null,
   activePlatform = null,
+  activePreOrder = false,
+  showPreOrderChip = false,
   basePath,
   emptyText,
 }: ProductBrowseProps) {
@@ -128,6 +132,7 @@ export function ProductBrowse({
       category: mode === "secondhand" ? activeCategory : null,
       area,
       platform: activePlatform,
+      preOrder: mode === "secondhand" ? activePreOrder : false,
     });
   }
 
@@ -136,6 +141,7 @@ export function ProductBrowse({
       category: mode === "secondhand" ? activeCategory : null,
       area: activeArea,
       platform,
+      preOrder: mode === "secondhand" ? activePreOrder : false,
     });
   }
 
@@ -151,6 +157,8 @@ export function ProductBrowse({
           basePath={basePath}
           area={activeArea}
           platform={activePlatform}
+          activePreOrder={activePreOrder}
+          showPreOrder={showPreOrderChip}
           query={query}
           onQueryChange={setQuery}
         />
@@ -230,7 +238,7 @@ export function ProductBrowse({
                 href={categoryHref(null)}
                 className={clsx(
                   styles.link,
-                  activeCategory == null && styles.active
+                  activeCategory == null && !activePreOrder && styles.active
                 )}
                 onClick={() => setFilterOpen(false)}
               >

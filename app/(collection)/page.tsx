@@ -4,8 +4,7 @@ import { CollectionPromoBanner } from "@/components/CollectionPromoBanner";
 import { FlashSaleStrip } from "@/components/FlashSaleStrip";
 import { PreOrderStrip } from "@/components/PreOrderStrip";
 import { ProductBrowse } from "@/components/ProductBrowse";
-import { SiteHeader } from "@/components/SiteHeader";
-import { listCategories } from "@/lib/categories";
+import { listCatalogCategories } from "@/lib/categories";
 import { getActiveFlashSalePublic } from "@/lib/flash-sale";
 import {
   getTodayPreOrderPublic,
@@ -22,16 +21,18 @@ import {
   getSettings,
   siteOrigin,
 } from "@/lib/settings";
+import { parsePreOrderParam } from "@/lib/urls";
 
 type PageProps = {
   searchParams: Promise<{
     area?: string;
     category?: string;
     platform?: string;
+    preorder?: string;
   }>;
 };
 
-/** Public catalog — data cached; header auth isolated via SiteHeader Suspense. */
+/** Public catalog — data cached; header lives in (collection)/layout. */
 export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -47,8 +48,12 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage({ searchParams }: PageProps) {
   const query = await searchParams;
   const area = query.area?.trim() || null;
-  const categorySlug = query.category?.trim() || null;
   const platform = query.platform?.trim() || null;
+  const preOrderOnly = parsePreOrderParam(query.preorder);
+  // Pre Order chip is exclusive with category chips
+  const categorySlug = preOrderOnly
+    ? null
+    : query.category?.trim() || null;
 
   const [
     categories,
@@ -60,7 +65,7 @@ export default async function HomePage({ searchParams }: PageProps) {
     preOrderMap,
     bannerImages,
   ] = await Promise.all([
-    listCategories(),
+    listCatalogCategories(ProductKind.secondhand),
     listStoreAreas(ProductKind.secondhand),
     listPlatforms(ProductKind.secondhand),
     listActiveSecondhand({
@@ -74,7 +79,11 @@ export default async function HomePage({ searchParams }: PageProps) {
     getCollectionBanner(),
   ]);
 
-  const items = products.map((product) => ({
+  const catalogProducts = preOrderOnly
+    ? products.filter((product) => preOrderMap.has(product.id))
+    : products;
+
+  const items = catalogProducts.map((product) => ({
     id: product.id,
     title: product.title,
     price: product.price,
@@ -89,8 +98,7 @@ export default async function HomePage({ searchParams }: PageProps) {
   }));
 
   return (
-    <div className="section-secondhand">
-      <SiteHeader active="secondhand" />
+    <>
       {bannerImages.length > 0 ? (
         <CollectionPromoBanner images={bannerImages} />
       ) : null}
@@ -119,10 +127,14 @@ export default async function HomePage({ searchParams }: PageProps) {
           activeCategory={categorySlug}
           activeArea={area}
           activePlatform={platform}
+          activePreOrder={preOrderOnly}
+          showPreOrderChip={preOrderMap.size > 0}
           basePath="/"
-          emptyText="Belum ada collection"
+          emptyText={
+            preOrderOnly ? "Belum ada pre order" : "Belum ada collection"
+          }
         />
       </main>
-    </div>
+    </>
   );
 }

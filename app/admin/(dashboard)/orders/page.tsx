@@ -55,7 +55,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
   } else if (params.accepted) {
     notice = "Diterima";
   } else if (params.confirmed) {
-    notice = "Diterima · Progress";
+    notice = "Diterima · Completed";
   } else if (params.rejected) {
     notice = "Ditolak";
   }
