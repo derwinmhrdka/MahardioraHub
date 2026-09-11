@@ -8,7 +8,7 @@ import { ProductNote } from "@/components/ProductNote";
 import { ProductPrice } from "@/components/ProductPrice";
 import { SiteHeader } from "@/components/SiteHeader";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import styles from "@/components/ProductDetail.module.css";
+import styles from "@/components/products/ProductDetail.module.css";
 import { auth } from "@/auth";
 import { getProductPreOrderTag } from "@/lib/pre-order";
 import { productImages } from "@/lib/product-images";

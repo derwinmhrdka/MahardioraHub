@@ -1,4 +1,4 @@
-import { readFile, stat } from "fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import { NextRequest, NextResponse } from "next/server";
 import { resolveUploadFile } from "@/lib/uploads";
 

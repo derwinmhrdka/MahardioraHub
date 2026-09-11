@@ -7,7 +7,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { ProductImageSlider } from "@/components/ProductImageSlider";
 import { ProductNote } from "@/components/ProductNote";
 import { SiteHeader } from "@/components/SiteHeader";
-import styles from "@/components/ProductDetail.module.css";
+import styles from "@/components/products/ProductDetail.module.css";
 import { formatRupiah } from "@/lib/format";
 import { productImages } from "@/lib/product-images";
 import { getProduct, getRelatedDeals } from "@/lib/products";

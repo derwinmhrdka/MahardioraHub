@@ -1,4 +1,4 @@
-import { createHash } from "crypto";
+import { createHash } from "node:crypto";
 
 function serverKey() {
   const key = process.env.MIDTRANS_SERVER_KEY?.trim();

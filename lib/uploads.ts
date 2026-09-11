@@ -1,6 +1,6 @@
-import { randomUUID } from "crypto";
-import { mkdir, readdir, stat, unlink, writeFile } from "fs/promises";
-import path from "path";
+import { randomUUID } from "node:crypto";
+import { mkdir, readdir, stat, unlink, writeFile } from "node:fs/promises";
+import path from "node:path";
 import sharp from "sharp";
 import {
   MAX_IMAGE_EDGE,

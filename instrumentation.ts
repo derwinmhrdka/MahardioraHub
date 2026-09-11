@@ -1,5 +1,7 @@
 export async function register() {
-  if (process.env.NEXT_RUNTIME !== "nodejs") return;
-  const { startOrderExpiryScheduler } = await import("@/lib/orders/scheduler");
-  startOrderExpiryScheduler();
+  // Only load Node scheduler on the Node.js runtime (not Edge).
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    // webpackIgnore: keep Edge instrumentation graph free of Node builtins.
+    await import(/* webpackIgnore: true */ "./instrumentation.node");
+  }
 }
