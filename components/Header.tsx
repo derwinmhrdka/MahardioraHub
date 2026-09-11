@@ -27,6 +27,7 @@ export async function Header({ active = "secondhand" }: HeaderProps) {
     price: number;
     discountPercent: number;
     imageUrl: string | null;
+    selected: boolean;
   }> = [];
 
   if (showCart) {
@@ -44,6 +45,7 @@ export async function Header({ active = "secondhand" }: HeaderProps) {
       price: row.product.price,
       discountPercent: row.product.discountPercent,
       imageUrl: productImages(row.product)[0] ?? null,
+      selected: row.selected,
     }));
   }
 

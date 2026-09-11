@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Header } from "@/components/Header";
 import { CheckoutBuyerForm } from "@/components/CheckoutBuyerForm";
-import { listCartItems } from "@/lib/cart";
+import { listSelectedCartItems } from "@/lib/cart";
 import { resolveCartOwner } from "@/lib/cart-owner";
 import { getUserBuyerProfile } from "@/lib/buyer";
 import { formatRupiah } from "@/lib/format";
@@ -25,23 +25,21 @@ export default async function CheckoutPaymentPage() {
   const [settings, rows, pendingQris, pendingTransfer, bankCount, profile] =
     await Promise.all([
       getSettings(),
-      listCartItems(owner.ownerKey),
+      listSelectedCartItems(owner.ownerKey),
       getActivePendingQrisOrder(owner),
       getActivePendingBankTransferOrder(owner),
       countActiveBankAccounts(),
       owner.userId ? getUserBuyerProfile(owner.userId) : Promise.resolve(null),
     ]);
 
-  if (pendingQris) {
-    redirect(`/checkout/${pendingQris.id}`);
-  }
-  if (pendingTransfer) {
-    redirect(`/checkout/${pendingTransfer.id}`);
-  }
-
+  // Cart kosong: lanjutkan pembayaran pending jika ada
   if (rows.length === 0) {
+    if (pendingQris) redirect(`/checkout/${pendingQris.id}`);
+    if (pendingTransfer) redirect(`/checkout/${pendingTransfer.id}`);
     redirect("/");
   }
+
+  const pendingOrder = pendingQris ?? pendingTransfer;
 
   const items = rows.map((row) => {
     const unit = salePrice(row.product.price, row.product.discountPercent);
@@ -72,6 +70,15 @@ export default async function CheckoutPaymentPage() {
           </Link>
           <h1 className={styles.title}>Payment</h1>
         </div>
+
+        {pendingOrder ? (
+          <p className={styles.pendingNote}>
+            Ada pembayaran pending.{" "}
+            <Link href={`/checkout/${pendingOrder.id}`}>Lanjutkan</Link>
+            {" · "}
+            <Link href="/orders?tab=pending">Lihat orders</Link>
+          </p>
+        ) : null}
 
         <section className={styles.panel} aria-label="Order">
           <div className={styles.panelHead}>

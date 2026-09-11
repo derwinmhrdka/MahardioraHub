@@ -67,18 +67,22 @@ export function resolveUploadFile(filename: string): string | null {
   return path.join(getUploadDir(), safe);
 }
 
-export async function saveProductImage(file: File): Promise<string> {
+export async function saveProductImage(file: File | Blob): Promise<string> {
+  const named = file as File;
   const mime =
     file.type ||
-    (file.name.toLowerCase().endsWith(".png")
+    (typeof named.name === "string" && named.name.toLowerCase().endsWith(".png")
       ? "image/png"
-      : file.name.toLowerCase().endsWith(".webp")
+      : typeof named.name === "string" &&
+          named.name.toLowerCase().endsWith(".webp")
         ? "image/webp"
-        : file.name.toLowerCase().endsWith(".gif")
+        : typeof named.name === "string" &&
+            named.name.toLowerCase().endsWith(".gif")
           ? "image/gif"
-          : file.name.toLowerCase().match(/\.(jpe?g)$/)
+          : typeof named.name === "string" &&
+              named.name.toLowerCase().match(/\.(jpe?g)$/)
             ? "image/jpeg"
-            : "");
+            : file.type || "image/jpeg");
 
   if (!ALLOWED_MIME.has(mime)) {
     throw new Error("Format gambar tidak didukung");

@@ -68,7 +68,10 @@ async function mergeGuestCartToUser(userId: string, guestId: string) {
     if (existing) {
       await prisma.cartItem.update({
         where: { id: existing.id },
-        data: { quantity: existing.quantity + item.quantity },
+        data: {
+          quantity: existing.quantity + item.quantity,
+          selected: existing.selected || item.selected,
+        },
       });
       await prisma.cartItem.delete({ where: { id: item.id } });
     } else {

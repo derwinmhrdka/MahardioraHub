@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -81,31 +81,39 @@ export function BankTransferCheckout({
     setPreview(url);
   }
 
-  function onSubmit(formData: FormData) {
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
     if (!selectedId) {
       setError("Pilih rekening dulu");
       return;
     }
-    const file = formData.get("proof");
-    if (!(file instanceof File) || file.size <= 0) {
-      if (!proofUrl) {
-        setError("Upload bukti transfer");
-        return;
-      }
+    const file = fileRef.current?.files?.[0] ?? null;
+    if (!file || file.size <= 0) {
+      setError("Upload bukti transfer");
+      return;
     }
+
+    const formData = new FormData();
+    formData.set("orderId", orderId);
+    formData.set("bankAccountId", String(selectedId));
+    formData.set("proof", file);
 
     setError(null);
     startTransition(async () => {
-      const result = await submitBankTransferProofAction(formData);
-      if (result?.error) {
-        setError(result.error);
-        return;
+      try {
+        const result = await submitBankTransferProofAction(formData);
+        if (result?.error) {
+          setError(result.error);
+          return;
+        }
+        if (result?.proofUrl) {
+          setProofUrl(result.proofUrl);
+          setPreview(result.proofUrl);
+        }
+        router.refresh();
+      } catch {
+        setError("Gagal mengirim bukti. Coba lagi.");
       }
-      if (result?.proofUrl) {
-        setProofUrl(result.proofUrl);
-        setPreview(result.proofUrl);
-      }
-      router.refresh();
     });
   }
 
@@ -212,7 +220,7 @@ export function BankTransferCheckout({
           </div>
         ) : null}
 
-        <form action={onSubmit} className={styles.form}>
+        <form onSubmit={handleSubmit} className={styles.form}>
           <input type="hidden" name="orderId" value={orderId} />
           <input
             type="hidden"
@@ -260,7 +268,6 @@ export function BankTransferCheckout({
                   accept="image/jpeg,image/png,image/webp,image/gif"
                   className={styles.fileInput}
                   onChange={(e) => onFileChange(e.target.files?.[0] ?? null)}
-                  required={!proofUrl}
                 />
                 {preview ? (
                   <button

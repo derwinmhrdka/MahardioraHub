@@ -4,7 +4,9 @@ import { revalidatePath } from "next/cache";
 import {
   addToCart,
   removeFromCart,
+  setAllCartSelected,
   setCartQuantity,
+  setCartSelected,
 } from "@/lib/cart";
 import { resolveCartOwner } from "@/lib/cart-owner";
 
@@ -54,4 +56,20 @@ export async function removeCartItemAction(formData: FormData) {
   const owner = await resolveCartOwner();
   await removeFromCart(owner.ownerKey, productId);
   revalidateCartViews(productId);
+}
+
+export async function toggleCartItemSelectedAction(formData: FormData) {
+  const productId = Number(formData.get("productId"));
+  const selected = formData.get("selected") === "1";
+  if (!Number.isFinite(productId)) throw new Error("Invalid");
+  const owner = await resolveCartOwner();
+  await setCartSelected(owner.ownerKey, productId, selected);
+  revalidateCartViews(productId);
+}
+
+export async function toggleAllCartSelectedAction(formData: FormData) {
+  const selected = formData.get("selected") === "1";
+  const owner = await resolveCartOwner();
+  await setAllCartSelected(owner.ownerKey, selected);
+  revalidateCartViews();
 }

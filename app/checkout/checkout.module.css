@@ -32,6 +32,24 @@
   letter-spacing: -0.01em;
 }
 
+.pendingNote {
+  margin: 0 0 0.65rem;
+  padding: 0.55rem 0.7rem;
+  border: 1.5px solid #111;
+  border-radius: 10px;
+  background: #fff8e8;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.35;
+  box-shadow: 1px 1px 0 #111;
+}
+
+.pendingNote a {
+  color: #111;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .panel {
   margin: 0 0 0.65rem;
   border: 1.5px solid #111;

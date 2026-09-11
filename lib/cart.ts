@@ -81,7 +81,7 @@ export async function addToCart(ownerKey: string, productId: number, qty = 1) {
     }
     return prisma.cartItem.update({
       where: { id: existing.id },
-      data: { quantity: nextQty },
+      data: { quantity: nextQty, selected: true },
     });
   }
 
@@ -89,8 +89,31 @@ export async function addToCart(ownerKey: string, productId: number, qty = 1) {
   if (quantity <= 0) throw new Error("Out of stock");
 
   return prisma.cartItem.create({
-    data: { ownerKey, productId, quantity },
+    data: { ownerKey, productId, quantity, selected: true },
   });
+}
+
+export async function setCartSelected(
+  ownerKey: string,
+  productId: number,
+  selected: boolean
+) {
+  await prisma.cartItem.updateMany({
+    where: { ownerKey, productId },
+    data: { selected },
+  });
+}
+
+export async function setAllCartSelected(ownerKey: string, selected: boolean) {
+  await prisma.cartItem.updateMany({
+    where: { ownerKey, product: secondhandActive },
+    data: { selected },
+  });
+}
+
+export async function listSelectedCartItems(ownerKey: string) {
+  const rows = await listCartItems(ownerKey);
+  return rows.filter((row) => row.selected);
 }
 
 export async function setCartQuantity(

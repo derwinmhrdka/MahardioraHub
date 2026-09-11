@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { countActiveBankAccounts } from "@/lib/bank-accounts";
 import { parseBuyerInput, saveBuyerProfile } from "@/lib/buyer";
@@ -30,12 +31,20 @@ async function prepareCheckout(formData: FormData) {
   return { owner, buyer };
 }
 
+function revalidateAfterCheckout() {
+  revalidatePath("/");
+  revalidatePath("/secondhand");
+  revalidatePath("/checkout");
+  revalidatePath("/orders");
+}
+
 export async function checkoutQrisAction(formData: FormData) {
   if (!(await qrisConfigured())) {
     throw new Error("QRIS belum dikonfigurasi");
   }
   const { owner, buyer } = await prepareCheckout(formData);
   const order = await createQrisCheckout({ owner, buyer });
+  revalidateAfterCheckout();
   redirect(`/checkout/${order.id}`);
 }
 
@@ -46,23 +55,32 @@ export async function checkoutBankTransferAction(formData: FormData) {
   }
   const { owner, buyer } = await prepareCheckout(formData);
   const order = await createBankTransferCheckout({ owner, buyer });
+  revalidateAfterCheckout();
   redirect(`/checkout/${order.id}`);
 }
 
+function asUploadFile(entry: FormDataEntryValue | null): File | Blob | null {
+  if (!entry || typeof entry === "string") return null;
+  if (typeof Blob !== "undefined" && entry instanceof Blob && entry.size > 0) {
+    return entry;
+  }
+  return null;
+}
+
 export async function submitBankTransferProofAction(formData: FormData) {
-  const owner = await resolveCartOwner();
-  const orderId = String(formData.get("orderId") ?? "").trim();
-  const bankAccountId = Number(formData.get("bankAccountId"));
-  if (!orderId || !Number.isFinite(bankAccountId)) {
-    return { error: "Data tidak lengkap" };
-  }
-
-  const file = formData.get("proof");
-  if (!(file instanceof File) || file.size <= 0) {
-    return { error: "Upload bukti transfer" };
-  }
-
   try {
+    const owner = await resolveCartOwner();
+    const orderId = String(formData.get("orderId") ?? "").trim();
+    const bankAccountId = Number(formData.get("bankAccountId"));
+    if (!orderId || !Number.isFinite(bankAccountId)) {
+      return { error: "Data tidak lengkap" };
+    }
+
+    const file = asUploadFile(formData.get("proof"));
+    if (!file) {
+      return { error: "Upload bukti transfer" };
+    }
+
     const proofUrl = await saveProductImage(file);
     const order = await attachPaymentProof({
       orderId,
@@ -71,8 +89,10 @@ export async function submitBankTransferProofAction(formData: FormData) {
       paymentProofUrl: proofUrl,
     });
     if (!order) return { error: "Order tidak ditemukan" };
+    if (!order.paymentProofUrl) return { error: "Gagal menyimpan bukti" };
     return { proofUrl: order.paymentProofUrl };
   } catch (e) {
+    console.error("submitBankTransferProofAction", e);
     const message = e instanceof Error ? e.message : "Gagal upload";
     return { error: message };
   }
@@ -84,6 +104,7 @@ export async function checkoutCashAction(formData: FormData) {
     createCashCheckout({ owner, buyer }),
     getSettings(),
   ]);
+  revalidateAfterCheckout();
 
   const text = buildCashWhatsAppMessage({
     template: settings.whatsappTemplate,

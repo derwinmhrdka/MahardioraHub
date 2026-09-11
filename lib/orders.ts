@@ -1,6 +1,6 @@
 import { OrderPayMethod, OrderPayProvider, OrderStatus, Prisma } from "@prisma/client";
 import type { BuyerInput } from "@/lib/buyer";
-import { listCartItems } from "@/lib/cart";
+import { listSelectedCartItems } from "@/lib/cart";
 import {
   cancelMidtransTransaction,
   createMidtransQris,
@@ -26,8 +26,8 @@ function makeExternalId(prefix: string) {
 }
 
 async function buildOrderDraft(ownerKey: string) {
-  const rows = await listCartItems(ownerKey);
-  if (rows.length === 0) throw new Error("Cart kosong");
+  const rows = await listSelectedCartItems(ownerKey);
+  if (rows.length === 0) throw new Error("Pilih item di cart dulu");
 
   const items = rows.map((row) => {
     const unitPrice = salePrice(row.product.price, row.product.discountPercent);
@@ -127,13 +127,11 @@ export async function getActivePendingQrisOrder(owner: CheckoutOwner) {
  * Reuse active pending QRIS if any; otherwise create new QR from cart.
  * Returning to payment must not mint a second QR.
  */
+/** QRIS via Midtrans or Xendit. Cart cleared after QR siap. */
 export async function createQrisCheckout(input: {
   owner: CheckoutOwner;
   buyer: CheckoutBuyer;
 }) {
-  const existing = await getActivePendingQrisOrder(input.owner);
-  if (existing) return existing;
-
   const draft = await buildOrderDraft(input.owner.ownerKey);
   const externalId = makeExternalId("qris");
   const provider = await getQrisProvider();
@@ -160,7 +158,7 @@ export async function createQrisCheckout(input: {
       if (!qr.qr_string) {
         throw new Error("Midtrans QR string missing");
       }
-      return prisma.order.update({
+      const updated = await prisma.order.update({
         where: { id: order.id },
         data: {
           pspId: qr.transaction_id,
@@ -169,6 +167,8 @@ export async function createQrisCheckout(input: {
         },
         include: { items: true },
       });
+      await clearCartForOrder(input.owner.ownerKey, updated.items);
+      return updated;
     }
 
     const qr = await createXenditDynamicQris({
@@ -176,7 +176,7 @@ export async function createQrisCheckout(input: {
       amount: draft.amount,
     });
 
-    return prisma.order.update({
+    const updated = await prisma.order.update({
       where: { id: order.id },
       data: {
         pspId: qr.id,
@@ -185,6 +185,8 @@ export async function createQrisCheckout(input: {
       },
       include: { items: true },
     });
+    await clearCartForOrder(input.owner.ownerKey, updated.items);
+    return updated;
   } catch (err) {
     await prisma.order.update({
       where: { id: order.id },
@@ -242,16 +244,14 @@ export async function getActivePendingBankTransferOrder(owner: CheckoutOwner) {
 }
 
 /**
- * Reuse active pending bank transfer if any; otherwise create from cart.
+ * Create bank transfer order from selected cart items.
  * Cart cleared on create; admin marks paid after reviewing proof.
+ * Allows multiple pending orders (new checkout tidak reuse pending lama).
  */
 export async function createBankTransferCheckout(input: {
   owner: CheckoutOwner;
   buyer: CheckoutBuyer;
 }) {
-  const existing = await getActivePendingBankTransferOrder(input.owner);
-  if (existing) return existing;
-
   const draft = await buildOrderDraft(input.owner.ownerKey);
   const externalId = makeExternalId("tf");
   const order = await createPendingOrder(
@@ -445,16 +445,24 @@ export async function getOrderForUser(orderId: string, userId: string) {
 }
 
 export async function getOrderForOwner(orderId: string, owner: CheckoutOwner) {
-  return prisma.order.findFirst({
-    where: {
-      id: orderId,
-      ...ownerOrderWhere(owner),
-    },
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
     include: {
       items: true,
       bankAccount: true,
     },
   });
+  if (!order) return null;
+
+  if (owner.userId && order.userId === owner.userId) return order;
+  if (owner.guestId && order.guestId === owner.guestId) return order;
+
+  // Logged-in user may open a guest order from the same browser session.
+  if (owner.userId && owner.guestId && order.guestId === owner.guestId) {
+    return order;
+  }
+
+  return null;
 }
 
 /** Buyer owns the order, guest cookie matches, or admin may open any order. */

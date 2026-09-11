@@ -148,9 +148,7 @@ export function CheckoutBuyerForm({
             />
             {lookupHint ? (
               <span className={styles.hintOk}>{lookupHint}</span>
-            ) : (
-              <span className={styles.hint}>Untuk autofill data berikutnya</span>
-            )}
+            ) : null}
           </label>
 
           <label
@@ -177,7 +175,7 @@ export function CheckoutBuyerForm({
               }
               onFocus={() => setFocused("address")}
               onBlur={() => setFocused(null)}
-              placeholder="Alamat lengkap pengiriman / pengambilan"
+              placeholder="Alamat lengkap"
               rows={3}
               required
             />
@@ -192,13 +190,6 @@ export function CheckoutBuyerForm({
             <h2 className={styles.headTitle}>Pilih metode</h2>
           </div>
         </div>
-        {!ready ? (
-          <p className={styles.needBuyer}>
-            Lengkapi data pembeli dulu sebelum memilih metode bayar.
-          </p>
-        ) : (
-          <p className={styles.readyBuyer}>Data lengkap · siap bayar</p>
-        )}
         <PaymentMethods
           qrisEnabled={qrisEnabled}
           bankTransferEnabled={bankTransferEnabled}
