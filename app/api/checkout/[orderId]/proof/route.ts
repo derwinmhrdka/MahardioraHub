@@ -9,13 +9,12 @@ type RouteContext = {
   params: Promise<{ orderId: string }>;
 };
 
-function isUploadBlob(entry: FormDataEntryValue | null): entry is Blob {
+function isUploadFile(entry: FormDataEntryValue | null): entry is File {
   if (!entry || typeof entry === "string") return false;
-  const blob = entry as Blob;
   return (
-    typeof blob.size === "number" &&
-    blob.size > 0 &&
-    typeof blob.arrayBuffer === "function"
+    typeof entry.size === "number" &&
+    entry.size > 0 &&
+    typeof entry.arrayBuffer === "function"
   );
 }
 
@@ -41,7 +40,7 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   const proof = formData.get("proof");
-  if (!isUploadBlob(proof)) {
+  if (!isUploadFile(proof)) {
     return NextResponse.json(
       { error: "Upload bukti transfer" },
       { status: 400 }

@@ -45,24 +45,14 @@ export function UserMenu({ user }: UserMenuProps) {
 
   if (!user) {
     return (
-      <div className={styles.guestRow}>
-        <Link
-          href="/orders"
-          className={styles.login}
-          aria-label="Order"
-          title="Order"
-        >
-          <Receipt size={16} strokeWidth={2.25} aria-hidden />
-        </Link>
-        <Link
-          href={loginHref}
-          className={styles.login}
-          aria-label="Login"
-          title="Login"
-        >
-          <LogIn size={16} strokeWidth={2.25} aria-hidden />
-        </Link>
-      </div>
+      <Link
+        href={loginHref}
+        className={styles.login}
+        aria-label="Login"
+        title="Login"
+      >
+        <LogIn size={16} strokeWidth={2.25} aria-hidden />
+      </Link>
     );
   }
 

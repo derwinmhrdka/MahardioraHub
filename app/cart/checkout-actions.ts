@@ -43,6 +43,9 @@ export async function checkoutQrisAction(formData: FormData) {
     throw new Error("QRIS belum dikonfigurasi");
   }
   const { owner, buyer } = await prepareCheckout(formData);
+  if (!owner.userId) {
+    throw new Error("Login diperlukan untuk QRIS");
+  }
   const order = await createQrisCheckout({ owner, buyer });
   revalidateAfterCheckout();
   redirect(`/checkout/${order.id}`);
@@ -54,6 +57,9 @@ export async function checkoutBankTransferAction(formData: FormData) {
     throw new Error("Belum ada rekening bank");
   }
   const { owner, buyer } = await prepareCheckout(formData);
+  if (!owner.userId) {
+    throw new Error("Login diperlukan untuk transfer bank");
+  }
   const order = await createBankTransferCheckout({ owner, buyer });
   revalidateAfterCheckout();
   redirect(`/checkout/${order.id}`);

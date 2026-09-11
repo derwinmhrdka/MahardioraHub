@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Check, Copy, RefreshCw } from "lucide-react";
 import { CancelOrderButton } from "@/components/CancelOrderButton";
+import { useAbandonPendingPayment } from "@/components/useAbandonPendingPayment";
 import { formatRupiah } from "@/lib/format";
 import styles from "./QrisCheckout.module.css";
 
@@ -16,6 +17,7 @@ type QrisCheckoutProps = {
   expiresAt: string | null;
   initialStatus: "pending" | "paid" | "expired" | "failed";
   canSimulate?: boolean;
+  showOrdersLink?: boolean;
 };
 
 function formatRemain(ms: number) {
@@ -33,6 +35,7 @@ export function QrisCheckout({
   expiresAt,
   initialStatus,
   canSimulate = false,
+  showOrdersLink = true,
 }: QrisCheckoutProps) {
   const router = useRouter();
   const [status, setStatus] = useState(initialStatus);
@@ -40,6 +43,10 @@ export function QrisCheckout({
   const [copied, setCopied] = useState(false);
   const [checking, setChecking] = useState(false);
   const [simulating, setSimulating] = useState(false);
+  const { markSafe } = useAbandonPendingPayment(
+    orderId,
+    status === "pending"
+  );
 
   const endMs = useMemo(() => {
     if (expiresAt) return new Date(expiresAt).getTime();
@@ -72,6 +79,7 @@ export function QrisCheckout({
       if (!res.ok) return;
       const data = (await res.json()) as { status?: string };
       if (data.status === "paid") {
+        markSafe();
         setStatus("paid");
         router.replace(`/checkout/success?order=${orderId}`);
       } else if (data.status === "expired" || data.status === "failed") {
@@ -114,6 +122,7 @@ export function QrisCheckout({
       if (!res.ok) return;
       const data = (await res.json()) as { status?: string };
       if (data.status === "paid") {
+        markSafe();
         setStatus("paid");
         router.replace(`/checkout/success?order=${orderId}`);
       }
@@ -225,9 +234,15 @@ export function QrisCheckout({
               {simulating ? "..." : "Sim"}
             </button>
           ) : null}
-          <Link href="/orders?tab=pending" className={styles.linkBtn}>
-            Order
-          </Link>
+          {showOrdersLink ? (
+            <Link href="/orders?tab=pending" className={styles.linkBtn}>
+              Order
+            </Link>
+          ) : (
+            <Link href="/" className={styles.linkBtn}>
+              Home
+            </Link>
+          )}
         </div>
       </div>
     </div>

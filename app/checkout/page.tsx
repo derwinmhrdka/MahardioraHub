@@ -32,12 +32,17 @@ export default async function CheckoutPaymentPage() {
       owner.userId ? getUserBuyerProfile(owner.userId) : Promise.resolve(null),
     ]);
 
-  // Cart kosong: lanjutkan pembayaran pending jika ada
+  // Cart kosong: lanjutkan pembayaran pending jika ada (login only)
   if (rows.length === 0) {
-    if (pendingQris) redirect(`/checkout/${pendingQris.id}`);
-    if (pendingTransfer) redirect(`/checkout/${pendingTransfer.id}`);
+    if (owner.userId) {
+      if (pendingQris) redirect(`/checkout/${pendingQris.id}`);
+      if (pendingTransfer) redirect(`/checkout/${pendingTransfer.id}`);
+    }
     redirect("/");
   }
+
+  // Guest: jangan paksa masuk ke payment pending lama
+  const isGuest = !owner.userId;
 
   const pendingOrder = pendingQris ?? pendingTransfer;
 
@@ -71,7 +76,7 @@ export default async function CheckoutPaymentPage() {
           <h1 className={styles.title}>Payment</h1>
         </div>
 
-        {pendingOrder ? (
+        {!isGuest && pendingOrder ? (
           <p className={styles.pendingNote}>
             Ada pembayaran pending.{" "}
             <Link href={`/checkout/${pendingOrder.id}`}>Lanjutkan</Link>
@@ -110,8 +115,9 @@ export default async function CheckoutPaymentPage() {
         </section>
 
         <CheckoutBuyerForm
-          qrisEnabled={await qrisConfigured()}
-          bankTransferEnabled={bankCount > 0}
+          qrisEnabled={!isGuest && (await qrisConfigured())}
+          bankTransferEnabled={!isGuest && bankCount > 0}
+          whatsappOnly={isGuest}
           initialBuyer={{
             name: profile?.name ?? "",
             whatsapp: profile?.whatsapp ?? "",

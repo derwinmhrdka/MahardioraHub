@@ -15,12 +15,14 @@ type CheckoutBuyerFormProps = {
   qrisEnabled: boolean;
   bankTransferEnabled: boolean;
   initialBuyer: BuyerDraft;
+  whatsappOnly?: boolean;
 };
 
 export function CheckoutBuyerForm({
   qrisEnabled,
   bankTransferEnabled,
   initialBuyer,
+  whatsappOnly = false,
 }: CheckoutBuyerFormProps) {
   const [buyer, setBuyer] = useState<BuyerDraft>(initialBuyer);
   const [lookupHint, setLookupHint] = useState<string | null>(null);
@@ -187,7 +189,9 @@ export function CheckoutBuyerForm({
         <div className={styles.head}>
           <div>
             <p className={styles.headTag}>Pembayaran</p>
-            <h2 className={styles.headTitle}>Pilih metode</h2>
+            <h2 className={styles.headTitle}>
+              {whatsappOnly ? "Konfirmasi" : "Pilih metode"}
+            </h2>
           </div>
         </div>
         <PaymentMethods
@@ -195,6 +199,7 @@ export function CheckoutBuyerForm({
           bankTransferEnabled={bankTransferEnabled}
           buyer={buyer}
           disabled={!ready}
+          whatsappOnly={whatsappOnly}
         />
       </section>
     </div>

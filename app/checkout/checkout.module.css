@@ -15,6 +15,7 @@
   place-items: center;
   width: 1.9rem;
   height: 1.9rem;
+  padding: 0;
   border: 1.5px solid #111;
   border-radius: 999px;
   background: #fff;
@@ -22,6 +23,12 @@
   box-shadow: 1px 1px 0 #111;
   text-decoration: none;
   flex-shrink: 0;
+  cursor: pointer;
+}
+
+.back:disabled {
+  opacity: 0.55;
+  cursor: wait;
 }
 
 .title {

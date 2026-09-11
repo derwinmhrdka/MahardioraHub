@@ -20,6 +20,8 @@ type PaymentMethodsProps = {
   bankTransferEnabled: boolean;
   buyer: BuyerFields;
   disabled?: boolean;
+  /** Guest checkout: WhatsApp confirmation only */
+  whatsappOnly?: boolean;
 };
 
 function PendingLabel({ label }: { label: string }) {
@@ -42,10 +44,15 @@ export function PaymentMethods({
   bankTransferEnabled,
   buyer,
   disabled = false,
+  whatsappOnly = false,
 }: PaymentMethodsProps) {
+  const showQris = !whatsappOnly && qrisEnabled;
+  const showBank = !whatsappOnly && bankTransferEnabled;
+  const showBankDisabled = !whatsappOnly && !bankTransferEnabled;
+
   return (
     <div className={`${styles.list} ${disabled ? styles.listDisabled : ""}`}>
-      {qrisEnabled ? (
+      {showQris ? (
         <form action={checkoutQrisAction} className={styles.form}>
           <BuyerHiddens buyer={buyer} />
           <button type="submit" className={styles.row} disabled={disabled}>
@@ -60,7 +67,7 @@ export function PaymentMethods({
         </form>
       ) : null}
 
-      {bankTransferEnabled ? (
+      {showBank ? (
         <form action={checkoutBankTransferAction} className={styles.form}>
           <BuyerHiddens buyer={buyer} />
           <button type="submit" className={styles.row} disabled={disabled}>
@@ -73,7 +80,9 @@ export function PaymentMethods({
             <ChevronRight size={16} strokeWidth={2.25} aria-hidden />
           </button>
         </form>
-      ) : (
+      ) : null}
+
+      {showBankDisabled ? (
         <div className={styles.form}>
           <button
             type="button"
@@ -91,7 +100,7 @@ export function PaymentMethods({
             </span>
           </button>
         </div>
-      )}
+      ) : null}
 
       <form action={checkoutCashAction} className={styles.form}>
         <BuyerHiddens buyer={buyer} />
@@ -100,7 +109,11 @@ export function PaymentMethods({
             <Banknote size={16} strokeWidth={2.25} />
           </span>
           <span className={styles.label}>
-            <PendingLabel label="Cash (Via WhatsApp)" />
+            <PendingLabel
+              label={
+                whatsappOnly ? "Konfirmasi via WhatsApp" : "Cash (Via WhatsApp)"
+              }
+            />
           </span>
           <ChevronRight size={16} strokeWidth={2.25} aria-hidden />
         </button>

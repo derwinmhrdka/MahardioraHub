@@ -11,6 +11,7 @@ import {
   Upload,
 } from "lucide-react";
 import { CancelOrderButton } from "@/components/CancelOrderButton";
+import { useAbandonPendingPayment } from "@/components/useAbandonPendingPayment";
 import { formatRupiah } from "@/lib/format";
 import styles from "./BankTransferCheckout.module.css";
 
@@ -28,6 +29,7 @@ type BankTransferCheckoutProps = {
   accounts: BankAccountOption[];
   initialBankAccountId: number | null;
   initialProofUrl: string | null;
+  showOrdersLink?: boolean;
 };
 
 export function BankTransferCheckout({
@@ -37,6 +39,7 @@ export function BankTransferCheckout({
   accounts,
   initialBankAccountId,
   initialProofUrl,
+  showOrdersLink = true,
 }: BankTransferCheckoutProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -50,13 +53,13 @@ export function BankTransferCheckout({
   const [fileName, setFileName] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const submitted = Boolean(proofUrl);
+  const { markSafe } = useAbandonPendingPayment(orderId, !submitted);
 
   const selected = useMemo(
     () => accounts.find((a) => a.id === selectedId) ?? null,
     [accounts, selectedId]
   );
-
-  const submitted = Boolean(proofUrl);
 
   async function copyAccountNumber() {
     if (!selected) return;
@@ -121,6 +124,7 @@ export function BankTransferCheckout({
         setProofUrl(data.proofUrl);
         setPreview(data.proofUrl);
         selectedFileRef.current = null;
+        markSafe();
         router.refresh();
       } catch (err) {
         console.error("submit proof", err);
@@ -332,9 +336,15 @@ export function BankTransferCheckout({
           />
         )}
         <div className={styles.links}>
-          <Link href="/orders?tab=pending" className={styles.linkBtn}>
-            Lihat order
-          </Link>
+          {showOrdersLink ? (
+            <Link href="/orders?tab=pending" className={styles.linkBtn}>
+              Lihat order
+            </Link>
+          ) : (
+            <Link href="/" className={styles.linkBtn}>
+              Home
+            </Link>
+          )}
         </div>
       </div>
     </div>

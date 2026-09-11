@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
-import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { CancelLeaveLink } from "@/components/CancelLeaveLink";
 import { BankTransferCheckout } from "@/components/BankTransferCheckout";
 import { Header } from "@/components/Header";
 import { QrisCheckout } from "@/components/QrisCheckout";
@@ -33,7 +33,7 @@ export default async function CheckoutOrderPage({ params }: PageProps) {
     order.status === "expired" ||
     order.status === "failed"
   ) {
-    redirect(`/orders/${order.id}`);
+    redirect(owner.userId ? `/orders/${order.id}` : "/");
   }
 
   if (order.status !== "pending") notFound();
@@ -48,20 +48,22 @@ export default async function CheckoutOrderPage({ params }: PageProps) {
   ]);
 
   const title = order.payMethod === "qris" ? "QRIS" : "Transfer Bank";
+  const leaveHref = owner.userId ? "/orders?tab=cancel" : "/";
 
   return (
     <div className="section-secondhand">
       <Header siteName={settings.siteName} active="secondhand" />
       <main className={`container ${styles.main}`}>
         <div className={styles.top}>
-          <Link
-            href="/orders?tab=pending"
+          <CancelLeaveLink
+            orderId={order.id}
+            href={leaveHref}
             className={styles.back}
             aria-label="Kembali"
             title="Kembali"
           >
             <ArrowLeft size={16} strokeWidth={2.5} aria-hidden />
-          </Link>
+          </CancelLeaveLink>
           <h1 className={styles.title}>{title}</h1>
         </div>
 
@@ -77,6 +79,7 @@ export default async function CheckoutOrderPage({ params }: PageProps) {
             }
             initialStatus="pending"
             canSimulate={qrisCanSimulate(order.payProvider)}
+            showOrdersLink={Boolean(owner.userId)}
           />
         ) : accounts.length === 0 ? (
           <p className={styles.emptyPay}>
@@ -95,6 +98,7 @@ export default async function CheckoutOrderPage({ params }: PageProps) {
             }))}
             initialBankAccountId={order.bankAccountId}
             initialProofUrl={order.paymentProofUrl}
+            showOrdersLink={Boolean(owner.userId)}
           />
         )}
       </main>
