@@ -51,8 +51,6 @@ export function PreOrderStrip({ lastOrderDate, items }: PreOrderStripProps) {
         </span>
       </div>
 
-      <p className={styles.note}>Hari terakhir pesan — jangan sampai kelewatan</p>
-
       <ul className={styles.scroller}>
         {items.map((item) => {
           const src = productImageUrl(item.imageUrl, 160);

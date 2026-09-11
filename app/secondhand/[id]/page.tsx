@@ -80,16 +80,6 @@ export default async function SecondhandItemPage({ params }: PageProps) {
               <span className={styles.preOrderTag}>
                 <Plane size={12} strokeWidth={2.5} aria-hidden />
                 Pre Order
-                <span className={styles.preOrderDate}>
-                  Last order{" "}
-                  {new Date(
-                    `${preOrder.lastOrderDate}T00:00:00.000Z`
-                  ).toLocaleDateString("id-ID", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </span>
               </span>
             ) : null}
             <ProductPrice

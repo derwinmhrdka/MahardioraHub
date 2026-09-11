@@ -142,9 +142,9 @@ function BatchEditor({
 
   const statusLabel =
     batch.status === "today"
-      ? "Last order hari ini"
+      ? "Hari ini"
       : batch.status === "expired"
-        ? "Sudah lewat"
+        ? "Lewat"
         : "Aktif";
 
   return (
@@ -230,7 +230,7 @@ function CreateBatch({
         onClick={() => setOpen(true)}
       >
         <Plus size={16} strokeWidth={2.35} aria-hidden />
-        Buat Pre Order baru
+        Buat Pre Order
       </button>
     );
   }
@@ -295,11 +295,6 @@ export function PreOrderAdmin({
 }: PreOrderAdminProps) {
   return (
     <div className={styles.wrap}>
-      <p className={styles.hint}>
-        Tanggal = Last Order. Lewat tanggal itu, produk otomatis hilang dari
-        Collection. Di hari Last Order, section biru muncul di beranda.
-      </p>
-
       <CreateBatch products={products} todayYmd={todayYmd} />
 
       <div className={styles.stack}>
