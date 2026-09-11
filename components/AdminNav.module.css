@@ -25,22 +25,12 @@
 .brandLogo {
   display: block;
   width: auto;
-  height: 2.2rem;
+  height: 2.95rem;
   object-fit: contain;
+  object-position: left center;
   flex-shrink: 0;
   user-select: none;
   -webkit-user-drag: none;
-}
-
-.brand {
-  font-family: var(--font-display-stack);
-  font-weight: 700;
-  font-size: var(--text-brand);
-  letter-spacing: 0.01em;
-  color: var(--color-text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .brandSub {

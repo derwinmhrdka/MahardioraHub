@@ -12,12 +12,3 @@ export function withFilters(path: string, params: FilterParams = {}): string {
   const qs = search.toString();
   return qs ? `${path}?${qs}` : path;
 }
-
-/** @deprecated use withFilters */
-export function withAreaQuery(
-  path: string,
-  area?: string | null,
-  category?: string | null
-): string {
-  return withFilters(path, { area, category });
-}

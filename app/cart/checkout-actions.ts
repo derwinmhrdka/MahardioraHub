@@ -7,13 +7,11 @@ import { resolveCheckoutBranch } from "@/lib/branches";
 import { parseBuyerInput, saveBuyerProfile } from "@/lib/buyer";
 import { resolveCartOwner } from "@/lib/cart-owner";
 import {
-  attachPaymentProof,
   createBankTransferCheckout,
   createCashCheckout,
   createQrisCheckout,
 } from "@/lib/orders";
 import { qrisConfigured } from "@/lib/qris-provider";
-import { saveProductImage } from "@/lib/uploads";
 
 function buyerFromForm(formData: FormData) {
   return parseBuyerInput({
@@ -64,49 +62,6 @@ export async function checkoutBankTransferAction(formData: FormData) {
   const order = await createBankTransferCheckout({ owner, buyer });
   revalidateAfterCheckout();
   redirect(`/checkout/${order.id}`);
-}
-
-function asUploadFile(entry: FormDataEntryValue | null): File | Blob | null {
-  if (!entry || typeof entry === "string") return null;
-  const blob = entry as Blob;
-  if (
-    typeof blob.size === "number" &&
-    blob.size > 0 &&
-    typeof blob.arrayBuffer === "function"
-  ) {
-    return blob;
-  }
-  return null;
-}
-
-export async function submitBankTransferProofAction(formData: FormData) {
-  try {
-    const owner = await resolveCartOwner();
-    const orderId = String(formData.get("orderId") ?? "").trim();
-    const bankAccountId = Number(formData.get("bankAccountId"));
-    if (!orderId || !Number.isFinite(bankAccountId)) {
-      return { error: "Data tidak lengkap" };
-    }
-
-    const file = asUploadFile(formData.get("proof"));
-    if (!file) {
-      return { error: "Upload bukti transfer" };
-    }
-
-    const proofUrl = await saveProductImage(file);
-    const order = await attachPaymentProof({
-      orderId,
-      owner,
-      bankAccountId,
-      paymentProofUrl: proofUrl,
-    });
-    if (!order.paymentProofUrl) return { error: "Gagal menyimpan bukti" };
-    return { proofUrl: order.paymentProofUrl };
-  } catch (e) {
-    console.error("submitBankTransferProofAction", e);
-    const message = e instanceof Error ? e.message : "Gagal upload";
-    return { error: message };
-  }
 }
 
 export async function checkoutCashAction(formData: FormData) {

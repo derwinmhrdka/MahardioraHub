@@ -15,7 +15,6 @@ type HeaderProps = {
 };
 
 export async function Header({ active = "secondhand" }: HeaderProps) {
-  const subtitle = active === "secondhand" ? "Collection" : "My Picks";
   const showCart = active === "secondhand";
   const session = await auth();
 
@@ -59,6 +58,9 @@ export async function Header({ active = "secondhand" }: HeaderProps) {
       }
     : null;
 
+  const collectionOn = active === "secondhand";
+  const picksOn = active === "deals";
+
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
@@ -71,31 +73,32 @@ export async function Header({ active = "secondhand" }: HeaderProps) {
             className={styles.brandLogo}
             src={BRAND_LOGO_SRC}
             alt={BRAND_LOGO_ALT}
-            width={120}
-            height={138}
+            width={160}
+            height={120}
             draggable={false}
           />
-          <span className={styles.brandSub}>{subtitle}</span>
         </Link>
         <div className={styles.right}>
           <nav className={styles.nav} aria-label="Main">
             <Link
               href="/"
-              aria-current={active === "secondhand" ? "page" : undefined}
+              className={collectionOn ? styles.navOn : styles.navOff}
+              aria-current={collectionOn ? "page" : undefined}
               aria-label="Collection"
               title="Collection"
             >
-              <Recycle size={12} strokeWidth={2.25} aria-hidden />
-              <span>Collection</span>
+              <Recycle size={13} strokeWidth={2.25} aria-hidden />
+              {collectionOn ? <span>Collection</span> : null}
             </Link>
             <Link
               href="/picks"
-              aria-current={active === "deals" ? "page" : undefined}
+              className={picksOn ? styles.navOn : styles.navOff}
+              aria-current={picksOn ? "page" : undefined}
               aria-label="My Picks"
               title="My Picks"
             >
-              <Package size={12} strokeWidth={2.25} aria-hidden />
-              <span>My Picks</span>
+              <Package size={13} strokeWidth={2.25} aria-hidden />
+              {picksOn ? <span>My Picks</span> : null}
             </Link>
           </nav>
           {showCart ? <CartDrawer count={cartCount} items={cartItems} /> : null}

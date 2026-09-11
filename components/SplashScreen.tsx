@@ -37,7 +37,7 @@ export function SplashScreen({ siteName }: SplashScreenProps) {
       role="presentation"
     >
       <div className={styles.hero}>
-        <StoreMark animated size={168} className={styles.mark} />
+        <StoreMark animated size={200} className={styles.mark} />
         <p className={styles.srOnly}>{siteName}</p>
       </div>
     </div>

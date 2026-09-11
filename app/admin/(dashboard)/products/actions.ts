@@ -17,10 +17,6 @@ import { parseImageUrlsField } from "@/lib/product-images";
 import { clampDiscountPercent } from "@/lib/pricing";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import {
-  MAX_UPLOAD_COUNT,
-  saveProductImage,
-} from "@/lib/uploads";
 import { cleanupRemovedUploads } from "@/lib/upload-gc";
 
 async function parseProductForm(formData: FormData) {
@@ -169,27 +165,6 @@ export async function importProductsCsvAction(formData: FormData) {
 
 export async function fetchProductLinkMetaAction(url: string) {
   return fetchProductLinkMeta(url);
-}
-
-export async function uploadProductImagesAction(formData: FormData) {
-  await requireAdmin();
-
-  const files = formData
-    .getAll("files")
-    .filter((entry): entry is File => entry instanceof File && entry.size > 0);
-
-  if (files.length === 0) {
-    throw new Error("Pilih file");
-  }
-  if (files.length > MAX_UPLOAD_COUNT) {
-    throw new Error(`Max ${MAX_UPLOAD_COUNT} file`);
-  }
-
-  const urls: string[] = [];
-  for (const file of files) {
-    urls.push(await saveProductImage(file));
-  }
-  return { urls };
 }
 
 export async function deleteUploadedImageAction(url: string) {

@@ -9,7 +9,6 @@ import {
 } from "@/lib/uploads-shared";
 
 export {
-  MAX_UPLOAD_BYTES,
   MAX_UPLOAD_INPUT_BYTES,
   MAX_UPLOAD_COUNT,
   MAX_IMAGE_EDGE,
@@ -49,10 +48,6 @@ export function filenameFromUploadUrl(url: string): string | null {
 
   const match = pathname.match(/^\/uploads\/([a-zA-Z0-9._-]+)$/);
   return match?.[1] ?? null;
-}
-
-export function isLocalUploadUrl(url: string): boolean {
-  return filenameFromUploadUrl(url) != null;
 }
 
 export function normalizeLocalUploadUrl(url: string): string | null {

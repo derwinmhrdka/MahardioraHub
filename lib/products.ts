@@ -163,8 +163,6 @@ export async function getRelatedDeals(
 }
 
 export async function createProduct(input: ProductCreateInput) {
-  // Optional an_redir helper: see lib/shopee.ts + AffiliateLinkTool (admin UI).
-  // Future: Shopee Open API generateShortLink for official short links.
   const gallery = normalizeImageUrls([
     ...(input.imageUrls ?? []),
     ...(input.imageUrl ? [input.imageUrl] : []),
@@ -265,8 +263,6 @@ export async function importProductsFromCsvRows(
 }
 
 export async function updateProduct(id: number, input: ProductUpdateInput) {
-  // Optional an_redir helper: see lib/shopee.ts + AffiliateLinkTool (admin UI).
-  // Future: Shopee Open API generateShortLink for official short links.
   const existing =
     input.imageUrls !== undefined || input.imageUrl !== undefined
       ? await prisma.product.findUnique({

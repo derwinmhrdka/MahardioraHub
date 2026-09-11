@@ -44,7 +44,7 @@ export default async function LoginPage({ searchParams }: PageProps) {
       </Link>
 
       <div className={styles.stage}>
-        <StoreMark animated size={156} className={styles.mark} />
+        <StoreMark animated size={190} className={styles.mark} />
 
         {isDev ? (
           <DevLoginButtons next={next} />

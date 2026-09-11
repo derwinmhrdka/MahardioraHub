@@ -547,14 +547,6 @@ export async function listOrdersForOwner(owner: CheckoutOwner, tab: OrderListTab
   });
 }
 
-/** @deprecated use listOrdersForOwner */
-export async function listOrdersForUser(userId: string, tab: OrderListTab) {
-  return listOrdersForOwner(
-    { ownerKey: `u_${userId}`, userId, guestId: null },
-    tab
-  );
-}
-
 export async function countPendingOrdersForOwner(owner: CheckoutOwner) {
   await expireOverdueQrisOrders(owner);
   await expireOverdueBankTransferOrders(owner);
@@ -572,22 +564,6 @@ export async function countProgressOrdersForOwner(owner: CheckoutOwner) {
       ...ownerOrderWhere(owner),
       status: OrderStatus.paid,
     },
-  });
-}
-
-export async function countPendingOrders(userId: string) {
-  return countPendingOrdersForOwner({
-    ownerKey: `u_${userId}`,
-    userId,
-    guestId: null,
-  });
-}
-
-export async function countProgressOrders(userId: string) {
-  return countProgressOrdersForOwner({
-    ownerKey: `u_${userId}`,
-    userId,
-    guestId: null,
   });
 }
 
@@ -810,15 +786,6 @@ export async function cancelOwnerOrder(orderId: string, owner: CheckoutOwner) {
   });
   if (proofUrl) await cleanupRemovedUploads([proofUrl]);
   return updated;
-}
-
-/** @deprecated use cancelOwnerOrder */
-export async function cancelUserOrder(orderId: string, userId: string) {
-  return cancelOwnerOrder(orderId, {
-    ownerKey: `u_${userId}`,
-    userId,
-    guestId: null,
-  });
 }
 
 /**

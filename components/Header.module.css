@@ -15,15 +15,14 @@
   gap: 0.75rem;
   max-width: 1100px;
   margin: 0 auto;
-  padding: 0.55rem 0.75rem;
+  padding: 0.5rem 0.75rem;
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
   min-width: 0;
-  line-height: 1.05;
+  line-height: 0;
   color: var(--color-text);
   text-decoration: none;
 }
@@ -31,27 +30,12 @@
 .brandLogo {
   display: block;
   width: auto;
-  height: 2.35rem;
+  height: 3.15rem;
   object-fit: contain;
+  object-position: left center;
   flex-shrink: 0;
   user-select: none;
   -webkit-user-drag: none;
-}
-
-.brandName {
-  font-family: var(--font-display-stack);
-  font-size: var(--text-brand);
-  font-weight: 700;
-  letter-spacing: 0.01em;
-}
-
-.brandSub {
-  font-family: var(--font-body-stack);
-  font-size: var(--text-meta);
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: var(--color-text-muted);
-  padding-top: 0.55rem;
 }
 
 .nav {
@@ -59,6 +43,10 @@
   flex: 0 1 auto;
   min-width: 0;
   gap: 0.2rem;
+  padding: 0.12rem;
+  border: 1.5px solid rgba(17, 17, 17, 0.14);
+  border-radius: 999px;
+  background: #f7f3eb;
 }
 
 .right {
@@ -69,61 +57,83 @@
   min-width: 0;
 }
 
-.nav a {
+.nav a,
+.navOn,
+.navOff {
   display: inline-flex;
   align-items: center;
-  gap: 0.22rem;
+  justify-content: center;
+  gap: 0.28rem;
   max-width: 100%;
-  padding: 0.28rem 0.45rem;
-  border: var(--stroke) solid transparent;
+  min-width: 1.85rem;
+  min-height: 1.85rem;
+  padding: 0.28rem 0.42rem;
+  border: 1.5px solid transparent;
   border-radius: 999px;
   font-family: var(--font-body-stack);
   font-size: 0.68rem;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1;
   white-space: nowrap;
+  text-decoration: none;
   color: var(--color-text-muted);
+  transition:
+    background 0.12s ease,
+    color 0.12s ease,
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
 }
 
-.nav a span {
+.nav a span,
+.navOn span {
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.nav a svg {
+.nav a svg,
+.navOn svg,
+.navOff svg {
   flex-shrink: 0;
-  color: var(--color-text-muted);
 }
 
-.nav a:hover {
+.navOff:hover {
   color: var(--color-text);
-  border-color: var(--color-border);
-  background: var(--color-surface);
+  background: rgba(255, 255, 255, 0.7);
 }
 
-.nav a[aria-current="page"] {
+.navOn {
   color: #fff;
   background: #111;
   border-color: #111;
+  padding-inline: 0.55rem;
   box-shadow: var(--shadow-doodle-sm);
 }
 
-.nav a[aria-current="page"] svg {
+.navOn svg {
   color: #fff;
 }
 
 @media (max-width: 380px) {
-  .nav a {
-    padding: 0.28rem 0.38rem;
-    font-size: 0.62rem;
-    gap: 0.15rem;
-  }
-
-  .brandSub {
-    display: none;
-  }
-
   .brandLogo {
-    height: 2.15rem;
+    height: 2.75rem;
+  }
+
+  .navOn,
+  .navOff {
+    min-width: 1.7rem;
+    min-height: 1.7rem;
+    padding: 0.24rem 0.34rem;
+    font-size: 0.62rem;
+  }
+
+  .navOn {
+    padding-inline: 0.45rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navOn,
+  .navOff {
+    transition: none;
   }
 }

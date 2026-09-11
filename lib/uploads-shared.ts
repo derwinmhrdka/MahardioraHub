@@ -1,8 +1,5 @@
 /** Shared upload limits (safe for client + server). */
 
-/** Preferred max size after client compress / for hints. */
-export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
-
 /** Raw upload accepted by server (phone photos often 8–15MB). */
 export const MAX_UPLOAD_INPUT_BYTES = 20 * 1024 * 1024;
 

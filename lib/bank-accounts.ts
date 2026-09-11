@@ -42,10 +42,6 @@ export async function countActiveBankAccounts() {
   return prisma.bankAccount.count({ where: { isActive: true } });
 }
 
-export async function getBankAccount(id: number) {
-  return prisma.bankAccount.findUnique({ where: { id } });
-}
-
 export async function createBankAccount(input: BankAccountInput) {
   const data = normalizeAccount(input);
   const max = await prisma.bankAccount.aggregate({ _max: { sortOrder: true } });
@@ -54,14 +50,6 @@ export async function createBankAccount(input: BankAccountInput) {
       ...data,
       sortOrder: (max._max.sortOrder ?? 0) + 1,
     },
-  });
-}
-
-export async function updateBankAccount(id: number, input: BankAccountInput) {
-  const data = normalizeAccount(input);
-  return prisma.bankAccount.update({
-    where: { id },
-    data,
   });
 }
 

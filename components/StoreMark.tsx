@@ -8,8 +8,6 @@ type StoreMarkProps = {
   /** Soft float animation (login / splash). */
   animated?: boolean;
   size?: number;
-  /** Show full logo including wordmark (default). */
-  full?: boolean;
 };
 
 /** Brand mark — Mahardiora-Hub character logo. */
@@ -17,9 +15,9 @@ export function StoreMark({
   className,
   animated = false,
   size = 72,
-  full = true,
 }: StoreMarkProps) {
-  const height = full ? Math.round(size * 1.15) : size;
+  // Trimmed logo aspect ≈ 1087×816
+  const height = Math.round(size * 0.75);
 
   return (
     <span

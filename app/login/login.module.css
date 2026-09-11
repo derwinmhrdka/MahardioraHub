@@ -94,18 +94,6 @@
   margin-bottom: 0.15rem;
 }
 
-.brand {
-  margin: 0;
-  font-family: var(--font-display-stack);
-  font-size: clamp(2rem, 8vw, 2.55rem);
-  font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: -0.02em;
-  text-align: center;
-  color: #111;
-  animation: fadeUp 0.55s ease 0.12s both;
-}
-
 .error {
   width: 0.55rem;
   height: 0.55rem;
