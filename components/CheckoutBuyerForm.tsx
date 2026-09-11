@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Check, MapPin, Phone, UserRound } from "lucide-react";
+import { Check, MapPin, Phone, Store, UserRound } from "lucide-react";
 import { PaymentMethods } from "@/components/PaymentMethods";
 import styles from "./CheckoutBuyerForm.module.css";
 
@@ -9,12 +9,19 @@ type BuyerDraft = {
   name: string;
   whatsapp: string;
   address: string;
+  branchId: string;
+};
+
+type BranchOption = {
+  id: number;
+  name: string;
 };
 
 type CheckoutBuyerFormProps = {
   qrisEnabled: boolean;
   bankTransferEnabled: boolean;
-  initialBuyer: BuyerDraft;
+  initialBuyer: Omit<BuyerDraft, "branchId">;
+  branches?: BranchOption[];
   whatsappOnly?: boolean;
 };
 
@@ -22,15 +29,25 @@ export function CheckoutBuyerForm({
   qrisEnabled,
   bankTransferEnabled,
   initialBuyer,
+  branches = [],
   whatsappOnly = false,
 }: CheckoutBuyerFormProps) {
-  const [buyer, setBuyer] = useState<BuyerDraft>(initialBuyer);
+  const showBranch = branches.length > 0;
+  const [buyer, setBuyer] = useState<BuyerDraft>({
+    ...initialBuyer,
+    branchId: "",
+  });
   const [lookupHint, setLookupHint] = useState<string | null>(null);
   const [focused, setFocused] = useState<string | null>(null);
   const lastLookup = useRef("");
 
   useEffect(() => {
-    setBuyer(initialBuyer);
+    setBuyer((prev) => ({
+      ...prev,
+      name: initialBuyer.name,
+      whatsapp: initialBuyer.whatsapp,
+      address: initialBuyer.address,
+    }));
   }, [initialBuyer.name, initialBuyer.whatsapp, initialBuyer.address]);
 
   async function lookupByWhatsapp(raw: string) {
@@ -58,6 +75,7 @@ export function CheckoutBuyerForm({
         name: prev.name.trim() ? prev.name : data.name || "",
         whatsapp: data.whatsapp || prev.whatsapp,
         address: prev.address.trim() ? prev.address : data.address || "",
+        branchId: prev.branchId,
       }));
       setLookupHint("Data ditemukan");
     } catch {
@@ -68,8 +86,15 @@ export function CheckoutBuyerForm({
   const nameOk = buyer.name.trim().length > 0;
   const waOk = buyer.whatsapp.replace(/\D/g, "").length >= 10;
   const addressOk = buyer.address.trim().length > 0;
-  const ready = nameOk && waOk && addressOk;
-  const filledCount = [nameOk, waOk, addressOk].filter(Boolean).length;
+  const branchOk = !showBranch || buyer.branchId !== "";
+  const ready = nameOk && waOk && addressOk && branchOk;
+  const totalFields = showBranch ? 4 : 3;
+  const filledCount = [
+    nameOk,
+    waOk,
+    addressOk,
+    ...(showBranch ? [branchOk] : []),
+  ].filter(Boolean).length;
 
   return (
     <div className={styles.wrap}>
@@ -79,8 +104,11 @@ export function CheckoutBuyerForm({
             <p className={styles.headTag}>Checkout</p>
             <h2 className={styles.headTitle}>Data pembeli</h2>
           </div>
-          <span className={styles.headBadge} aria-label={`${filledCount} dari 3`}>
-            {filledCount}/3
+          <span
+            className={styles.headBadge}
+            aria-label={`${filledCount} dari ${totalFields}`}
+          >
+            {filledCount}/{totalFields}
           </span>
         </div>
 
@@ -182,6 +210,43 @@ export function CheckoutBuyerForm({
               required
             />
           </label>
+
+          {showBranch ? (
+            <label
+              className={`${styles.field} ${focused === "branch" ? styles.fieldOn : ""} ${
+                branchOk ? styles.fieldOk : ""
+              }`}
+            >
+              <span className={styles.fieldTop}>
+                <span className={styles.fieldIcon} aria-hidden>
+                  <Store size={14} strokeWidth={2.4} />
+                </span>
+                <span className={styles.fieldLabel}>Dikirim dari</span>
+                {branchOk ? (
+                  <span className={styles.fieldCheck} aria-hidden>
+                    <Check size={12} strokeWidth={3} />
+                  </span>
+                ) : null}
+              </span>
+              <select
+                name="branchId"
+                value={buyer.branchId}
+                onChange={(e) =>
+                  setBuyer((prev) => ({ ...prev, branchId: e.target.value }))
+                }
+                onFocus={() => setFocused("branch")}
+                onBlur={() => setFocused(null)}
+                required
+              >
+                <option value="">Pilih cabang</option>
+                {branches.map((branch) => (
+                  <option key={branch.id} value={String(branch.id)}>
+                    {branch.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
         </div>
       </section>
 

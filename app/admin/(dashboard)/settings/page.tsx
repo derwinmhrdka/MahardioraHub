@@ -9,6 +9,7 @@ import {
   Settings2,
   Shield,
   ShieldOff,
+  Store,
   Tags,
   Trash2,
   UserRound,
@@ -37,15 +38,20 @@ import { xenditConfigured } from "@/lib/xendit";
 import {
   addAdminAction,
   createBankAccountAction,
+  createBranchAction,
   createCategoryAction,
   deleteBankAccountAction,
+  deleteBranchAction,
   deleteCategoryAction,
   makeAdminAction,
   revokeAdminAction,
+  setBranchesFeatureAction,
   toggleBankAccountAction,
+  toggleBranchAction,
   updateSettingsAction,
 } from "./actions";
 import { listBankAccounts } from "@/lib/bank-accounts";
+import { listBranches } from "@/lib/branches";
 import styles from "./settings.module.css";
 
 type Tab =
@@ -56,6 +62,7 @@ type Tab =
   | "flash"
   | "preorder"
   | "payment"
+  | "cabang"
   | "banner";
 
 type NavItem = {
@@ -92,7 +99,10 @@ const NAV_GROUPS: NavGroup[] = [
   {
     id: "bayar",
     label: "Pembayaran",
-    items: [{ id: "payment", label: "Metode", Icon: CreditCard }],
+    items: [
+      { id: "payment", label: "Metode", Icon: CreditCard },
+      { id: "cabang", label: "Cabang", Icon: Store },
+    ],
   },
   {
     id: "akun",
@@ -119,6 +129,8 @@ type PageProps = {
     bannerError?: string;
     bankSaved?: string;
     bankError?: string;
+    branchSaved?: string;
+    branchError?: string;
   }>;
 };
 
@@ -152,6 +164,7 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
     preOrders,
     preProducts,
     bankAccounts,
+    branches,
   ] = await Promise.all([
     getSettings(),
     listCategories(),
@@ -162,6 +175,7 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
     tab === "preorder" ? listPreOrdersAdmin() : Promise.resolve([]),
     tab === "preorder" ? listSecondhandForPreOrder() : Promise.resolve([]),
     tab === "payment" ? listBankAccounts() : Promise.resolve([]),
+    tab === "cabang" ? listBranches() : Promise.resolve([]),
   ]);
 
   const todayYmd = jakartaTodayYmd();
@@ -174,14 +188,16 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
     (params.flashSaved && tab === "flash") ||
     (params.preSaved && tab === "preorder") ||
     (params.bannerSaved && tab === "banner") ||
-    (params.bankSaved && tab === "payment");
+    (params.bankSaved && tab === "payment") ||
+    (params.branchSaved && tab === "cabang");
   const showError =
     (params.catError && tab === "kategori") ||
     (params.userError && tab === "user") ||
     (params.flashError && tab === "flash") ||
     (params.preError && tab === "preorder") ||
     (params.bannerError && tab === "banner") ||
-    (params.bankError && tab === "payment");
+    (params.bankError && tab === "payment") ||
+    (params.branchError && tab === "cabang");
 
   const midtransOk = midtransConfigured();
   const xenditOk = xenditConfigured();
@@ -459,6 +475,143 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
                       placeholder="No. rekening"
                       aria-label="Nomor rekening"
                       inputMode="numeric"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      className={styles.iconBtn}
+                      aria-label="Tambah"
+                      title="Tambah"
+                    >
+                      <Plus size={16} strokeWidth={2.25} aria-hidden />
+                    </button>
+                  </form>
+                </section>
+              </div>
+            ) : null}
+
+            {tab === "cabang" ? (
+              <div className={styles.payStack}>
+                <section className={styles.sectionCard} aria-label="Fitur cabang">
+                  <div className={styles.sectionCardHead}>
+                    <p className={styles.payLabel}>Fitur cabang</p>
+                  </div>
+                  <p className={styles.sectionCardHint}>
+                    Jika nonaktif, pilihan &quot;Dikirim dari&quot; disembunyikan di
+                    checkout.
+                  </p>
+                  <form
+                    action={setBranchesFeatureAction}
+                    className={styles.branchToggleRow}
+                  >
+                    <input
+                      type="hidden"
+                      name="enabled"
+                      value={settings.branchesEnabled ? "0" : "1"}
+                    />
+                    <span className={styles.branchToggleLabel}>
+                      {settings.branchesEnabled ? "Aktif" : "Nonaktif"}
+                    </span>
+                    <button
+                      type="submit"
+                      className={styles.iconBtn}
+                      aria-label={
+                        settings.branchesEnabled
+                          ? "Nonaktifkan fitur cabang"
+                          : "Aktifkan fitur cabang"
+                      }
+                      title={
+                        settings.branchesEnabled
+                          ? "Nonaktifkan fitur"
+                          : "Aktifkan fitur"
+                      }
+                    >
+                      {settings.branchesEnabled ? (
+                        <ShieldOff size={14} strokeWidth={2.25} />
+                      ) : (
+                        <Shield size={14} strokeWidth={2.25} />
+                      )}
+                    </button>
+                  </form>
+                </section>
+
+                <section className={styles.sectionCard} aria-label="Daftar cabang">
+                  <div className={styles.sectionCardHead}>
+                    <p className={styles.payLabel}>Daftar cabang</p>
+                  </div>
+                  <ul className={styles.bankList}>
+                    {branches.length === 0 ? (
+                      <li className={styles.catEmpty}>Belum ada cabang</li>
+                    ) : (
+                      branches.map((branch) => (
+                        <li key={branch.id} className={styles.bankRow}>
+                          <div className={styles.bankMeta}>
+                            <span className={styles.bankName}>
+                              {branch.name}
+                              {!branch.isActive ? (
+                                <span className={styles.bankOff}> off</span>
+                              ) : null}
+                            </span>
+                          </div>
+                          <div className={styles.bankActions}>
+                            <form action={toggleBranchAction}>
+                              <input
+                                type="hidden"
+                                name="id"
+                                value={branch.id}
+                              />
+                              <input
+                                type="hidden"
+                                name="isActive"
+                                value={branch.isActive ? "0" : "1"}
+                              />
+                              <button
+                                type="submit"
+                                className={styles.iconBtn}
+                                aria-label={
+                                  branch.isActive ? "Nonaktifkan" : "Aktifkan"
+                                }
+                                title={
+                                  branch.isActive ? "Nonaktifkan" : "Aktifkan"
+                                }
+                              >
+                                {branch.isActive ? (
+                                  <ShieldOff size={14} strokeWidth={2.25} />
+                                ) : (
+                                  <Shield size={14} strokeWidth={2.25} />
+                                )}
+                              </button>
+                            </form>
+                            <form action={deleteBranchAction}>
+                              <input
+                                type="hidden"
+                                name="id"
+                                value={branch.id}
+                              />
+                              <button
+                                type="submit"
+                                className={styles.iconBtn}
+                                aria-label="Hapus"
+                                title="Hapus"
+                              >
+                                <Trash2
+                                  size={14}
+                                  strokeWidth={2.25}
+                                  aria-hidden
+                                />
+                              </button>
+                            </form>
+                          </div>
+                        </li>
+                      ))
+                    )}
+                  </ul>
+
+                  <form action={createBranchAction} className={styles.addRow}>
+                    <input
+                      name="name"
+                      placeholder="Nama cabang"
+                      aria-label="Nama cabang"
                       required
                     />
                     <button

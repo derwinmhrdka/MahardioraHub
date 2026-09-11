@@ -57,10 +57,23 @@ model Setting {
   contactEmail           String?
   shopeeAffiliateId      String? // used by admin optional an_redir link helper
   qrisProvider           OrderPayProvider @default(midtrans)
+  /** When false, hide “Dikirim dari” even if branches exist. */
+  branchesEnabled        Boolean          @default(true)
   /** Promo banner on Collection. Ratio 3:2 (e.g. 1200×800). */
   collectionBannerActive Boolean          @default(false)
   collectionBannerImages String[]         @default([])
   collectionBannerHidden String[]         @default([])
+}
+
+/** Store / pickup branches (managed in Settings → Cabang). */
+model Branch {
+  id        Int      @id @default(autoincrement())
+  name      String
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
 }
 
 /** Singleton flash sale config + timed product picks (secondhand only). */
@@ -204,6 +217,10 @@ model Order {
   buyerName       String
   buyerWhatsapp   String
   buyerAddress    String
+  branchId        Int?
+  branch          Branch?           @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  /** Snapshot of branch name at checkout (keeps label if branch deleted). */
+  shipFromBranch  String?
   status          OrderStatus       @default(pending)
   payMethod       OrderPayMethod
   payProvider     OrderPayProvider?
@@ -229,6 +246,7 @@ model Order {
   @@index([buyerWhatsapp])
   @@index([pspId])
   @@index([bankAccountId])
+  @@index([branchId])
 }
 
 model OrderItem {

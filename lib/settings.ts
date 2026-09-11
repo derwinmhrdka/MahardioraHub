@@ -13,6 +13,7 @@ export type SettingInput = {
   contactEmail?: string | null;
   shopeeAffiliateId?: string | null;
   qrisProvider?: OrderPayProvider;
+  branchesEnabled?: boolean;
   collectionBannerActive?: boolean;
   collectionBannerImages?: string[];
   collectionBannerHidden?: string[];
@@ -61,6 +62,7 @@ export async function updateSettings(input: SettingInput) {
       contactEmail: input.contactEmail || null,
       shopeeAffiliateId: input.shopeeAffiliateId || null,
       qrisProvider,
+      branchesEnabled: input.branchesEnabled ?? true,
       collectionBannerActive: bannerActive ?? false,
       collectionBannerImages: bannerImages ?? [],
       collectionBannerHidden: bannerHidden ?? [],
@@ -72,6 +74,9 @@ export async function updateSettings(input: SettingInput) {
       contactEmail: input.contactEmail || null,
       shopeeAffiliateId: input.shopeeAffiliateId || null,
       qrisProvider,
+      ...(input.branchesEnabled !== undefined
+        ? { branchesEnabled: input.branchesEnabled }
+        : {}),
       ...(bannerActive !== undefined
         ? { collectionBannerActive: bannerActive }
         : {}),

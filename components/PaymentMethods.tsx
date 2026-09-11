@@ -13,6 +13,7 @@ type BuyerFields = {
   name: string;
   whatsapp: string;
   address: string;
+  branchId?: string;
 };
 
 type PaymentMethodsProps = {
@@ -35,6 +36,9 @@ function BuyerHiddens({ buyer }: { buyer: BuyerFields }) {
       <input type="hidden" name="buyerName" value={buyer.name} />
       <input type="hidden" name="buyerWhatsapp" value={buyer.whatsapp} />
       <input type="hidden" name="buyerAddress" value={buyer.address} />
+      {buyer.branchId ? (
+        <input type="hidden" name="branchId" value={buyer.branchId} />
+      ) : null}
     </>
   );
 }

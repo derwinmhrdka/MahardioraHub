@@ -54,6 +54,7 @@ export default async function CheckoutSuccessPage({ searchParams }: PageProps) {
               buyerName: order.buyerName,
               buyerWhatsapp: order.buyerWhatsapp,
               buyerAddress: order.buyerAddress,
+              shipFromBranch: order.shipFromBranch,
               items: order.items.map((item) => ({
                 productId: item.productId,
                 title: item.title,

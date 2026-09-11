@@ -11,6 +11,7 @@ import { productImageUrl } from "@/lib/image-url";
 import { productImages } from "@/lib/product-images";
 import { salePrice } from "@/lib/pricing";
 import { countActiveBankAccounts } from "@/lib/bank-accounts";
+import { getCheckoutBranches } from "@/lib/branches";
 import { getSettings } from "@/lib/settings";
 import {
   getActivePendingBankTransferOrder,
@@ -22,7 +23,7 @@ import styles from "./checkout.module.css";
 export default async function CheckoutPaymentPage() {
   const owner = await resolveCartOwner();
 
-  const [settings, rows, pendingQris, pendingTransfer, bankCount, profile] =
+  const [settings, rows, pendingQris, pendingTransfer, bankCount, profile, branches] =
     await Promise.all([
       getSettings(),
       listSelectedCartItems(owner.ownerKey),
@@ -30,6 +31,7 @@ export default async function CheckoutPaymentPage() {
       getActivePendingBankTransferOrder(owner),
       countActiveBankAccounts(),
       owner.userId ? getUserBuyerProfile(owner.userId) : Promise.resolve(null),
+      getCheckoutBranches(),
     ]);
 
   // Cart kosong: lanjutkan pembayaran pending jika ada (login only)
@@ -118,6 +120,10 @@ export default async function CheckoutPaymentPage() {
           qrisEnabled={!isGuest && (await qrisConfigured())}
           bankTransferEnabled={!isGuest && bankCount > 0}
           whatsappOnly={isGuest}
+          branches={branches.map((branch) => ({
+            id: branch.id,
+            name: branch.name,
+          }))}
           initialBuyer={{
             name: profile?.name ?? "",
             whatsapp: profile?.whatsapp ?? "",

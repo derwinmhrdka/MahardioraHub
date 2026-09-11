@@ -65,6 +65,7 @@ function sellerWhatsAppHref(input: {
   buyerName?: string;
   buyerWhatsapp?: string;
   buyerAddress?: string;
+  shipFromBranch?: string | null;
 }) {
   const link = orderPageUrl(input.orderId);
   const text = [
@@ -75,6 +76,7 @@ function sellerWhatsAppHref(input: {
     input.buyerName ? `Nama : ${input.buyerName}` : null,
     input.buyerWhatsapp ? `WA : ${input.buyerWhatsapp}` : null,
     input.buyerAddress ? `Alamat : ${input.buyerAddress}` : null,
+    input.shipFromBranch ? `Dikirim dari : ${input.shipFromBranch}` : null,
   ]
     .filter((line): line is string => line != null)
     .join("\n");
@@ -146,6 +148,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
         buyerName: order.buyerName,
         buyerWhatsapp: order.buyerWhatsapp,
         buyerAddress: order.buyerAddress,
+        shipFromBranch: order.shipFromBranch,
       })
     : null;
 
@@ -207,6 +210,12 @@ export default async function OrderDetailPage({ params }: PageProps) {
                   <dt>Alamat</dt>
                   <dd>{order.buyerAddress || "—"}</dd>
                 </div>
+                {order.shipFromBranch ? (
+                  <div>
+                    <dt>Dikirim dari</dt>
+                    <dd>{order.shipFromBranch}</dd>
+                  </div>
+                ) : null}
                 {order.bankAccount ? (
                   <div className={styles.metaWide}>
                     <dt>Rekening</dt>

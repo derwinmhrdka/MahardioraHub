@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { countActiveBankAccounts } from "@/lib/bank-accounts";
+import { resolveCheckoutBranch } from "@/lib/branches";
 import { parseBuyerInput, saveBuyerProfile } from "@/lib/buyer";
 import { resolveCartOwner } from "@/lib/cart-owner";
 import {
@@ -26,9 +27,17 @@ function buyerFromForm(formData: FormData) {
 
 async function prepareCheckout(formData: FormData) {
   const owner = await resolveCartOwner();
-  const buyer = buyerFromForm(formData);
-  await saveBuyerProfile({ userId: owner.userId, buyer });
-  return { owner, buyer };
+  const buyerBase = buyerFromForm(formData);
+  const branch = await resolveCheckoutBranch(formData.get("branchId"));
+  await saveBuyerProfile({ userId: owner.userId, buyer: buyerBase });
+  return {
+    owner,
+    buyer: {
+      ...buyerBase,
+      branchId: branch?.branchId ?? null,
+      shipFromBranch: branch?.shipFromBranch ?? null,
+    },
+  };
 }
 
 function revalidateAfterCheckout() {
@@ -125,6 +134,7 @@ export async function checkoutCashAction(formData: FormData) {
       buyerName: order.buyerName,
       buyerWhatsapp: order.buyerWhatsapp,
       buyerAddress: order.buyerAddress,
+      shipFromBranch: order.shipFromBranch,
       items: order.items.map((item) => ({
         productId: item.productId,
         title: item.title,

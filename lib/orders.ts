@@ -13,7 +13,10 @@ import { createXenditDynamicQris } from "@/lib/xendit";
 import { orderPageUrl } from "@/lib/settings";
 import { cleanupRemovedUploads } from "@/lib/upload-gc";
 
-export type CheckoutBuyer = BuyerInput;
+export type CheckoutBuyer = BuyerInput & {
+  branchId?: number | null;
+  shipFromBranch?: string | null;
+};
 
 export type CheckoutOwner = {
   ownerKey: string;
@@ -62,6 +65,8 @@ async function createPendingOrder(
       buyerName: buyer.name,
       buyerWhatsapp: buyer.whatsapp,
       buyerAddress: buyer.address,
+      branchId: buyer.branchId ?? null,
+      shipFromBranch: buyer.shipFromBranch ?? null,
       status: OrderStatus.pending,
       payMethod,
       payProvider: payProvider ?? null,
@@ -357,6 +362,7 @@ export function buildCashWhatsAppMessage(input: {
     buyerName?: string;
     buyerWhatsapp?: string;
     buyerAddress?: string;
+    shipFromBranch?: string | null;
     items: Array<{
       productId: number;
       title: string;
@@ -380,6 +386,9 @@ export function buildCashWhatsAppMessage(input: {
     input.order.buyerName ? `Nama : ${input.order.buyerName}` : null,
     input.order.buyerWhatsapp ? `WA : ${input.order.buyerWhatsapp}` : null,
     input.order.buyerAddress ? `Alamat : ${input.order.buyerAddress}` : null,
+    input.order.shipFromBranch
+      ? `Dikirim dari : ${input.order.shipFromBranch}`
+      : null,
     "",
     "Item :",
     ...lines,
@@ -399,6 +408,7 @@ export function buildQrisPaidWhatsAppMessage(input: {
     buyerName?: string;
     buyerWhatsapp?: string;
     buyerAddress?: string;
+    shipFromBranch?: string | null;
     items: Array<{
       productId: number;
       title: string;
@@ -422,6 +432,9 @@ export function buildQrisPaidWhatsAppMessage(input: {
     input.order.buyerName ? `Nama : ${input.order.buyerName}` : null,
     input.order.buyerWhatsapp ? `WA : ${input.order.buyerWhatsapp}` : null,
     input.order.buyerAddress ? `Alamat : ${input.order.buyerAddress}` : null,
+    input.order.shipFromBranch
+      ? `Dikirim dari : ${input.order.shipFromBranch}`
+      : null,
     "",
     "Item :",
     ...lines,

@@ -8,6 +8,12 @@ import {
   deleteBankAccount,
   setBankAccountActive,
 } from "@/lib/bank-accounts";
+import {
+  createBranch,
+  deleteBranch,
+  setBranchActive,
+  setBranchesFeatureEnabled,
+} from "@/lib/branches";
 import { createCategory, deleteCategory } from "@/lib/categories";
 import { requireAdmin } from "@/lib/auth";
 import {
@@ -412,4 +418,65 @@ export async function toggleBankAccountAction(formData: FormData) {
   }
   revalidatePaymentTab();
   redirect("/admin/settings?tab=payment&bankSaved=1");
+}
+
+function revalidateBranchTab() {
+  revalidatePath("/admin/settings");
+  revalidatePath("/checkout");
+}
+
+export async function setBranchesFeatureAction(formData: FormData) {
+  await requireAdmin();
+  const enabled = String(formData.get("enabled") ?? "") === "1";
+  try {
+    await setBranchesFeatureEnabled(enabled);
+  } catch {
+    redirect("/admin/settings?tab=cabang&branchError=1");
+  }
+  revalidateBranchTab();
+  redirect("/admin/settings?tab=cabang&branchSaved=1");
+}
+
+export async function createBranchAction(formData: FormData) {
+  await requireAdmin();
+  try {
+    await createBranch({
+      name: String(formData.get("name") ?? ""),
+    });
+  } catch {
+    redirect("/admin/settings?tab=cabang&branchError=1");
+  }
+  revalidateBranchTab();
+  redirect("/admin/settings?tab=cabang&branchSaved=1");
+}
+
+export async function deleteBranchAction(formData: FormData) {
+  await requireAdmin();
+  const id = Number(formData.get("id"));
+  if (!Number.isFinite(id)) {
+    redirect("/admin/settings?tab=cabang&branchError=1");
+  }
+  try {
+    await deleteBranch(id);
+  } catch {
+    redirect("/admin/settings?tab=cabang&branchError=1");
+  }
+  revalidateBranchTab();
+  redirect("/admin/settings?tab=cabang&branchSaved=1");
+}
+
+export async function toggleBranchAction(formData: FormData) {
+  await requireAdmin();
+  const id = Number(formData.get("id"));
+  const isActive = String(formData.get("isActive") ?? "") === "1";
+  if (!Number.isFinite(id)) {
+    redirect("/admin/settings?tab=cabang&branchError=1");
+  }
+  try {
+    await setBranchActive(id, isActive);
+  } catch {
+    redirect("/admin/settings?tab=cabang&branchError=1");
+  }
+  revalidateBranchTab();
+  redirect("/admin/settings?tab=cabang&branchSaved=1");
 }
