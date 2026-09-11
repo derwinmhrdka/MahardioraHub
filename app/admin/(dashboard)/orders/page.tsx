@@ -1,9 +1,9 @@
 import { AdminOrderList } from "@/components/AdminOrderList";
+import { parseAdminOrderListTab } from "@/lib/order-display";
 import {
   countAdminPendingBankTransfers,
   countAdminProgressOrders,
   listOrdersForAdmin,
-  type OrderListTab,
 } from "@/lib/orders";
 import { prisma } from "@/lib/prisma";
 import { productImages } from "@/lib/product-images";
@@ -20,16 +20,9 @@ type PageProps = {
   }>;
 };
 
-function parseTab(raw: string | undefined): OrderListTab {
-  if (raw === "pending") return "pending";
-  if (raw === "completed") return "completed";
-  if (raw === "cancel" || raw === "cancelled") return "cancel";
-  return "progress";
-}
-
 export default async function AdminOrdersPage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const tab = parseTab(params.tab);
+  const tab = parseAdminOrderListTab(params.tab);
 
   const [orders, progressCount, pendingCount] = await Promise.all([
     listOrdersForAdmin(tab),

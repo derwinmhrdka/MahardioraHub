@@ -5,6 +5,7 @@ import {
   markOrderFailed,
   markOrderPaid,
 } from "@/lib/orders";
+import { log } from "@/lib/logger";
 import { verifyMidtransNotification } from "@/lib/midtrans";
 
 export const runtime = "nodejs";
@@ -47,21 +48,25 @@ export async function POST(req: NextRequest) {
     (status === "capture" && fraud === "accept")
   ) {
     await markOrderPaid({ externalId, pspId });
+    log.info("webhook.midtrans.paid", { externalId, status });
     return NextResponse.json({ ok: true });
   }
 
   if (status === "expire") {
     if (externalId) await markOrderExpired(externalId);
+    log.info("webhook.midtrans.expired", { externalId });
     return NextResponse.json({ ok: true });
   }
 
   if (status === "cancel") {
     if (externalId) await markOrderCancelled(externalId);
+    log.info("webhook.midtrans.cancelled", { externalId });
     return NextResponse.json({ ok: true });
   }
 
   if (status === "deny") {
     if (externalId) await markOrderFailed(externalId);
+    log.info("webhook.midtrans.failed", { externalId });
     return NextResponse.json({ ok: true });
   }
 

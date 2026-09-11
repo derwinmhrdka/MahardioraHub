@@ -29,6 +29,7 @@ import {
   normalizeBannerHidden,
   normalizeBannerImages,
 } from "@/lib/collection-banner";
+import { revalidateProducts, revalidateSettings } from "@/lib/revalidate";
 import { cleanupProductUploadsAndOrphans } from "@/lib/upload-gc";
 import { grantAdminByEmail, revokeAdminByEmail } from "@/lib/users";
 
@@ -51,15 +52,13 @@ export async function updateFlashSaleAction(formData: FormData) {
     redirect("/admin/settings?tab=flash&flashError=1");
   }
 
-  revalidatePath("/secondhand");
-  revalidatePath("/");
+  revalidateProducts();
   revalidatePath("/admin/settings");
   redirect("/admin/settings?tab=flash&flashSaved=1");
 }
 
 function revalidatePreOrder() {
-  revalidatePath("/");
-  revalidatePath("/secondhand");
+  revalidateProducts();
   revalidatePath("/admin/settings");
 }
 
@@ -147,9 +146,7 @@ async function patchBannerSettings(patch: {
 }
 
 function revalidateBanner() {
-  revalidatePath("/");
-  revalidatePath("/secondhand");
-  revalidatePath("/admin/settings");
+  revalidateSettings();
 }
 
 export async function addCollectionBannerAction(formData: FormData) {
@@ -276,10 +273,7 @@ export async function updateSettingsAction(formData: FormData) {
     qrisProvider,
   });
 
-  revalidatePath("/");
-  revalidatePath("/secondhand");
-  revalidatePath("/checkout");
-  revalidatePath("/admin/settings");
+  revalidateSettings();
   revalidatePath("/admin/products/new");
 
   const tab =
@@ -292,10 +286,8 @@ export async function updateSettingsAction(formData: FormData) {
 }
 
 function revalidateCategoryPaths() {
-  revalidatePath("/");
-  revalidatePath("/secondhand");
+  revalidateProducts();
   revalidatePath("/admin/settings");
-  revalidatePath("/admin/products");
   revalidatePath("/admin/products/new");
 }
 

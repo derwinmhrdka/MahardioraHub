@@ -1,9 +1,11 @@
 import { OrderPayProvider } from "@prisma/client";
+import { unstable_cache } from "next/cache";
 import {
   normalizeBannerHidden,
   normalizeBannerImages,
   visibleBannerImages,
 } from "./collection-banner";
+import { CACHE_TAGS } from "./cache-tags";
 import { prisma } from "./prisma";
 
 export type SettingInput = {
@@ -27,12 +29,20 @@ export {
 
 const DEFAULT_WA_TEMPLATE = "Halo, saya tertarik dengan produk ini.";
 
-export async function getSettings() {
+async function loadSettings() {
   const settings = await prisma.setting.findUnique({ where: { id: 1 } });
   if (!settings) {
     throw new Error("Settings row missing. Run migrations and seed.");
   }
   return settings;
+}
+
+/** Cached settings row (busted via `revalidateTag("settings")`). */
+export async function getSettings() {
+  return unstable_cache(loadSettings, ["settings-row"], {
+    tags: [CACHE_TAGS.settings],
+    revalidate: 300,
+  })();
 }
 
 export async function updateSettings(input: SettingInput) {

@@ -1,5 +1,5 @@
-import { Header } from "@/components/Header";
 import { ProductBrowse } from "@/components/ProductBrowse";
+import { SiteHeader } from "@/components/SiteHeader";
 import { listCategories } from "@/lib/categories";
 import {
   listActiveDeals,
@@ -14,6 +14,8 @@ import { getSettings, siteOrigin } from "@/lib/settings";
 type PageProps = {
   searchParams: Promise<{ area?: string; platform?: string }>;
 };
+
+export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
@@ -50,7 +52,7 @@ export default async function PicksPage({ searchParams }: PageProps) {
 
   return (
     <div className="section-deals">
-      <Header active="deals" />
+      <SiteHeader active="deals" />
       <main className="container">
         <h1 className="page-title">My Picks</h1>
         <ProductBrowse

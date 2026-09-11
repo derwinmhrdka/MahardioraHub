@@ -1,5 +1,7 @@
 import { clampDiscountPercent } from "./pricing";
 import { ProductKind, Prisma } from "@prisma/client";
+import { unstable_cache } from "next/cache";
+import { CACHE_TAGS } from "./cache-tags";
 import { normalizeImageUrls, productImages } from "./product-images";
 import { prisma } from "./prisma";
 import { cleanupProductUploadsAndOrphans, cleanupRemovedUploads, getReferencedLocalUploadUrls } from "./upload-gc";
@@ -60,12 +62,26 @@ function activeWhere(
   return where;
 }
 
-export async function listActiveDeals(filters: ProductListFilters = {}) {
-  return prisma.product.findMany({
-    where: activeWhere(ProductKind.deal, filters),
-    include: productInclude,
-    orderBy: { createdAt: "desc" },
+function filtersCacheKey(filters: ProductListFilters = {}) {
+  return JSON.stringify({
+    storeArea: filters.storeArea?.trim() || "",
+    categorySlug: filters.categorySlug?.trim() || "",
+    platform: filters.platform?.trim() || "",
   });
+}
+
+export async function listActiveDeals(filters: ProductListFilters = {}) {
+  const key = filtersCacheKey(filters);
+  return unstable_cache(
+    async () =>
+      prisma.product.findMany({
+        where: activeWhere(ProductKind.deal, filters),
+        include: productInclude,
+        orderBy: { createdAt: "desc" },
+      }),
+    ["products-deals", key],
+    { tags: [CACHE_TAGS.products], revalidate: 60 }
+  )();
 }
 
 export async function listDealsByCategory(
@@ -76,58 +92,77 @@ export async function listDealsByCategory(
 }
 
 export async function listActiveSecondhand(filters: ProductListFilters = {}) {
-  const { listExpiredPreOrderProductIds } = await import("@/lib/pre-order");
-  const expiredIds = await listExpiredPreOrderProductIds();
+  const key = filtersCacheKey(filters);
+  return unstable_cache(
+    async () => {
+      const { listExpiredPreOrderProductIds } = await import("@/lib/pre-order");
+      const expiredIds = await listExpiredPreOrderProductIds();
 
-  const rows = await prisma.product.findMany({
-    where: {
-      ...activeWhere(ProductKind.secondhand, filters),
-      ...(expiredIds.length > 0 ? { id: { notIn: expiredIds } } : {}),
+      const rows = await prisma.product.findMany({
+        where: {
+          ...activeWhere(ProductKind.secondhand, filters),
+          ...(expiredIds.length > 0 ? { id: { notIn: expiredIds } } : {}),
+        },
+        include: productInclude,
+        orderBy: { createdAt: "desc" },
+      });
+
+      return rows.sort((a, b) => {
+        const aSold = a.stock <= 0 ? 1 : 0;
+        const bSold = b.stock <= 0 ? 1 : 0;
+        if (aSold !== bSold) return aSold - bSold;
+        return b.createdAt.getTime() - a.createdAt.getTime();
+      });
     },
-    include: productInclude,
-    orderBy: { createdAt: "desc" },
-  });
-
-  return rows.sort((a, b) => {
-    const aSold = a.stock <= 0 ? 1 : 0;
-    const bSold = b.stock <= 0 ? 1 : 0;
-    if (aSold !== bSold) return aSold - bSold;
-    return b.createdAt.getTime() - a.createdAt.getTime();
-  });
+    ["products-secondhand", key],
+    { tags: [CACHE_TAGS.products], revalidate: 60 }
+  )();
 }
 
 export async function listStoreAreas(kind?: ProductKind) {
-  const rows = await prisma.product.findMany({
-    where: {
-      isActive: true,
-      storeArea: { not: null },
-      ...(kind ? { kind } : {}),
-    },
-    select: { storeArea: true },
-    distinct: ["storeArea"],
-    orderBy: { storeArea: "asc" },
-  });
+  return unstable_cache(
+    async () => {
+      const rows = await prisma.product.findMany({
+        where: {
+          isActive: true,
+          storeArea: { not: null },
+          ...(kind ? { kind } : {}),
+        },
+        select: { storeArea: true },
+        distinct: ["storeArea"],
+        orderBy: { storeArea: "asc" },
+      });
 
-  return rows
-    .map((row) => row.storeArea)
-    .filter((area): area is string => Boolean(area && area.trim()));
+      return rows
+        .map((row) => row.storeArea)
+        .filter((area): area is string => Boolean(area && area.trim()));
+    },
+    ["products-store-areas", kind ?? "all"],
+    { tags: [CACHE_TAGS.products], revalidate: 120 }
+  )();
 }
 
 export async function listPlatforms(kind?: ProductKind) {
-  const rows = await prisma.product.findMany({
-    where: {
-      isActive: true,
-      shopName: { not: null },
-      ...(kind ? { kind } : {}),
-    },
-    select: { shopName: true },
-    distinct: ["shopName"],
-    orderBy: { shopName: "asc" },
-  });
+  return unstable_cache(
+    async () => {
+      const rows = await prisma.product.findMany({
+        where: {
+          isActive: true,
+          shopName: { not: null },
+          ...(kind ? { kind } : {}),
+        },
+        select: { shopName: true },
+        distinct: ["shopName"],
+        orderBy: { shopName: "asc" },
+      });
 
-  return rows
-    .map((row) => row.shopName)
-    .filter((name): name is string => Boolean(name && name.trim()));
+      return rows
+        .map((row) => row.shopName)
+        .filter((name): name is string => Boolean(name && name.trim()));
+    },
+    ["products-platforms", kind ?? "all"],
+    { tags: [CACHE_TAGS.products], revalidate: 120 }
+  )();
 }
 
 export async function listAllProducts() {

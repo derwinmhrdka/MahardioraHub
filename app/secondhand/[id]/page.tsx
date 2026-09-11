@@ -3,10 +3,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, MapPin, Package, Plane, Tag } from "lucide-react";
 import { AddToCartButton } from "@/components/AddToCartButton";
-import { Header } from "@/components/Header";
 import { ProductImageSlider } from "@/components/ProductImageSlider";
 import { ProductNote } from "@/components/ProductNote";
 import { ProductPrice } from "@/components/ProductPrice";
+import { SiteHeader } from "@/components/SiteHeader";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import styles from "@/components/ProductDetail.module.css";
 import { auth } from "@/auth";
@@ -63,7 +63,7 @@ export default async function SecondhandItemPage({ params }: PageProps) {
   });
   return (
     <div className="section-secondhand">
-      <Header siteName={settings.siteName} active="secondhand" />
+      <SiteHeader siteName={settings.siteName} active="secondhand" />
       <main className="container">
         <Link
           href="/"

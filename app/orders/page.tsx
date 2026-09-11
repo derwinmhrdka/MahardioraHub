@@ -15,10 +15,14 @@ import { formatRupiah } from "@/lib/format";
 import { productImageUrl } from "@/lib/image-url";
 import { resolveCartOwner } from "@/lib/cart-owner";
 import {
+  buyerEmptyCopy,
+  orderStatusLabel,
+  parseOrderListTab,
+} from "@/lib/order-display";
+import {
   countPendingOrdersForOwner,
   countProgressOrdersForOwner,
   listOrdersForOwner,
-  type OrderListTab,
 } from "@/lib/orders";
 import { prisma } from "@/lib/prisma";
 import { productImages } from "@/lib/product-images";
@@ -29,35 +33,6 @@ type PageProps = {
   searchParams: Promise<{ tab?: string; cancelled?: string }>;
 };
 
-function parseTab(raw: string | undefined): OrderListTab {
-  if (raw === "progress" || raw === "in-progress") return "progress";
-  if (raw === "completed" || raw === "selesai") return "completed";
-  if (raw === "cancel" || raw === "cancelled") return "cancel";
-  if (raw === "payment") return "pending";
-  return "pending";
-}
-
-function emptyCopy(tab: OrderListTab) {
-  if (tab === "pending") {
-    return { label: "Belum ada pending", Icon: Clock3 };
-  }
-  if (tab === "progress") {
-    return { label: "Belum ada in progress", Icon: Loader };
-  }
-  if (tab === "completed") {
-    return { label: "Belum ada completed", Icon: CheckCircle2 };
-  }
-  return { label: "Belum ada cancel", Icon: Ban };
-}
-
-function statusMeta(status: string) {
-  if (status === "paid") return "In Progress";
-  if (status === "completed") return "Completed";
-  if (status === "cancelled") return "Cancelled";
-  if (status === "expired") return "Expired";
-  if (status === "failed") return "Failed";
-  return "Menunggu pembayaran";
-}
 
 export default async function OrdersPage({ searchParams }: PageProps) {
   const params = await searchParams;
@@ -66,7 +41,7 @@ export default async function OrdersPage({ searchParams }: PageProps) {
     redirect("/");
   }
 
-  const tab = parseTab(params.tab);
+  const tab = parseOrderListTab(params.tab);
 
   const [settings, orders, pendingCount, progressCount] = await Promise.all([
     getSettings(),
@@ -89,8 +64,14 @@ export default async function OrdersPage({ searchParams }: PageProps) {
     products.map((p) => [p.id, productImages(p)[0] ?? null])
   );
 
-  const empty = emptyCopy(tab);
-  const EmptyIcon = empty.Icon;
+  const emptyIconByTab = {
+    pending: Clock3,
+    progress: Loader,
+    completed: CheckCircle2,
+    cancel: Ban,
+  } as const;
+  const emptyLabel = buyerEmptyCopy(tab);
+  const EmptyIcon = emptyIconByTab[tab];
 
   return (
     <div className="section-secondhand">
@@ -166,7 +147,7 @@ export default async function OrdersPage({ searchParams }: PageProps) {
             <span className={styles.emptyIcon} aria-hidden>
               <EmptyIcon size={28} strokeWidth={1.75} />
             </span>
-            <p className={styles.emptyLabel}>{empty.label}</p>
+            <p className={styles.emptyLabel}>{emptyLabel}</p>
           </div>
         ) : (
           <ul className={styles.list}>
@@ -187,7 +168,7 @@ export default async function OrdersPage({ searchParams }: PageProps) {
                             tab === "pending" ? styles.statusPending : ""
                           }`}
                         >
-                          {statusMeta(order.status)}
+                          {orderStatusLabel(order.status)}
                         </p>
                         <p className={styles.invMini}>{order.externalId}</p>
                       </div>

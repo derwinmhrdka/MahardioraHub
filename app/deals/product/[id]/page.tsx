@@ -3,10 +3,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, MapPin, Store, Tag } from "lucide-react";
 import { DealCta } from "@/components/DealCta";
-import { Header } from "@/components/Header";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductImageSlider } from "@/components/ProductImageSlider";
 import { ProductNote } from "@/components/ProductNote";
+import { SiteHeader } from "@/components/SiteHeader";
 import styles from "@/components/ProductDetail.module.css";
 import { formatRupiah } from "@/lib/format";
 import { productImages } from "@/lib/product-images";
@@ -17,6 +17,8 @@ import { getSettings, productPageUrl } from "@/lib/settings";
 type PageProps = {
   params: Promise<{ id: string }>;
 };
+
+export const revalidate = 60;
 
 export async function generateMetadata({
   params,
@@ -53,7 +55,7 @@ export default async function DealProductPage({ params }: PageProps) {
   ]);
   return (
     <div className="section-deals">
-      <Header siteName={settings.siteName} active="deals" />
+      <SiteHeader siteName={settings.siteName} active="deals" />
       <main className="container">
         <Link
           href="/picks"

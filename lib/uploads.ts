@@ -82,7 +82,7 @@ export async function saveProductImage(file: File | Blob): Promise<string> {
     throw new Error("File kosong");
   }
   if (file.size > MAX_UPLOAD_INPUT_BYTES) {
-    throw new Error("Ukuran file terlalu besar (max 20MB)");
+    throw new Error("File terlalu besar");
   }
 
   const input = Buffer.from(await file.arrayBuffer());

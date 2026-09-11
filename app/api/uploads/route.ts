@@ -1,10 +1,19 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { log } from "@/lib/logger";
+import {
+  clientRateKey,
+  rateLimit,
+  rateLimitResponse,
+} from "@/lib/rate-limit";
 import { MAX_UPLOAD_COUNT, saveProductImage } from "@/lib/uploads";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
+  const limited = rateLimit(clientRateKey(request, "uploads"), 30, 60_000);
+  if (!limited.ok) return rateLimitResponse(limited.retryAfterSec);
+
   const session = await auth();
   if (!session?.user || session.user.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -36,9 +45,11 @@ export async function POST(request: Request) {
     for (const file of files) {
       urls.push(await saveProductImage(file));
     }
+    log.info("uploads.saved", { count: urls.length, userId: session.user.id });
     return NextResponse.json({ urls });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Gagal";
+    log.warn("uploads.failed", { error: message });
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }

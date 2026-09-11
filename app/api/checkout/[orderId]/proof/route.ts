@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { resolveCartOwner } from "@/lib/cart-owner";
+import { log } from "@/lib/logger";
 import { attachPaymentProof } from "@/lib/orders";
+import {
+  clientRateKey,
+  rateLimit,
+  rateLimitResponse,
+} from "@/lib/rate-limit";
 import { saveProductImage } from "@/lib/uploads";
 
 export const runtime = "nodejs";
@@ -19,6 +25,9 @@ function isUploadFile(entry: FormDataEntryValue | null): entry is File {
 }
 
 export async function POST(request: Request, context: RouteContext) {
+  const limited = rateLimit(clientRateKey(request, "proof"), 20, 60_000);
+  if (!limited.ok) return rateLimitResponse(limited.retryAfterSec);
+
   const { orderId } = await context.params;
   if (!orderId?.trim()) {
     return NextResponse.json({ error: "Order tidak valid" }, { status: 400 });
@@ -64,10 +73,11 @@ export async function POST(request: Request, context: RouteContext) {
       );
     }
 
+    log.info("checkout.proof_uploaded", { orderId: order.id });
     return NextResponse.json({ proofUrl: order.paymentProofUrl });
   } catch (e) {
-    console.error("POST /api/checkout/[orderId]/proof", e);
     const message = e instanceof Error ? e.message : "Gagal upload";
+    log.warn("checkout.proof_failed", { orderId, error: message });
     const status =
       message === "Order tidak ditemukan"
         ? 404

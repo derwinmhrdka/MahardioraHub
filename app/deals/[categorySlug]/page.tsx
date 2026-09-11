@@ -1,13 +1,15 @@
 import { notFound } from "next/navigation";
 import { ProductKind } from "@prisma/client";
-import { Header } from "@/components/Header";
 import { ProductBrowse } from "@/components/ProductBrowse";
+import { SiteHeader } from "@/components/SiteHeader";
 import { getCategoryBySlug, listCategories } from "@/lib/categories";
 import {
   listDealsByCategory,
   listPlatforms,
   listStoreAreas,
 } from "@/lib/products";
+
+export const revalidate = 60;
 
 type PageProps = {
   params: Promise<{ categorySlug: string }>;
@@ -48,7 +50,7 @@ export default async function CategoryDealsPage({
 
   return (
     <div className="section-deals">
-      <Header active="deals" />
+      <SiteHeader active="deals" />
       <main className="container">
         <h1 className="page-title">{category.name}</h1>
         <ProductBrowse

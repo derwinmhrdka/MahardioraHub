@@ -7,6 +7,8 @@ import { GoogleLoginButton } from "@/components/GoogleLoginButton";
 import { StoreMark } from "@/components/StoreMark";
 import styles from "./login.module.css";
 
+export const dynamic = "force-dynamic";
+
 type PageProps = {
   searchParams: Promise<{ next?: string; error?: string }>;
 };

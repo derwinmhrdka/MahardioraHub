@@ -17,7 +17,7 @@ function canvasToBlob(
   return new Promise((resolve, reject) => {
     canvas.toBlob(
       (blob) => {
-        if (!blob) reject(new Error("Gagal compress gambar"));
+        if (!blob) reject(new Error("Gagal memproses gambar"));
         else resolve(blob);
       },
       type,
@@ -34,7 +34,7 @@ export async function compressImageFile(file: File): Promise<File> {
   if (!file.type.startsWith("image/")) return file;
   if (file.type === "image/gif") return file;
   if (file.size > MAX_UPLOAD_INPUT_BYTES) {
-    throw new Error("Ukuran file terlalu besar (max 20MB)");
+    throw new Error("File terlalu besar");
   }
   // Already small enough — still re-encode if huge dimensions later
   const needsWork = file.size > CLIENT_COMPRESS_TARGET_BYTES;

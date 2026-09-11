@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { markOrderExpired, markOrderPaid } from "@/lib/orders";
+import { log } from "@/lib/logger";
 import { verifyXenditCallbackToken } from "@/lib/xendit";
 
 export const runtime = "nodejs";
@@ -57,11 +58,13 @@ export async function POST(req: NextRequest) {
     status === "SUCCEEDED"
   ) {
     await markOrderPaid({ externalId, pspId: xenditId });
+    log.info("webhook.xendit.paid", { externalId, status });
     return NextResponse.json({ ok: true });
   }
 
   if (status === "EXPIRED" || status === "INACTIVE") {
     if (externalId) await markOrderExpired(externalId);
+    log.info("webhook.xendit.expired", { externalId, status });
     return NextResponse.json({ ok: true });
   }
 

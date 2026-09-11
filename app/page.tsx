@@ -2,9 +2,9 @@ import { ProductKind } from "@prisma/client";
 import type { Metadata } from "next";
 import { CollectionPromoBanner } from "@/components/CollectionPromoBanner";
 import { FlashSaleStrip } from "@/components/FlashSaleStrip";
-import { Header } from "@/components/Header";
 import { PreOrderStrip } from "@/components/PreOrderStrip";
 import { ProductBrowse } from "@/components/ProductBrowse";
+import { SiteHeader } from "@/components/SiteHeader";
 import { listCategories } from "@/lib/categories";
 import { getActiveFlashSalePublic } from "@/lib/flash-sale";
 import {
@@ -30,6 +30,9 @@ type PageProps = {
     platform?: string;
   }>;
 };
+
+/** Public catalog — data cached; header auth isolated via SiteHeader Suspense. */
+export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
@@ -87,7 +90,7 @@ export default async function HomePage({ searchParams }: PageProps) {
 
   return (
     <div className="section-secondhand">
-      <Header active="secondhand" />
+      <SiteHeader active="secondhand" />
       {bannerImages.length > 0 ? (
         <CollectionPromoBanner images={bannerImages} />
       ) : null}

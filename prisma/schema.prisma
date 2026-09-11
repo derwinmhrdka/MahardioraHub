@@ -40,6 +40,10 @@ model Product {
   cartItems     CartItem[]
   flashSaleItems FlashSaleItem[]
   preOrderItems  PreOrderItem[]
+
+  @@index([kind, isActive, createdAt])
+  @@index([categoryId, isActive])
+  @@index([isActive, kind])
 }
 
 model Click {

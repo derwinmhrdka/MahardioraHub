@@ -45,6 +45,7 @@ services:
       MIDTRANS_IS_PRODUCTION: ${MIDTRANS_IS_PRODUCTION:-false}
       XENDIT_SECRET_KEY: ${XENDIT_SECRET_KEY:-}
       XENDIT_CALLBACK_TOKEN: ${XENDIT_CALLBACK_TOKEN:-}
+      CRON_SECRET: ${CRON_SECRET:-}
       # Inside the container only — does not use host :3000 / :3001
       PORT: "3000"
       NODE_ENV: production
@@ -53,6 +54,18 @@ services:
       - "127.0.0.1:${APP_HOST_PORT:-13000}:3000"
     volumes:
       - uploads:/app/uploads
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/api/health').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
 volumes:
   pgdata:

@@ -496,10 +496,6 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
                   <div className={styles.sectionCardHead}>
                     <p className={styles.payLabel}>Fitur cabang</p>
                   </div>
-                  <p className={styles.sectionCardHint}>
-                    Jika nonaktif, pilihan &quot;Dikirim dari&quot; disembunyikan di
-                    checkout.
-                  </p>
                   <form
                     action={setBranchesFeatureAction}
                     className={styles.branchToggleRow}

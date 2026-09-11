@@ -1,7 +1,6 @@
 "use server";
 
 import { ProductKind } from "@prisma/client";
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
   createProduct,
@@ -17,6 +16,7 @@ import { parseImageUrlsField } from "@/lib/product-images";
 import { clampDiscountPercent } from "@/lib/pricing";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { revalidateProducts, revalidateSettings } from "@/lib/revalidate";
 import { cleanupRemovedUploads } from "@/lib/upload-gc";
 
 async function parseProductForm(formData: FormData) {
@@ -84,10 +84,7 @@ async function parseProductForm(formData: FormData) {
 export async function createProductAction(formData: FormData) {
   const data = await parseProductForm(formData);
   await createProduct(data);
-  revalidatePath("/");
-  revalidatePath("/picks");
-  revalidatePath("/secondhand");
-  revalidatePath("/admin/products");
+  revalidateProducts();
   redirect("/admin/products");
 }
 
@@ -96,12 +93,7 @@ export async function updateProductAction(formData: FormData) {
   if (!Number.isFinite(id)) throw new Error("Invalid product id");
   const data = await parseProductForm(formData);
   await updateProduct(id, data);
-  revalidatePath("/");
-  revalidatePath("/picks");
-  revalidatePath("/secondhand");
-  revalidatePath(`/deals/product/${id}`);
-  revalidatePath(`/secondhand/${id}`);
-  revalidatePath("/admin/products");
+  revalidateProducts(id);
   redirect("/admin/products");
 }
 
@@ -109,30 +101,21 @@ export async function hideProductAction(formData: FormData) {
   const id = Number(formData.get("id"));
   if (!Number.isFinite(id)) throw new Error("Invalid product id");
   await setProductActive(id, false);
-  revalidatePath("/");
-  revalidatePath("/picks");
-  revalidatePath("/secondhand");
-  revalidatePath("/admin/products");
+  revalidateProducts(id);
 }
 
 export async function showProductAction(formData: FormData) {
   const id = Number(formData.get("id"));
   if (!Number.isFinite(id)) throw new Error("Invalid product id");
   await setProductActive(id, true);
-  revalidatePath("/");
-  revalidatePath("/picks");
-  revalidatePath("/secondhand");
-  revalidatePath("/admin/products");
+  revalidateProducts(id);
 }
 
 export async function deleteProductAction(formData: FormData) {
   const id = Number(formData.get("id"));
   if (!Number.isFinite(id)) throw new Error("Invalid product id");
   await deleteProduct(id);
-  revalidatePath("/");
-  revalidatePath("/picks");
-  revalidatePath("/secondhand");
-  revalidatePath("/admin/products");
+  revalidateProducts(id);
 }
 
 export async function importProductsCsvAction(formData: FormData) {
@@ -151,9 +134,7 @@ export async function importProductsCsvAction(formData: FormData) {
 
   const result = await importProductsFromCsvRows(parsed.rows);
   const allErrors = [...parsed.errors, ...result.errors];
-  revalidatePath("/");
-  revalidatePath("/secondhand");
-  revalidatePath("/admin/products");
+  revalidateProducts();
 
   const params = new URLSearchParams();
   params.set("imported", String(result.created));
@@ -194,9 +175,7 @@ export async function deleteUploadedImageAction(url: string) {
         collectionBannerActive: next.length > 0 && next.some((u) => !hidden.includes(u)),
       },
     });
-    revalidatePath("/secondhand");
-    revalidatePath("/");
-    revalidatePath("/admin/settings");
+    revalidateSettings();
   }
 
   await cleanupRemovedUploads([trimmed]);

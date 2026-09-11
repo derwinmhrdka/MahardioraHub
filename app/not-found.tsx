@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Home } from "lucide-react";
-import { Header } from "@/components/Header";
+import { SiteHeader } from "@/components/SiteHeader";
 import { getSettings } from "@/lib/settings";
 import styles from "./not-found.module.css";
 
@@ -15,7 +15,7 @@ export default async function NotFound() {
 
   return (
     <div className="section-secondhand">
-      <Header siteName={siteName} active="secondhand" />
+      <SiteHeader siteName={siteName} active="secondhand" />
       <main className={`container ${styles.main}`}>
         <div className={styles.card}>
           <p className={styles.code}>404</p>

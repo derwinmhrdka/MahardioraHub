@@ -7,7 +7,9 @@ import { SplashScreen } from "@/components/SplashScreen";
 import { getSettings, siteOrigin } from "@/lib/settings";
 import "./globals.css";
 
-export const dynamic = "force-dynamic";
+// Public routes: no force-dynamic here — catalog uses ISR/data cache.
+// Private routes (checkout/orders/admin/login) set force-dynamic locally.
+// Header auth/cart is isolated via <SiteHeader> Suspense on public pages.
 
 export const viewport: Viewport = {
   width: "device-width",

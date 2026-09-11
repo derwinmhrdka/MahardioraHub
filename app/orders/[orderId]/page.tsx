@@ -13,6 +13,12 @@ import { formatRupiah } from "@/lib/format";
 import { productImageUrl } from "@/lib/image-url";
 import { getGuestId } from "@/lib/cart-owner";
 import {
+  formatOrderDateTime,
+  orderBackTab,
+  orderStatusLabelShort,
+  payMethodLabel,
+} from "@/lib/order-display";
+import {
   buildCashWhatsAppMessage,
   cancelOwnerOrder,
   getOrderForViewer,
@@ -28,38 +34,6 @@ type PageProps = {
   searchParams: Promise<{ contact?: string }>;
 };
 
-function statusLabel(status: string) {
-  if (status === "paid") return "In Progress";
-  if (status === "completed") return "Completed";
-  if (status === "cancelled") return "Cancelled";
-  if (status === "expired") return "Expired";
-  if (status === "failed") return "Failed";
-  return "Pending";
-}
-
-function payMethodLabel(method: string) {
-  if (method === "qris") return "QRIS";
-  if (method === "bank_transfer") return "Transfer Bank";
-  if (method === "cash") return "Cash (WhatsApp)";
-  return method;
-}
-
-function backTab(status: string) {
-  if (status === "pending") return "pending";
-  if (status === "paid") return "progress";
-  if (status === "completed") return "completed";
-  return "cancel";
-}
-
-function formatDate(date: Date) {
-  return date.toLocaleString("id-ID", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 function sellerWhatsAppHref(input: {
   whatsappNumber: string;
@@ -189,9 +163,9 @@ export default async function OrderDetailPage({
     : null;
 
   const backHref = isAdmin
-    ? `/admin/orders?tab=${backTab(order.status)}`
+    ? `/admin/orders?tab=${orderBackTab(order.status)}`
     : isLoggedIn
-      ? `/orders?tab=${backTab(order.status)}`
+      ? `/orders?tab=${orderBackTab(order.status)}`
       : "/";
 
   return (
@@ -227,7 +201,7 @@ export default async function OrderDetailPage({
 
           <div className={styles.panel}>
             <div className={styles.panelHead}>
-              <span>{statusLabel(order.status)}</span>
+              <span>{orderStatusLabelShort(order.status)}</span>
               {isPending && isOwner ? (
                 <span className={styles.noPrint}>
                   <OrderCountdown expiresAt={expiresAt} />
@@ -240,7 +214,7 @@ export default async function OrderDetailPage({
               <dl className={styles.metaGrid}>
                 <div>
                   <dt>Tanggal</dt>
-                  <dd>{formatDate(order.createdAt)}</dd>
+                  <dd>{formatOrderDateTime(order.createdAt)}</dd>
                 </div>
                 <div>
                   <dt>Pembayaran</dt>
@@ -249,7 +223,7 @@ export default async function OrderDetailPage({
                 {order.paidAt ? (
                   <div>
                     <dt>Dibayar</dt>
-                    <dd>{formatDate(order.paidAt)}</dd>
+                    <dd>{formatOrderDateTime(order.paidAt)}</dd>
                   </div>
                 ) : null}
                 <div>

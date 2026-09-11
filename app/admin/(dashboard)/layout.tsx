@@ -5,6 +5,8 @@ import { countAdminProgressOrders } from "@/lib/orders";
 import { getSettings } from "@/lib/settings";
 import styles from "./admin.module.css";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminDashboardLayout({
   children,
 }: {
