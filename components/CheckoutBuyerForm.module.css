@@ -1,0 +1,194 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.panel {
+  margin: 0;
+  border: 2px solid #111;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 3px 3px 0 #111;
+  overflow: hidden;
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 0.9rem 0.75rem;
+  border-bottom: 1.5px solid rgba(17, 17, 17, 0.1);
+  background: #111;
+  color: #fff;
+}
+
+.headTag {
+  margin: 0 0 0.15rem;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.headTitle {
+  margin: 0;
+  font-family: var(--font-body-stack);
+  font-size: 0.98rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.headBadge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 2.4rem;
+  height: 1.7rem;
+  padding: 0 0.5rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.7rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.85rem 0.85rem 0.95rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0.7rem 0.75rem 0.75rem;
+  border: 1.5px solid rgba(17, 17, 17, 0.16);
+  border-radius: 14px;
+  background: #faf8f3;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.fieldOn {
+  border-color: #111;
+  background: #fff;
+  box-shadow: 2px 2px 0 #111;
+}
+
+.fieldOk {
+  border-color: #111;
+}
+
+.fieldTop {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.fieldIcon {
+  display: grid;
+  place-items: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  border: 1.5px solid #111;
+  border-radius: 8px;
+  background: #111;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.fieldLabel {
+  flex: 1;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #111;
+}
+
+.fieldCheck {
+  display: grid;
+  place-items: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 999px;
+  background: #047857;
+  color: #fff;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  margin: 0;
+  padding: 0.15rem 0 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #111;
+  font-family: var(--font-body-stack);
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+  box-shadow: none;
+  outline: none;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: rgba(17, 17, 17, 0.35);
+  font-weight: 600;
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 4.2rem;
+}
+
+.hint,
+.hintOk {
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.hint {
+  color: var(--color-text-muted);
+}
+
+.hintOk {
+  color: #047857;
+}
+
+.needBuyer,
+.readyBuyer {
+  margin: 0;
+  padding: 0.7rem 0.9rem 0.15rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.needBuyer {
+  color: #c2410c;
+}
+
+.readyBuyer {
+  color: #047857;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field {
+    transition: none;
+  }
+}

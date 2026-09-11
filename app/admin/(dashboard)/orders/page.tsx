@@ -1,5 +1,6 @@
 import { AdminOrderList } from "@/components/AdminOrderList";
 import {
+  countAdminPendingBankTransfers,
   countAdminProgressOrders,
   listOrdersForAdmin,
   type OrderListTab,
@@ -12,12 +13,15 @@ type PageProps = {
     tab?: string;
     accepted?: string;
     rejected?: string;
+    confirmed?: string;
     rejectError?: string;
+    confirmError?: string;
     order?: string;
   }>;
 };
 
 function parseTab(raw: string | undefined): OrderListTab {
+  if (raw === "pending") return "pending";
   if (raw === "completed") return "completed";
   if (raw === "cancel" || raw === "cancelled") return "cancel";
   return "progress";
@@ -27,9 +31,10 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const tab = parseTab(params.tab);
 
-  const [orders, progressCount] = await Promise.all([
+  const [orders, progressCount, pendingCount] = await Promise.all([
     listOrdersForAdmin(tab),
     countAdminProgressOrders(),
+    countAdminPendingBankTransfers(),
   ]);
 
   const productIds = [
@@ -51,8 +56,13 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
   if (params.rejectError) {
     notice = "Isi alasan";
     noticeTone = "error";
+  } else if (params.confirmError) {
+    notice = "Bukti belum ada";
+    noticeTone = "error";
   } else if (params.accepted) {
     notice = "Diterima";
+  } else if (params.confirmed) {
+    notice = "Transfer dikonfirmasi";
   } else if (params.rejected) {
     notice = "Ditolak";
   }
@@ -62,6 +72,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
       orders={orders}
       activeTab={tab}
       progressCount={progressCount}
+      pendingCount={pendingCount}
       imageByProduct={imageByProduct}
       notice={notice}
       noticeTone={noticeTone}

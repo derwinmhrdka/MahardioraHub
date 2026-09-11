@@ -1,13 +1,13 @@
 import Link from "next/link";
-import { auth } from "@/auth";
 import { Header } from "@/components/Header";
 import { PaymentSuccessMark } from "@/components/PaymentSuccessMark";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { formatRupiah } from "@/lib/format";
+import { resolveCartOwner } from "@/lib/cart-owner";
 import {
   buildQrisPaidWhatsAppMessage,
   getOrderByExternalId,
-  getOrderForUser,
+  getOrderForOwner,
 } from "@/lib/orders";
 import { getSettings } from "@/lib/settings";
 import styles from "../checkout.module.css";
@@ -16,19 +16,27 @@ type PageProps = {
   searchParams: Promise<{ order?: string; ext?: string }>;
 };
 
+function ownsOrder(
+  order: { userId: string | null; guestId: string | null },
+  owner: { userId: string | null; guestId: string | null }
+) {
+  if (owner.userId && order.userId === owner.userId) return true;
+  if (owner.guestId && order.guestId === owner.guestId) return true;
+  return false;
+}
+
 export default async function CheckoutSuccessPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const settings = await getSettings();
-  const session = await auth();
+  const owner = await resolveCartOwner();
 
-  let order =
-    params.order && session?.user?.id
-      ? await getOrderForUser(params.order, session.user.id)
-      : params.ext
-        ? await getOrderByExternalId(params.ext)
-        : null;
+  let order = params.order
+    ? await getOrderForOwner(params.order, owner)
+    : params.ext
+      ? await getOrderByExternalId(params.ext)
+      : null;
 
-  if (order && session?.user?.id && order.userId !== session.user.id) {
+  if (order && params.ext && !ownsOrder(order, owner)) {
     order = null;
   }
 
@@ -43,6 +51,9 @@ export default async function CheckoutSuccessPage({ searchParams }: PageProps) {
               id: order.id,
               externalId: order.externalId,
               amount: order.amount,
+              buyerName: order.buyerName,
+              buyerWhatsapp: order.buyerWhatsapp,
+              buyerAddress: order.buyerAddress,
               items: order.items.map((item) => ({
                 productId: item.productId,
                 title: item.title,

@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import Link from "next/link";
 import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { addToCartAction } from "@/app/cart/actions";
 import { flyToCart } from "@/lib/cart-fly";
@@ -18,12 +17,9 @@ type AddToCartButtonProps = {
 
 export function AddToCartButton({
   productId,
-  next,
   stock = 0,
-  loggedIn = true,
   imageUrl = null,
 }: AddToCartButtonProps) {
-  const returnTo = next || `/secondhand/${productId}`;
   const available = stock > 0;
   const maxQty = Math.max(1, stock);
   const [qty, setQty] = useState(1);
@@ -58,41 +54,6 @@ export function AddToCartButton({
     );
   }
 
-  if (!loggedIn) {
-    return (
-      <div className={styles.row}>
-        <div className={styles.qty}>
-          <button
-            type="button"
-            className={styles.qtyBtn}
-            aria-label="Kurang"
-            onClick={dec}
-            disabled={qty <= 1}
-          >
-            <Minus size={12} strokeWidth={2.5} aria-hidden />
-          </button>
-          <span className={styles.qtyVal}>{qty}</span>
-          <button
-            type="button"
-            className={styles.qtyBtn}
-            aria-label="Tambah"
-            onClick={inc}
-            disabled={qty >= maxQty}
-          >
-            <Plus size={12} strokeWidth={2.5} aria-hidden />
-          </button>
-        </div>
-        <Link
-          href={`/login?next=${encodeURIComponent(returnTo)}`}
-          className={styles.btn}
-        >
-          <ShoppingCart size={16} strokeWidth={2.25} aria-hidden />
-          Tambah
-        </Link>
-      </div>
-    );
-  }
-
   return (
     <form
       className={styles.form}
@@ -104,7 +65,6 @@ export function AddToCartButton({
       }}
     >
       <input type="hidden" name="productId" value={productId} />
-      <input type="hidden" name="next" value={returnTo} />
       <input type="hidden" name="quantity" value={qty} />
       <div className={styles.row}>
         <div className={styles.qty}>

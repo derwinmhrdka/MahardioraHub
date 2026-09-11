@@ -2,18 +2,16 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import Link from "next/link";
 import { ShoppingCart, X } from "lucide-react";
 import { CartView, type CartViewItem } from "@/components/CartView";
 import styles from "./CartDrawer.module.css";
 
 type CartDrawerProps = {
   count: number;
-  loggedIn: boolean;
   items: CartViewItem[];
 };
 
-export function CartDrawer({ count, loggedIn, items }: CartDrawerProps) {
+export function CartDrawer({ count, items }: CartDrawerProps) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const panelRef = useRef<HTMLElement>(null);
@@ -37,19 +35,6 @@ export function CartDrawer({ count, loggedIn, items }: CartDrawerProps) {
       document.body.style.overflow = prev;
     };
   }, [open]);
-
-  if (!loggedIn) {
-    return (
-      <Link
-        href="/login?next=/"
-        className={styles.trigger}
-        aria-label="Cart"
-        title="Cart"
-      >
-        <ShoppingCart size={16} strokeWidth={2.25} aria-hidden />
-      </Link>
-    );
-  }
 
   const overlay =
     open && mounted

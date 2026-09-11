@@ -1,33 +1,42 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { auth } from "@/auth";
 import { Header } from "@/components/Header";
-import { PaymentMethods } from "@/components/PaymentMethods";
+import { CheckoutBuyerForm } from "@/components/CheckoutBuyerForm";
 import { listCartItems } from "@/lib/cart";
+import { resolveCartOwner } from "@/lib/cart-owner";
+import { getUserBuyerProfile } from "@/lib/buyer";
 import { formatRupiah } from "@/lib/format";
 import { productImageUrl } from "@/lib/image-url";
 import { productImages } from "@/lib/product-images";
 import { salePrice } from "@/lib/pricing";
+import { countActiveBankAccounts } from "@/lib/bank-accounts";
 import { getSettings } from "@/lib/settings";
-import { getActivePendingQrisOrder } from "@/lib/orders";
+import {
+  getActivePendingBankTransferOrder,
+  getActivePendingQrisOrder,
+} from "@/lib/orders";
 import { qrisConfigured } from "@/lib/qris-provider";
 import styles from "./checkout.module.css";
 
 export default async function CheckoutPaymentPage() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    redirect("/login?next=/checkout");
-  }
+  const owner = await resolveCartOwner();
 
-  const [settings, rows, pendingQris] = await Promise.all([
-    getSettings(),
-    listCartItems(session.user.id),
-    getActivePendingQrisOrder(session.user.id),
-  ]);
+  const [settings, rows, pendingQris, pendingTransfer, bankCount, profile] =
+    await Promise.all([
+      getSettings(),
+      listCartItems(owner.ownerKey),
+      getActivePendingQrisOrder(owner),
+      getActivePendingBankTransferOrder(owner),
+      countActiveBankAccounts(),
+      owner.userId ? getUserBuyerProfile(owner.userId) : Promise.resolve(null),
+    ]);
 
   if (pendingQris) {
     redirect(`/checkout/${pendingQris.id}`);
+  }
+  if (pendingTransfer) {
+    redirect(`/checkout/${pendingTransfer.id}`);
   }
 
   if (rows.length === 0) {
@@ -93,12 +102,15 @@ export default async function CheckoutPaymentPage() {
           </ul>
         </section>
 
-        <section className={styles.panel} aria-label="Bayar">
-          <div className={styles.panelHead}>
-            <span>Bayar</span>
-          </div>
-          <PaymentMethods qrisEnabled={await qrisConfigured()} />
-        </section>
+        <CheckoutBuyerForm
+          qrisEnabled={await qrisConfigured()}
+          bankTransferEnabled={bankCount > 0}
+          initialBuyer={{
+            name: profile?.name ?? "",
+            whatsapp: profile?.whatsapp ?? "",
+            address: profile?.address ?? "",
+          }}
+        />
 
         <div className={styles.bar}>
           <div className={styles.barMeta}>

@@ -3,6 +3,7 @@ import {
   Ban,
   CheckCircle2,
   ClipboardList,
+  Hourglass,
   ImageOff,
   Loader,
 } from "lucide-react";
@@ -24,14 +25,24 @@ type OrderRow = {
   id: string;
   externalId: string;
   status: string;
+  payMethod: string;
   amount: number;
   cancelReason: string | null;
+  paymentProofUrl: string | null;
+  buyerName: string;
+  buyerWhatsapp: string;
+  buyerAddress: string;
   createdAt: Date;
   paidAt: Date | null;
+  bankAccount: {
+    bankName: string;
+    accountName: string;
+    accountNumber: string;
+  } | null;
   user: {
     name: string | null;
     email: string | null;
-  };
+  } | null;
   items: OrderItem[];
 };
 
@@ -39,6 +50,7 @@ type AdminOrderListProps = {
   orders: OrderRow[];
   activeTab: OrderListTab;
   progressCount: number;
+  pendingCount: number;
   imageByProduct: Map<number, string | null>;
   notice?: string | null;
   noticeTone?: "ok" | "error";
@@ -46,12 +58,14 @@ type AdminOrderListProps = {
 };
 
 const TABS: { id: OrderListTab; label: string; Icon: typeof Loader }[] = [
+  { id: "pending", label: "Pending", Icon: Hourglass },
   { id: "progress", label: "Progress", Icon: Loader },
   { id: "completed", label: "Completed", Icon: CheckCircle2 },
   { id: "cancel", label: "Cancel", Icon: Ban },
 ];
 
 function emptyLabel(tab: OrderListTab) {
+  if (tab === "pending") return "Belum ada transfer menunggu";
   if (tab === "progress") return "Belum ada pesanan";
   if (tab === "completed") return "Belum ada completed";
   return "Belum ada cancel";
@@ -61,6 +75,7 @@ export function AdminOrderList({
   orders,
   activeTab,
   progressCount,
+  pendingCount,
   imageByProduct,
   notice = null,
   noticeTone = "ok",
@@ -91,6 +106,11 @@ export function AdminOrderList({
                 {progressCount > 9 ? "9+" : progressCount}
               </span>
             ) : null}
+            {id === "pending" && pendingCount > 0 ? (
+              <span className={styles.badge} aria-label={`${pendingCount}`}>
+                {pendingCount > 9 ? "9+" : pendingCount}
+              </span>
+            ) : null}
           </Link>
         ))}
       </div>
@@ -118,11 +138,42 @@ export function AdminOrderList({
                 <div>
                   <p className={styles.inv}>{order.externalId}</p>
                   <p className={styles.buyer}>
-                    {order.user.name || order.user.email || "User"}
+                    {order.buyerName ||
+                      order.user?.name ||
+                      order.user?.email ||
+                      "User"}
                   </p>
+                  {order.buyerWhatsapp ? (
+                    <p className={styles.buyerPhone}>{order.buyerWhatsapp}</p>
+                  ) : null}
+                  {order.payMethod === "bank_transfer" ? (
+                    <p className={styles.payTag}>Transfer bank</p>
+                  ) : null}
                 </div>
                 <p className={styles.amount}>{formatRupiah(order.amount)}</p>
               </div>
+
+              {order.bankAccount ? (
+                <p className={styles.bankInfo}>
+                  {order.bankAccount.bankName} ·{" "}
+                  {order.bankAccount.accountNumber}
+                </p>
+              ) : null}
+
+              {order.paymentProofUrl ? (
+                <a
+                  href={order.paymentProofUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.proof}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={order.paymentProofUrl} alt="Bukti transfer" />
+                  <span>Lihat bukti</span>
+                </a>
+              ) : activeTab === "pending" ? (
+                <p className={styles.noProof}>Belum upload bukti</p>
+              ) : null}
 
               {order.cancelReason ? (
                 <p className={styles.reason}>{order.cancelReason}</p>
@@ -151,12 +202,25 @@ export function AdminOrderList({
                 })}
               </ul>
 
-              {activeTab === "progress" ? (
-                <AdminOrderActions
-                  orderId={order.id}
-                  forceRejectOpen={rejectFocusOrderId === order.id}
-                />
-              ) : null}
+              <div className={styles.cardActions}>
+                <Link href={`/orders/${order.id}`} className={styles.invoiceLink}>
+                  Invoice
+                </Link>
+                {activeTab === "progress" ? (
+                  <AdminOrderActions
+                    orderId={order.id}
+                    forceRejectOpen={rejectFocusOrderId === order.id}
+                  />
+                ) : null}
+                {activeTab === "pending" ? (
+                  <AdminOrderActions
+                    orderId={order.id}
+                    mode="bankPending"
+                    canConfirm={Boolean(order.paymentProofUrl)}
+                    forceRejectOpen={rejectFocusOrderId === order.id}
+                  />
+                ) : null}
+              </div>
             </li>
           ))}
         </ul>

@@ -96,11 +96,21 @@ model User {
   email     String     @unique
   name      String?
   image     String?
+  phone     String?
+  address   String?
   role      UserRole   @default(visitor)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-  cartItems CartItem[]
   orders    Order[]
+}
+
+/** Guest checkout profile keyed by WhatsApp number. */
+model GuestBuyer {
+  whatsapp  String   @id
+  name      String
+  address   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 /** Emails allowed to access /admin after Google login. */
@@ -112,16 +122,16 @@ model AdminAllowlist {
 
 model CartItem {
   id        Int      @id @default(autoincrement())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /** `u_{userId}` or `g_{guestId}` */
+  ownerKey  String
   productId Int
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   quantity  Int      @default(1)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userId, productId])
-  @@index([userId])
+  @@unique([ownerKey, productId])
+  @@index([ownerKey])
 }
 
 enum OrderStatus {
@@ -137,6 +147,20 @@ enum OrderPayMethod {
   invoice
   qris
   cash
+  bank_transfer
+}
+
+/** Bank accounts for manual transfer (managed in admin Settings → Payment). */
+model BankAccount {
+  id            Int      @id @default(autoincrement())
+  bankName      String
+  accountName   String
+  accountNumber String
+  isActive      Boolean  @default(true)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  orders        Order[]
 }
 
 enum OrderPayProvider {
@@ -144,11 +168,15 @@ enum OrderPayProvider {
   midtrans
 }
 
-/** Secondhand checkout: QRIS (Midtrans/Xendit) or Cash (WA invoice). */
+/** Secondhand checkout: QRIS, Cash (WA), or bank transfer. */
 model Order {
   id              String            @id @default(cuid())
-  userId          String
-  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String?
+  user            User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  guestId         String?
+  buyerName       String
+  buyerWhatsapp   String
+  buyerAddress    String
   status          OrderStatus       @default(pending)
   payMethod       OrderPayMethod
   payProvider     OrderPayProvider?
@@ -158,6 +186,10 @@ model Order {
   pspId           String?
   invoiceUrl      String?
   qrString        String?
+  bankAccountId   Int?
+  bankAccount     BankAccount?      @relation(fields: [bankAccountId], references: [id], onDelete: SetNull)
+  paymentProofUrl String?
+  paymentProofAt  DateTime?
   paidAt          DateTime?
   expiresAt       DateTime?
   cancelReason    String?
@@ -166,7 +198,10 @@ model Order {
   items           OrderItem[]
 
   @@index([userId, status])
+  @@index([guestId, status])
+  @@index([buyerWhatsapp])
   @@index([pspId])
+  @@index([bankAccountId])
 }
 
 model OrderItem {

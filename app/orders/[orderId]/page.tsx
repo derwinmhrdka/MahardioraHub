@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { ArrowLeft, ImageOff } from "lucide-react";
 import { auth } from "@/auth";
 import { CancelOrderButton } from "@/components/CancelOrderButton";
@@ -8,10 +8,15 @@ import { OrderCountdown } from "@/components/OrderCountdown";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { formatRupiah } from "@/lib/format";
 import { productImageUrl } from "@/lib/image-url";
-import { getOrderForUser } from "@/lib/orders";
+import { getGuestId } from "@/lib/cart-owner";
+import {
+  cancelOwnerOrder,
+  getOrderForViewer,
+  type CheckoutOwner,
+} from "@/lib/orders";
 import { prisma } from "@/lib/prisma";
 import { productImages } from "@/lib/product-images";
-import { getSettings, productPageUrl } from "@/lib/settings";
+import { getSettings, orderPageUrl } from "@/lib/settings";
 import styles from "../orders.module.css";
 
 type PageProps = {
@@ -27,6 +32,13 @@ function statusLabel(status: string) {
   return "Pending";
 }
 
+function payMethodLabel(method: string) {
+  if (method === "qris") return "QRIS";
+  if (method === "bank_transfer") return "Transfer Bank";
+  if (method === "cash") return "Cash (WhatsApp)";
+  return method;
+}
+
 function backTab(status: string) {
   if (status === "pending") return "pending";
   if (status === "paid") return "progress";
@@ -34,42 +46,76 @@ function backTab(status: string) {
   return "cancel";
 }
 
+function formatDate(date: Date) {
+  return date.toLocaleString("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 function sellerWhatsAppHref(input: {
   whatsappNumber: string;
   invoiceNo: string;
-  productId: number;
-  title: string;
-  quantity: number;
+  orderId: string;
+  amount: number;
+  buyerName?: string;
+  buyerWhatsapp?: string;
+  buyerAddress?: string;
 }) {
-  const link = productPageUrl("secondhand", input.productId);
+  const link = orderPageUrl(input.orderId);
   const text = [
-    "Halo, saya mau hubungi soal order.",
+    "Halo, saya mau hubungi soal pesanan.",
     `Invoice : ${input.invoiceNo}`,
-    `Produk : ${input.title}`,
-    `Qty : ${input.quantity}`,
-    `Link : ${link}`,
-  ].join("\n");
+    `Total : Rp ${input.amount.toLocaleString("id-ID")}`,
+    `Pesanan : ${link}`,
+    input.buyerName ? `Nama : ${input.buyerName}` : null,
+    input.buyerWhatsapp ? `WA : ${input.buyerWhatsapp}` : null,
+    input.buyerAddress ? `Alamat : ${input.buyerAddress}` : null,
+  ]
+    .filter((line): line is string => line != null)
+    .join("\n");
   return `https://wa.me/${input.whatsappNumber}?text=${encodeURIComponent(text)}`;
 }
 
 export default async function OrderDetailPage({ params }: PageProps) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    redirect("/login?next=/orders");
-  }
-
   const { orderId } = await params;
-  let order = await getOrderForUser(orderId, session.user.id);
+  const session = await auth();
+  const guestId = await getGuestId();
+  const isAdmin = session?.user?.role === "admin";
+
+  let order = await getOrderForViewer(orderId, {
+    userId: session?.user?.id ?? null,
+    guestId,
+    isAdmin: Boolean(isAdmin),
+  });
   if (!order) notFound();
 
+  const isOwner =
+    (session?.user?.id && order.userId === session.user.id) ||
+    (guestId && order.guestId === guestId);
+
   if (
+    isOwner &&
     order.status === "pending" &&
     order.expiresAt &&
     order.expiresAt.getTime() <= Date.now()
   ) {
-    const { cancelUserOrder } = await import("@/lib/orders");
-    await cancelUserOrder(order.id, session.user.id);
-    order = await getOrderForUser(orderId, session.user.id);
+    const owner: CheckoutOwner = {
+      ownerKey: session?.user?.id
+        ? `u_${session.user.id}`
+        : `g_${guestId}`,
+      userId: session?.user?.id ?? null,
+      guestId: guestId,
+    };
+    await cancelOwnerOrder(order.id, owner);
+    order = await getOrderForViewer(orderId, {
+      userId: session?.user?.id ?? null,
+      guestId,
+      isAdmin: Boolean(isAdmin),
+    });
     if (!order) notFound();
   }
 
@@ -85,10 +131,22 @@ export default async function OrderDetailPage({ params }: PageProps) {
   const isPending = order.status === "pending";
   const isInvoice =
     order.status === "paid" || order.status === "completed";
-  const showContact = isInvoice;
+  const showContact = isInvoice && Boolean(isOwner);
   const expiresAt =
     order.expiresAt?.toISOString() ??
     new Date(order.createdAt.getTime() + 60 * 60 * 1000).toISOString();
+
+  const waHref = showContact
+    ? sellerWhatsAppHref({
+        whatsappNumber: settings.whatsappNumber,
+        invoiceNo: order.externalId,
+        orderId: order.id,
+        amount: order.amount,
+        buyerName: order.buyerName,
+        buyerWhatsapp: order.buyerWhatsapp,
+        buyerAddress: order.buyerAddress,
+      })
+    : null;
 
   return (
     <div className="section-secondhand">
@@ -96,23 +154,69 @@ export default async function OrderDetailPage({ params }: PageProps) {
       <main className={`container ${styles.main}`}>
         <div className={styles.top}>
           <Link
-            href={`/orders?tab=${backTab(order.status)}`}
+            href={
+              isAdmin && !isOwner
+                ? "/admin/orders"
+                : `/orders?tab=${backTab(order.status)}`
+            }
             className={styles.back}
             aria-label="Kembali"
             title="Kembali"
           >
             <ArrowLeft size={16} strokeWidth={2.5} aria-hidden />
           </Link>
-          <h1 className={styles.title}>{isInvoice ? "Invoice" : "Order"}</h1>
+          <h1 className={styles.title}>Invoice</h1>
         </div>
 
         <div className={styles.detail}>
           <div className={styles.panel}>
             <div className={styles.panelHead}>
               <span>{statusLabel(order.status)}</span>
-              {isPending ? <OrderCountdown expiresAt={expiresAt} /> : null}
+              {isPending && isOwner ? (
+                <OrderCountdown expiresAt={expiresAt} />
+              ) : null}
             </div>
-            <p className={styles.inv}>{order.externalId}</p>
+            <div className={styles.invoiceMeta}>
+              <p className={styles.invLabel}>No. Invoice</p>
+              <p className={styles.invValue}>{order.externalId}</p>
+              <dl className={styles.metaGrid}>
+                <div>
+                  <dt>Tanggal</dt>
+                  <dd>{formatDate(order.createdAt)}</dd>
+                </div>
+                <div>
+                  <dt>Pembayaran</dt>
+                  <dd>{payMethodLabel(order.payMethod)}</dd>
+                </div>
+                {order.paidAt ? (
+                  <div>
+                    <dt>Dibayar</dt>
+                    <dd>{formatDate(order.paidAt)}</dd>
+                  </div>
+                ) : null}
+                <div>
+                  <dt>Nama</dt>
+                  <dd>{order.buyerName}</dd>
+                </div>
+                <div>
+                  <dt>WhatsApp</dt>
+                  <dd>{order.buyerWhatsapp || "—"}</dd>
+                </div>
+                <div className={styles.metaWide}>
+                  <dt>Alamat</dt>
+                  <dd>{order.buyerAddress || "—"}</dd>
+                </div>
+                {order.bankAccount ? (
+                  <div className={styles.metaWide}>
+                    <dt>Rekening</dt>
+                    <dd>
+                      {order.bankAccount.bankName} ·{" "}
+                      {order.bankAccount.accountNumber}
+                    </dd>
+                  </div>
+                ) : null}
+              </dl>
+            </div>
             {order.cancelReason ? (
               <p className={styles.cancelReason}>{order.cancelReason}</p>
             ) : null}
@@ -126,15 +230,6 @@ export default async function OrderDetailPage({ params }: PageProps) {
                   imageByProduct.get(item.productId) ?? null,
                   96
                 );
-                const waHref = showContact
-                  ? sellerWhatsAppHref({
-                      whatsappNumber: settings.whatsappNumber,
-                      invoiceNo: order.externalId,
-                      productId: item.productId,
-                      title: item.title,
-                      quantity: item.quantity,
-                    })
-                  : null;
                 return (
                   <li key={item.id} className={styles.item}>
                     <div className={styles.thumb}>
@@ -150,17 +245,6 @@ export default async function OrderDetailPage({ params }: PageProps) {
                       <p className={styles.itemSub}>
                         x{item.quantity} · {formatRupiah(item.unitPrice)}
                       </p>
-                      {waHref ? (
-                        <a
-                          href={waHref}
-                          className={styles.waBtn}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <WhatsAppIcon size={14} />
-                          Hubungi Seller
-                        </a>
-                      ) : null}
                     </div>
                     <p className={styles.itemPrice}>
                       {formatRupiah(item.unitPrice * item.quantity)}
@@ -175,11 +259,26 @@ export default async function OrderDetailPage({ params }: PageProps) {
             </div>
           </div>
 
-          {isPending ? (
+          {waHref ? (
+            <a
+              href={waHref}
+              className={styles.waBtnBlock}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <WhatsAppIcon size={16} />
+              Hubungi Seller
+            </a>
+          ) : null}
+
+          {isPending && isOwner ? (
             <div className={styles.actions}>
-              {order.payMethod === "qris" ? (
+              {order.payMethod === "qris" ||
+              order.payMethod === "bank_transfer" ? (
                 <Link href={`/checkout/${order.id}`} className={styles.btn}>
-                  Bayar
+                  {order.payMethod === "bank_transfer" && order.paymentProofUrl
+                    ? "Lihat bukti"
+                    : "Bayar"}
                 </Link>
               ) : null}
               <CancelOrderButton orderId={order.id} />

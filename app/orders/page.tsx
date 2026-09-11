@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import {
   ArrowLeft,
   Ban,
@@ -8,16 +7,16 @@ import {
   ImageOff,
   Loader,
 } from "lucide-react";
-import { auth } from "@/auth";
 import { CancelOrderButton } from "@/components/CancelOrderButton";
 import { Header } from "@/components/Header";
 import { OrderCountdown } from "@/components/OrderCountdown";
 import { formatRupiah } from "@/lib/format";
 import { productImageUrl } from "@/lib/image-url";
+import { resolveCartOwner } from "@/lib/cart-owner";
 import {
-  countPendingOrders,
-  countProgressOrders,
-  listOrdersForUser,
+  countPendingOrdersForOwner,
+  countProgressOrdersForOwner,
+  listOrdersForOwner,
   type OrderListTab,
 } from "@/lib/orders";
 import { prisma } from "@/lib/prisma";
@@ -60,20 +59,15 @@ function statusMeta(status: string) {
 }
 
 export default async function OrdersPage({ searchParams }: PageProps) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    redirect("/login?next=/orders");
-  }
-
   const params = await searchParams;
   const tab = parseTab(params.tab);
-  const userId = session.user.id;
+  const owner = await resolveCartOwner();
 
   const [settings, orders, pendingCount, progressCount] = await Promise.all([
     getSettings(),
-    listOrdersForUser(userId, tab),
-    countPendingOrders(userId),
-    countProgressOrders(userId),
+    listOrdersForOwner(owner, tab),
+    countPendingOrdersForOwner(owner),
+    countProgressOrdersForOwner(owner),
   ]);
 
   const productIds = [
@@ -182,13 +176,16 @@ export default async function OrdersPage({ searchParams }: PageProps) {
                 <li key={order.id} className={styles.card}>
                   <Link href={`/orders/${order.id}`} className={styles.cardBody}>
                     <div className={styles.cardTop}>
-                      <p
-                        className={`${styles.statusLine} ${
-                          tab === "pending" ? styles.statusPending : ""
-                        }`}
-                      >
-                        {statusMeta(order.status)}
-                      </p>
+                      <div className={styles.cardTopText}>
+                        <p
+                          className={`${styles.statusLine} ${
+                            tab === "pending" ? styles.statusPending : ""
+                          }`}
+                        >
+                          {statusMeta(order.status)}
+                        </p>
+                        <p className={styles.invMini}>{order.externalId}</p>
+                      </div>
                       {tab === "pending" ? (
                         <OrderCountdown expiresAt={expiresAt} />
                       ) : (
@@ -237,28 +234,29 @@ export default async function OrdersPage({ searchParams }: PageProps) {
                   </Link>
 
                   <div className={styles.actions}>
+                    <Link
+                      href={`/orders/${order.id}`}
+                      className={styles.btnGhost}
+                    >
+                      Invoice
+                    </Link>
                     {tab === "pending" ? (
                       <>
-                        {order.payMethod === "qris" ? (
+                        {order.payMethod === "qris" ||
+                        order.payMethod === "bank_transfer" ? (
                           <Link
                             href={`/checkout/${order.id}`}
                             className={styles.btn}
                           >
-                            Bayar
+                            {order.payMethod === "bank_transfer" &&
+                            order.paymentProofUrl
+                              ? "Bukti"
+                              : "Bayar"}
                           </Link>
                         ) : null}
                         <CancelOrderButton orderId={order.id} />
                       </>
-                    ) : (
-                      <Link
-                        href={`/orders/${order.id}`}
-                        className={styles.btnGhost}
-                      >
-                        {order.status === "paid" || order.status === "completed"
-                          ? "Invoice"
-                          : "Detail"}
-                      </Link>
-                    )}
+                    ) : null}
                   </div>
                 </li>
               );

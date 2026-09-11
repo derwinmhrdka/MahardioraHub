@@ -1,0 +1,581 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 420px;
+  margin: 0.2rem auto 0;
+  padding: 0 0 1.75rem;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem 1rem 1.05rem;
+  border: 2px solid #111;
+  border-radius: 16px;
+  background: #111;
+  color: #fff;
+  box-shadow: 3px 3px 0 #111;
+}
+
+.heroTop {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.35rem;
+}
+
+.heroMark {
+  display: grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.heroTag {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.heroLabel {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.heroAmount {
+  margin: 0;
+  font-family: var(--font-body-stack);
+  font-size: clamp(1.55rem, 6vw, 1.85rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.heroNote {
+  margin: 0.35rem 0 0;
+  max-width: 28rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  border: 2px solid #111;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 3px 3px 0 #111;
+  overflow: hidden;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.95rem 0.9rem 1rem;
+}
+
+.step + .step,
+.form .step {
+  border-top: 1.5px solid rgba(17, 17, 17, 0.1);
+}
+
+.stepHead {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.stepNum {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 1.55rem;
+  height: 1.55rem;
+  border: 1.5px solid #111;
+  border-radius: 999px;
+  background: #111;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.stepTitle {
+  margin: 0;
+  font-family: var(--font-body-stack);
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #111;
+  line-height: 1.15;
+}
+
+.stepSub {
+  margin: 0.12rem 0 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  line-height: 1.25;
+}
+
+.accountList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.account {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 0.75rem;
+  border: 1.5px solid rgba(17, 17, 17, 0.18);
+  border-radius: 12px;
+  background: #faf8f3;
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease,
+    box-shadow 0.12s ease,
+    transform 0.12s ease;
+}
+
+.account:hover {
+  border-color: #111;
+  background: #fff;
+}
+
+.accountOn {
+  border-color: #111;
+  background: #fff;
+  box-shadow: 2px 2px 0 #111;
+}
+
+.accountLocked {
+  cursor: default;
+}
+
+.accountLocked:hover {
+  transform: none;
+}
+
+.account input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.accountCheck {
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 1.5px solid #111;
+  border-radius: 999px;
+  background: #fff;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.accountOn .accountCheck {
+  background: #111;
+}
+
+.accountBody {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.08rem;
+}
+
+.accountBank {
+  font-size: 0.86rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #111;
+}
+
+.accountName {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copyCard {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.85rem 0.9rem;
+  border: 2px solid #111;
+  border-radius: 14px;
+  background: #111;
+  color: #fff;
+  cursor: pointer;
+  text-align: left;
+  box-shadow: 2px 2px 0 #111;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.copyCard:hover {
+  background: #1f1f1f;
+}
+
+.copyCard:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 #111;
+}
+
+.copyCardDone {
+  background: #052e1c;
+  border-color: #052e1c;
+}
+
+.copyCardDone:hover {
+  background: #064e3b;
+}
+
+.copyMeta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.copyLabel {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.copyNumber {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(1.05rem, 4.5vw, 1.25rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copyAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  padding: 0.4rem 0.65rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+}
+
+.form .btnPrimary,
+.form .statusOk,
+.form .error {
+  margin: 0 0.9rem 0.95rem;
+}
+
+.preview {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1.5px solid #111;
+  border-radius: 14px;
+  background: #f7f3eb;
+  box-shadow: 1px 1px 0 #111;
+}
+
+.preview img {
+  display: block;
+  width: 100%;
+  max-height: 15rem;
+  object-fit: contain;
+  background: #fff;
+}
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: 100%;
+  min-height: 8.5rem;
+  margin: 0;
+  padding: 1rem;
+  border: 1.5px dashed rgba(17, 17, 17, 0.35);
+  border-radius: 14px;
+  background: #faf8f3;
+  color: #111;
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.dropzone:hover:not(:disabled) {
+  border-color: #111;
+  border-style: solid;
+  background: #fff;
+  box-shadow: 2px 2px 0 #111;
+}
+
+.dropzone:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.dropIcon {
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  margin-bottom: 0.15rem;
+  border: 1.5px solid #111;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.dropTitle {
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.dropHint {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.pickBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  min-height: 2.25rem;
+  padding: 0.4rem 0.75rem;
+  border: 1.5px solid #111;
+  border-radius: 11px;
+  background: #fff;
+  color: #111;
+  font-family: var(--font-body-stack);
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 1px 1px 0 #111;
+}
+
+.pickBtn:hover {
+  background: #f7f3eb;
+}
+
+.pickBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.error {
+  margin: 0;
+  padding: 0.55rem 0.7rem;
+  border: 1.5px solid #9f1239;
+  border-radius: 11px;
+  background: #fff1f2;
+  color: #9f1239;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.statusOk {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 0.85rem;
+  border: 1.5px solid #047857;
+  border-radius: 12px;
+  background: #ecfdf5;
+}
+
+.statusIcon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 999px;
+  background: #047857;
+  color: #fff;
+}
+
+.statusTitle {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #065f46;
+  line-height: 1.15;
+}
+
+.statusSub {
+  margin: 0.1rem 0 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #047857;
+}
+
+.extId {
+  margin: 0;
+  padding: 0.55rem 0.9rem 0.85rem;
+  border-top: 1.5px solid rgba(17, 17, 17, 0.1);
+  text-align: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.58rem;
+  font-weight: 500;
+  color: rgba(17, 17, 17, 0.35);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.footer form {
+  margin: 0;
+  width: 100%;
+}
+
+.btnPrimary,
+.btnSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  min-height: 2.7rem;
+  padding: 0.55rem 1rem;
+  border: 2px solid #111;
+  border-radius: 13px;
+  font-family: var(--font-body-stack);
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 #111;
+}
+
+.btnPrimary {
+  background: #111;
+  color: #fff;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background: #1f1f1f;
+}
+
+.btnPrimary:active:not(:disabled) {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 #111;
+}
+
+.btnPrimary:disabled {
+  opacity: 0.4;
+  cursor: default;
+  box-shadow: none;
+}
+
+.btnSecondary {
+  background: #fff;
+  color: #9f1239;
+  border-color: #9f1239;
+  box-shadow: 3px 3px 0 #9f1239;
+}
+
+.links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.1rem;
+}
+
+.linkBtn {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-body-stack);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  cursor: pointer;
+}
+
+.linkBtn:hover {
+  color: #111;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account,
+  .copyCard,
+  .dropzone,
+  .btnPrimary {
+    transition: none;
+  }
+
+  .copyCard:active,
+  .btnPrimary:active:not(:disabled) {
+    transform: none;
+  }
+}

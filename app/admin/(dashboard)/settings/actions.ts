@@ -3,6 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { OrderPayProvider } from "@prisma/client";
+import {
+  createBankAccount,
+  deleteBankAccount,
+  setBankAccountActive,
+} from "@/lib/bank-accounts";
 import { createCategory, deleteCategory } from "@/lib/categories";
 import { requireAdmin } from "@/lib/auth";
 import {
@@ -287,4 +292,55 @@ export async function revokeAdminAction(formData: FormData) {
   }
   revalidateUserTab();
   redirect("/admin/settings?tab=user&userSaved=1");
+}
+
+function revalidatePaymentTab() {
+  revalidatePath("/admin/settings");
+  revalidatePath("/checkout");
+}
+
+export async function createBankAccountAction(formData: FormData) {
+  await requireAdmin();
+  try {
+    await createBankAccount({
+      bankName: String(formData.get("bankName") ?? ""),
+      accountName: String(formData.get("accountName") ?? ""),
+      accountNumber: String(formData.get("accountNumber") ?? ""),
+    });
+  } catch {
+    redirect("/admin/settings?tab=payment&bankError=1");
+  }
+  revalidatePaymentTab();
+  redirect("/admin/settings?tab=payment&bankSaved=1");
+}
+
+export async function deleteBankAccountAction(formData: FormData) {
+  await requireAdmin();
+  const id = Number(formData.get("id"));
+  if (!Number.isFinite(id)) {
+    redirect("/admin/settings?tab=payment&bankError=1");
+  }
+  try {
+    await deleteBankAccount(id);
+  } catch {
+    redirect("/admin/settings?tab=payment&bankError=1");
+  }
+  revalidatePaymentTab();
+  redirect("/admin/settings?tab=payment&bankSaved=1");
+}
+
+export async function toggleBankAccountAction(formData: FormData) {
+  await requireAdmin();
+  const id = Number(formData.get("id"));
+  const isActive = String(formData.get("isActive") ?? "") === "1";
+  if (!Number.isFinite(id)) {
+    redirect("/admin/settings?tab=payment&bankError=1");
+  }
+  try {
+    await setBankAccountActive(id, isActive);
+  } catch {
+    redirect("/admin/settings?tab=payment&bankError=1");
+  }
+  revalidatePaymentTab();
+  redirect("/admin/settings?tab=payment&bankSaved=1");
 }

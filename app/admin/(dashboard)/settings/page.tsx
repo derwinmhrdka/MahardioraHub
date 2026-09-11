@@ -28,12 +28,16 @@ import { listAdminAllowlist, listVisitorUsers } from "@/lib/users";
 import { xenditConfigured } from "@/lib/xendit";
 import {
   addAdminAction,
+  createBankAccountAction,
   createCategoryAction,
+  deleteBankAccountAction,
   deleteCategoryAction,
   makeAdminAction,
   revokeAdminAction,
+  toggleBankAccountAction,
   updateSettingsAction,
 } from "./actions";
+import { listBankAccounts } from "@/lib/bank-accounts";
 import styles from "./settings.module.css";
 
 type Tab =
@@ -71,6 +75,8 @@ type PageProps = {
     flashError?: string;
     bannerSaved?: string;
     bannerError?: string;
+    bankSaved?: string;
+    bankError?: string;
   }>;
 };
 
@@ -84,15 +90,23 @@ function parseTab(raw: string | undefined): Tab {
 export default async function AdminSettingsPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const tab = parseTab(params.tab);
-  const [settings, categories, admins, visitors, flashSale, flashProducts] =
-    await Promise.all([
-      getSettings(),
-      listCategories(),
-      tab === "user" ? listAdminAllowlist() : Promise.resolve([]),
-      tab === "user" ? listVisitorUsers() : Promise.resolve([]),
-      tab === "flash" ? getFlashSaleAdmin() : Promise.resolve(null),
-      tab === "flash" ? listSecondhandForFlashSale() : Promise.resolve([]),
-    ]);
+  const [
+    settings,
+    categories,
+    admins,
+    visitors,
+    flashSale,
+    flashProducts,
+    bankAccounts,
+  ] = await Promise.all([
+    getSettings(),
+    listCategories(),
+    tab === "user" ? listAdminAllowlist() : Promise.resolve([]),
+    tab === "user" ? listVisitorUsers() : Promise.resolve([]),
+    tab === "flash" ? getFlashSaleAdmin() : Promise.resolve(null),
+    tab === "flash" ? listSecondhandForFlashSale() : Promise.resolve([]),
+    tab === "payment" ? listBankAccounts() : Promise.resolve([]),
+  ]);
 
   const showSaved =
     (params.saved &&
@@ -100,12 +114,14 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
     (params.catSaved && tab === "kategori") ||
     (params.userSaved && tab === "user") ||
     (params.flashSaved && tab === "flash") ||
-    (params.bannerSaved && tab === "banner");
+    (params.bannerSaved && tab === "banner") ||
+    (params.bankSaved && tab === "payment");
   const showError =
     (params.catError && tab === "kategori") ||
     (params.userError && tab === "user") ||
     (params.flashError && tab === "flash") ||
-    (params.bannerError && tab === "banner");
+    (params.bannerError && tab === "banner") ||
+    (params.bankError && tab === "payment");
 
   const midtransOk = midtransConfigured();
   const xenditOk = xenditConfigured();
@@ -214,43 +230,149 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
         ) : null}
 
         {tab === "payment" ? (
-          <form action={updateSettingsAction} className="form admin-form">
-            <input type="hidden" name="section" value="payment" />
-            <div className={styles.payBlock}>
-              <p className={styles.payLabel}>QRIS</p>
-              <div className={styles.payList} role="radiogroup" aria-label="QRIS">
-                <label className={styles.payOption}>
-                  <input
-                    type="radio"
-                    name="qrisProvider"
-                    value="midtrans"
-                    defaultChecked={settings.qrisProvider === "midtrans"}
-                  />
-                  <span className={styles.payName}>Midtrans</span>
-                  <span className={styles.payMeta}>
-                    {midtransOk ? "OK" : "—"}
-                  </span>
-                </label>
-                <label className={styles.payOption}>
-                  <input
-                    type="radio"
-                    name="qrisProvider"
-                    value="xendit"
-                    defaultChecked={settings.qrisProvider === "xendit"}
-                  />
-                  <span className={styles.payName}>Xendit</span>
-                  <span className={styles.payMeta}>
-                    {xenditOk ? "OK" : "—"}
-                  </span>
-                </label>
+          <div className={styles.payStack}>
+            <form action={updateSettingsAction} className="form admin-form">
+              <input type="hidden" name="section" value="payment" />
+              <div className={styles.payBlock}>
+                <p className={styles.payLabel}>QRIS</p>
+                <div
+                  className={styles.payList}
+                  role="radiogroup"
+                  aria-label="QRIS"
+                >
+                  <label className={styles.payOption}>
+                    <input
+                      type="radio"
+                      name="qrisProvider"
+                      value="midtrans"
+                      defaultChecked={settings.qrisProvider === "midtrans"}
+                    />
+                    <span className={styles.payName}>Midtrans</span>
+                    <span className={styles.payMeta}>
+                      {midtransOk ? "OK" : "—"}
+                    </span>
+                  </label>
+                  <label className={styles.payOption}>
+                    <input
+                      type="radio"
+                      name="qrisProvider"
+                      value="xendit"
+                      defaultChecked={settings.qrisProvider === "xendit"}
+                    />
+                    <span className={styles.payName}>Xendit</span>
+                    <span className={styles.payMeta}>
+                      {xenditOk ? "OK" : "—"}
+                    </span>
+                  </label>
+                </div>
               </div>
-            </div>
-            <div className="form-actions">
-              <button type="submit" className="btn btn-block">
-                Simpan
-              </button>
-            </div>
-          </form>
+              <div className="form-actions">
+                <button type="submit" className="btn btn-block">
+                  Simpan
+                </button>
+              </div>
+            </form>
+
+            <section className={styles.payBlock} aria-label="Transfer bank">
+              <p className={styles.payLabel}>Transfer bank</p>
+              <ul className={styles.bankList}>
+                {bankAccounts.length === 0 ? (
+                  <li className={styles.catEmpty}>Belum ada rekening</li>
+                ) : (
+                  bankAccounts.map((account) => (
+                    <li key={account.id} className={styles.bankRow}>
+                      <div className={styles.bankMeta}>
+                        <span className={styles.bankName}>
+                          {account.bankName}
+                          {!account.isActive ? (
+                            <span className={styles.bankOff}> off</span>
+                          ) : null}
+                        </span>
+                        <span className={styles.bankDetail}>
+                          {account.accountName} · {account.accountNumber}
+                        </span>
+                      </div>
+                      <div className={styles.bankActions}>
+                        <form action={toggleBankAccountAction}>
+                          <input
+                            type="hidden"
+                            name="id"
+                            value={account.id}
+                          />
+                          <input
+                            type="hidden"
+                            name="isActive"
+                            value={account.isActive ? "0" : "1"}
+                          />
+                          <button
+                            type="submit"
+                            className={styles.iconBtn}
+                            aria-label={
+                              account.isActive ? "Nonaktifkan" : "Aktifkan"
+                            }
+                            title={
+                              account.isActive ? "Nonaktifkan" : "Aktifkan"
+                            }
+                          >
+                            {account.isActive ? (
+                              <ShieldOff size={14} strokeWidth={2.25} />
+                            ) : (
+                              <Shield size={14} strokeWidth={2.25} />
+                            )}
+                          </button>
+                        </form>
+                        <form action={deleteBankAccountAction}>
+                          <input
+                            type="hidden"
+                            name="id"
+                            value={account.id}
+                          />
+                          <button
+                            type="submit"
+                            className={styles.iconBtn}
+                            aria-label="Hapus"
+                            title="Hapus"
+                          >
+                            <Trash2 size={14} strokeWidth={2.25} aria-hidden />
+                          </button>
+                        </form>
+                      </div>
+                    </li>
+                  ))
+                )}
+              </ul>
+
+              <form action={createBankAccountAction} className={styles.bankAdd}>
+                <input
+                  name="bankName"
+                  placeholder="Bank"
+                  aria-label="Nama bank"
+                  required
+                />
+                <input
+                  name="accountName"
+                  placeholder="Atas nama"
+                  aria-label="Atas nama"
+                  required
+                />
+                <input
+                  name="accountNumber"
+                  placeholder="No. rekening"
+                  aria-label="Nomor rekening"
+                  inputMode="numeric"
+                  required
+                />
+                <button
+                  type="submit"
+                  className={styles.iconBtn}
+                  aria-label="Tambah"
+                  title="Tambah"
+                >
+                  <Plus size={16} strokeWidth={2.25} aria-hidden />
+                </button>
+              </form>
+            </section>
+          </div>
         ) : null}
 
         {tab === "kategori" ? (

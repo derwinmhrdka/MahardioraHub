@@ -114,6 +114,10 @@ export function productPageUrl(kind: "deal" | "secondhand", id: number): string 
   return `${siteOrigin()}${path}`;
 }
 
+export function orderPageUrl(orderId: string): string {
+  return `${siteOrigin()}/orders/${orderId}`;
+}
+
 export function buildWhatsAppMessage(input: {
   template: string;
   productTitle: string;

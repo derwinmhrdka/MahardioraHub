@@ -15,9 +15,9 @@ function clampQty(qty: number, stock: number) {
   return Math.min(max, Math.max(0, Math.round(qty)));
 }
 
-export async function getCartCount(userId: string): Promise<number> {
+export async function getCartCount(ownerKey: string): Promise<number> {
   const items = await prisma.cartItem.findMany({
-    where: { userId, product: secondhandActive },
+    where: { ownerKey, product: secondhandActive },
     select: {
       quantity: true,
       product: { select: { stock: true } },
@@ -29,9 +29,9 @@ export async function getCartCount(userId: string): Promise<number> {
   );
 }
 
-export async function listCartItems(userId: string) {
+export async function listCartItems(ownerKey: string) {
   const rows = await prisma.cartItem.findMany({
-    where: { userId, product: secondhandActive },
+    where: { ownerKey, product: secondhandActive },
     include: {
       product: {
         include: { category: true },
@@ -40,7 +40,6 @@ export async function listCartItems(userId: string) {
     orderBy: { updatedAt: "desc" },
   });
 
-  // Drop / clamp lines that exceed current stock
   const kept = [];
   for (const row of rows) {
     const qty = clampQty(row.quantity, row.product.stock);
@@ -61,7 +60,7 @@ export async function listCartItems(userId: string) {
   return kept;
 }
 
-export async function addToCart(userId: string, productId: number, qty = 1) {
+export async function addToCart(ownerKey: string, productId: number, qty = 1) {
   const product = await prisma.product.findFirst({
     where: { id: productId, ...secondhandActive },
     select: { id: true, stock: true },
@@ -71,7 +70,7 @@ export async function addToCart(userId: string, productId: number, qty = 1) {
 
   const addQty = Math.max(1, Math.round(qty));
   const existing = await prisma.cartItem.findUnique({
-    where: { userId_productId: { userId, productId } },
+    where: { ownerKey_productId: { ownerKey, productId } },
   });
 
   if (existing) {
@@ -90,12 +89,12 @@ export async function addToCart(userId: string, productId: number, qty = 1) {
   if (quantity <= 0) throw new Error("Out of stock");
 
   return prisma.cartItem.create({
-    data: { userId, productId, quantity },
+    data: { ownerKey, productId, quantity },
   });
 }
 
 export async function setCartQuantity(
-  userId: string,
+  ownerKey: string,
   productId: number,
   quantity: number
 ) {
@@ -104,27 +103,31 @@ export async function setCartQuantity(
     select: { stock: true },
   });
   if (!product) {
-    await prisma.cartItem.deleteMany({ where: { userId, productId } });
+    await prisma.cartItem.deleteMany({ where: { ownerKey, productId } });
     return null;
   }
 
   const qty = clampQty(quantity, product.stock);
   if (qty <= 0) {
-    await prisma.cartItem.deleteMany({ where: { userId, productId } });
+    await prisma.cartItem.deleteMany({ where: { ownerKey, productId } });
     return null;
   }
 
   return prisma.cartItem.updateMany({
-    where: { userId, productId },
+    where: { ownerKey, productId },
     data: { quantity: qty },
   });
 }
 
-export async function removeFromCart(userId: string, productId: number) {
-  await prisma.cartItem.deleteMany({ where: { userId, productId } });
+export async function removeFromCart(ownerKey: string, productId: number) {
+  await prisma.cartItem.deleteMany({ where: { ownerKey, productId } });
 }
 
-export function cartLineTotal(price: number, discountPercent: number, quantity: number) {
+export function cartLineTotal(
+  price: number,
+  discountPercent: number,
+  quantity: number
+) {
   return salePrice(price, discountPercent) * quantity;
 }
 

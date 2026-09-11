@@ -3,6 +3,11 @@
   flex-direction: column;
 }
 
+.listDisabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
 .form {
   margin: 0;
 }
@@ -55,9 +60,33 @@
   color: #c2410c;
 }
 
+.bank {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.rowDisabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.rowDisabled:hover,
+.rowDisabled:active {
+  background: #fff;
+}
+
 .label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
   font-family: var(--font-body-stack);
   font-size: 0.82rem;
   font-weight: 800;
   line-height: 1.2;
+}
+
+.sub {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
 }

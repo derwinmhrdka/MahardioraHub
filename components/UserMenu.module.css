@@ -4,6 +4,12 @@
   place-items: center;
 }
 
+.guestRow {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
 .login,
 .avatarBtn {
   display: grid;

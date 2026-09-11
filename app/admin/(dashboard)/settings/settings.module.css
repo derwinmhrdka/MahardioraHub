@@ -124,10 +124,93 @@
   color: #b91c1c;
 }
 
+.payStack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
 .payBlock {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+}
+
+.bankList {
+  list-style: none;
+  margin: 0 0 0.55rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.bankRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.55rem;
+  border: 2px solid #111;
+  border-radius: 10px;
+  background: var(--color-surface);
+  box-shadow: 2px 2px 0 #111;
+}
+
+.bankMeta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.bankName {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #111;
+}
+
+.bankOff {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.bankDetail {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bankActions {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.bankActions form {
+  margin: 0;
+}
+
+.bankAdd {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.35rem;
+}
+
+.bankAdd input {
+  min-width: 0;
+}
+
+@media (min-width: 520px) {
+  .bankAdd {
+    grid-template-columns: 1fr 1fr 1.2fr auto;
+    align-items: stretch;
+  }
 }
 
 .payLabel {

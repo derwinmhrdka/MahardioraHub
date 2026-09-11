@@ -1,20 +1,15 @@
-import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
-import { getOrderForUser } from "@/lib/orders";
+import { resolveCartOwner } from "@/lib/cart-owner";
+import { getOrderForOwner } from "@/lib/orders";
 
 type RouteContext = {
   params: Promise<{ orderId: string }>;
 };
 
 export async function GET(_req: NextRequest, context: RouteContext) {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
+  const owner = await resolveCartOwner();
   const { orderId } = await context.params;
-  const order = await getOrderForUser(orderId, userId);
+  const order = await getOrderForOwner(orderId, owner);
   if (!order) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }

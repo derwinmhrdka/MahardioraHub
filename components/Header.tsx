@@ -1,8 +1,9 @@
-import { auth } from "@/auth";
 import { CartDrawer } from "@/components/CartDrawer";
 import { UserMenu } from "@/components/UserMenu";
 import { getCartCount, listCartItems } from "@/lib/cart";
+import { resolveCartOwner } from "@/lib/cart-owner";
 import { productImages } from "@/lib/product-images";
+import { auth } from "@/auth";
 import Link from "next/link";
 import { Package, Recycle } from "lucide-react";
 import styles from "./Header.module.css";
@@ -16,7 +17,6 @@ export async function Header({ active = "secondhand" }: HeaderProps) {
   const subtitle = active === "secondhand" ? "Collection" : "My Picks";
   const showCart = active === "secondhand";
   const session = await auth();
-  const userId = session?.user?.id;
 
   let cartCount = 0;
   let cartItems: Array<{
@@ -29,10 +29,11 @@ export async function Header({ active = "secondhand" }: HeaderProps) {
     imageUrl: string | null;
   }> = [];
 
-  if (showCart && userId) {
+  if (showCart) {
+    const owner = await resolveCartOwner();
     const [count, rows] = await Promise.all([
-      getCartCount(userId),
-      listCartItems(userId),
+      getCartCount(owner.ownerKey),
+      listCartItems(owner.ownerKey),
     ]);
     cartCount = count;
     cartItems = rows.map((row) => ({
@@ -86,13 +87,7 @@ export async function Header({ active = "secondhand" }: HeaderProps) {
               <span>My Picks</span>
             </Link>
           </nav>
-          {showCart ? (
-            <CartDrawer
-              count={cartCount}
-              loggedIn={Boolean(userId)}
-              items={cartItems}
-            />
-          ) : null}
+          {showCart ? <CartDrawer count={cartCount} items={cartItems} /> : null}
           <UserMenu user={user} />
         </div>
       </div>

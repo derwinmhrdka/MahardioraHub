@@ -1,6 +1,6 @@
-import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
-import { getOrderForUser, markOrderPaid } from "@/lib/orders";
+import { resolveCartOwner } from "@/lib/cart-owner";
+import { getOrderForOwner, markOrderPaid } from "@/lib/orders";
 import { isMidtransSandbox } from "@/lib/midtrans";
 import { isXenditTestMode, simulateXenditQrPayment } from "@/lib/xendit";
 
@@ -13,14 +13,9 @@ type RouteContext = {
  * (webhook may not reach localhost).
  */
 export async function POST(_req: NextRequest, context: RouteContext) {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
+  const owner = await resolveCartOwner();
   const { orderId } = await context.params;
-  const order = await getOrderForUser(orderId, userId);
+  const order = await getOrderForOwner(orderId, owner);
   if (!order || order.payMethod !== "qris") {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -57,7 +52,6 @@ export async function POST(_req: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: "Sandbox only" }, { status: 403 });
     }
 
-    // Midtrans sandbox: mark paid locally (dashboard simulator also hits webhook).
     await markOrderPaid({
       externalId: order.externalId,
       pspId: order.pspId,

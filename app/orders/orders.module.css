@@ -162,10 +162,17 @@
 
 .cardTop {
   display: flex;
-  align-items: baseline;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 0.5rem;
   margin-bottom: 0.45rem;
+}
+
+.cardTopText {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
 }
 
 .statusLine {
@@ -177,6 +184,17 @@
 
 .statusPending {
   color: #ea580c;
+}
+
+.invMini {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: rgba(17, 17, 17, 0.45);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .card:has(.tick) .statusLine {
@@ -492,6 +510,91 @@
   font-size: 0.58rem;
   color: rgba(17, 17, 17, 0.4);
   word-break: break-all;
+}
+
+.invoiceMeta {
+  padding: 0.55rem 0.7rem 0.75rem;
+}
+
+.invLabel {
+  margin: 0;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.invValue {
+  margin: 0.2rem 0 0.65rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #111;
+  word-break: break-all;
+  line-height: 1.35;
+}
+
+.metaGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem 0.75rem;
+  margin: 0;
+}
+
+.metaGrid div {
+  min-width: 0;
+}
+
+.metaGrid dt {
+  margin: 0;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.metaGrid dd {
+  margin: 0.15rem 0 0;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #111;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metaWide {
+  grid-column: 1 / -1;
+}
+
+.waBtnBlock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  min-height: 2.55rem;
+  padding: 0.5rem 1rem;
+  border: 1.5px solid #128c7e;
+  border-radius: 12px;
+  background: #25d366;
+  color: #fff;
+  font-family: var(--font-body-stack);
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 2px 2px 0 #128c7e;
+}
+
+.waBtnBlock:hover {
+  background: #20bd5a;
+}
+
+.panel .cancelReason {
+  margin: 0;
+  padding: 0 0.7rem 0.7rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
