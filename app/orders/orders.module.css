@@ -684,13 +684,9 @@
     margin: 12mm;
   }
 
-  html,
-  body {
-    height: auto !important;
-    background: #fff !important;
-  }
-
   .invoicePage {
+    height: auto !important;
+    min-height: 0 !important;
     background: #fff !important;
   }
 
