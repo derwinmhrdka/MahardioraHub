@@ -21,8 +21,6 @@ type PaymentMethodsProps = {
   bankTransferEnabled: boolean;
   buyer: BuyerFields;
   disabled?: boolean;
-  /** Guest checkout: WhatsApp confirmation only */
-  whatsappOnly?: boolean;
 };
 
 function PendingLabel({ label }: { label: string }) {
@@ -48,11 +46,10 @@ export function PaymentMethods({
   bankTransferEnabled,
   buyer,
   disabled = false,
-  whatsappOnly = false,
 }: PaymentMethodsProps) {
-  const showQris = !whatsappOnly && qrisEnabled;
-  const showBank = !whatsappOnly && bankTransferEnabled;
-  const showBankDisabled = !whatsappOnly && !bankTransferEnabled;
+  const showQris = qrisEnabled;
+  const showBank = bankTransferEnabled;
+  const showBankDisabled = !bankTransferEnabled;
 
   return (
     <div className={`${styles.list} ${disabled ? styles.listDisabled : ""}`}>
@@ -113,11 +110,7 @@ export function PaymentMethods({
             <Banknote size={16} strokeWidth={2.25} />
           </span>
           <span className={styles.label}>
-            <PendingLabel
-              label={
-                whatsappOnly ? "Konfirmasi via WhatsApp" : "Cash (Via WhatsApp)"
-              }
-            />
+            <PendingLabel label="Cash (Via WhatsApp)" />
           </span>
           <ChevronRight size={16} strokeWidth={2.25} aria-hidden />
         </button>

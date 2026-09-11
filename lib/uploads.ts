@@ -4,12 +4,13 @@ import path from "path";
 import sharp from "sharp";
 import {
   MAX_IMAGE_EDGE,
-  MAX_UPLOAD_BYTES,
+  MAX_UPLOAD_INPUT_BYTES,
   WEBP_QUALITY,
 } from "@/lib/uploads-shared";
 
 export {
   MAX_UPLOAD_BYTES,
+  MAX_UPLOAD_INPUT_BYTES,
   MAX_UPLOAD_COUNT,
   MAX_IMAGE_EDGE,
   WEBP_QUALITY,
@@ -82,8 +83,11 @@ export async function saveProductImage(file: File | Blob): Promise<string> {
   if (!ALLOWED_MIME.has(mime)) {
     throw new Error("Format gambar tidak didukung");
   }
-  if (file.size <= 0 || file.size > MAX_UPLOAD_BYTES) {
-    throw new Error("Ukuran file max 5MB");
+  if (file.size <= 0) {
+    throw new Error("File kosong");
+  }
+  if (file.size > MAX_UPLOAD_INPUT_BYTES) {
+    throw new Error("Ukuran file terlalu besar (max 20MB)");
   }
 
   const input = Buffer.from(await file.arrayBuffer());
@@ -93,16 +97,27 @@ export async function saveProductImage(file: File | Blob): Promise<string> {
 
   let output: Buffer;
   try {
-    output = await sharp(input)
-      .rotate()
-      .resize({
-        width: MAX_IMAGE_EDGE,
-        height: MAX_IMAGE_EDGE,
-        fit: "inside",
-        withoutEnlargement: true,
-      })
-      .webp({ quality: WEBP_QUALITY })
-      .toBuffer();
+    let quality = WEBP_QUALITY;
+    let edge = MAX_IMAGE_EDGE;
+    const pipeline = () =>
+      sharp(input)
+        .rotate()
+        .resize({
+          width: edge,
+          height: edge,
+          fit: "inside",
+          withoutEnlargement: true,
+        })
+        .webp({ quality });
+
+    output = await pipeline().toBuffer();
+
+    // Extra pass if still large (rare for already-compressed client uploads)
+    while (output.length > 2.5 * 1024 * 1024 && (quality > 50 || edge > 1000)) {
+      if (quality > 50) quality -= 10;
+      else edge = Math.round(edge * 0.85);
+      output = await pipeline().toBuffer();
+    }
   } catch {
     throw new Error("Gambar tidak bisa diproses");
   }

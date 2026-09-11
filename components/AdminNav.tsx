@@ -11,6 +11,7 @@ import {
   Settings,
 } from "lucide-react";
 import { logoutAction } from "@/app/admin/actions";
+import { BRAND_LOGO_ALT, BRAND_LOGO_SRC } from "@/components/StoreMark";
 import styles from "./AdminNav.module.css";
 
 type AdminNavProps = {
@@ -61,7 +62,15 @@ export function AdminNav({
     <>
       <header className={styles.top}>
         <div className={styles.brandBlock}>
-          <span className={styles.brand}>{siteName}</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className={styles.brandLogo}
+            src={BRAND_LOGO_SRC}
+            alt={siteName || BRAND_LOGO_ALT}
+            width={120}
+            height={138}
+            draggable={false}
+          />
           <span className={styles.brandSub}>Admin</span>
         </div>
         <div className={styles.topRight} ref={rootRef}>

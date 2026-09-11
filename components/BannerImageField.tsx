@@ -12,6 +12,7 @@ import {
 import { deleteUploadedImageAction } from "@/app/admin/(dashboard)/products/actions";
 import { BannerCropDialog } from "@/components/BannerCropDialog";
 import { COLLECTION_BANNER_MAX } from "@/lib/collection-banner";
+import { compressImageFile } from "@/lib/compress-image";
 import styles from "./ProductForm.module.css";
 import bannerStyles from "./BannerImageField.module.css";
 
@@ -44,8 +45,9 @@ function filesFromClipboard(data: DataTransfer | null): File[] {
 }
 
 async function uploadCropped(file: File): Promise<string> {
+  const compressed = await compressImageFile(file);
   const formData = new FormData();
-  formData.append("files", file);
+  formData.append("files", compressed);
   const result = await fetch("/api/uploads", {
     method: "POST",
     body: formData,

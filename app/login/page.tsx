@@ -5,7 +5,6 @@ import { auth } from "@/auth";
 import { DevLoginButtons } from "@/components/DevLoginButtons";
 import { GoogleLoginButton } from "@/components/GoogleLoginButton";
 import { StoreMark } from "@/components/StoreMark";
-import { getSettings } from "@/lib/settings";
 import styles from "./login.module.css";
 
 type PageProps = {
@@ -22,13 +21,6 @@ export default async function LoginPage({ searchParams }: PageProps) {
   }
   if (session?.user) {
     redirect("/");
-  }
-
-  let siteName = "MahardioraHub";
-  try {
-    siteName = (await getSettings()).siteName;
-  } catch {
-    // fallback
   }
 
   const next =
@@ -52,9 +44,7 @@ export default async function LoginPage({ searchParams }: PageProps) {
       </Link>
 
       <div className={styles.stage}>
-        <StoreMark animated size={88} className={styles.mark} />
-
-        <p className={styles.brand}>{siteName}</p>
+        <StoreMark animated size={156} className={styles.mark} />
 
         {isDev ? (
           <DevLoginButtons next={next} />

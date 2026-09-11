@@ -1,5 +1,6 @@
 import { CartDrawer } from "@/components/CartDrawer";
 import { UserMenu } from "@/components/UserMenu";
+import { BRAND_LOGO_ALT, BRAND_LOGO_SRC } from "@/components/StoreMark";
 import { getCartCount, listCartItems } from "@/lib/cart";
 import { resolveCartOwner } from "@/lib/cart-owner";
 import { productImages } from "@/lib/product-images";
@@ -65,7 +66,15 @@ export async function Header({ active = "secondhand" }: HeaderProps) {
           href={active === "deals" ? "/picks" : "/"}
           className={styles.brand}
         >
-          <span className={styles.brandName}>Mahardiora</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className={styles.brandLogo}
+            src={BRAND_LOGO_SRC}
+            alt={BRAND_LOGO_ALT}
+            width={120}
+            height={138}
+            draggable={false}
+          />
           <span className={styles.brandSub}>{subtitle}</span>
         </Link>
         <div className={styles.right}>

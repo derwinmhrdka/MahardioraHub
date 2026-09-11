@@ -5,9 +5,9 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["sharp"],
   experimental: {
     serverActions: {
-      bodySizeLimit: "12mb",
+      bodySizeLimit: "24mb",
     },
-    middlewareClientMaxBodySize: "12mb",
+    middlewareClientMaxBodySize: "24mb",
   },
   // Avoid webpack pack cache filling the disk during Docker builds (ENOSPC).
   webpack: (config, { dev }) => {

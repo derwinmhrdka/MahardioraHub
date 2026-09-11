@@ -33,7 +33,7 @@ export default async function CheckoutOrderPage({ params }: PageProps) {
     order.status === "expired" ||
     order.status === "failed"
   ) {
-    redirect(owner.userId ? `/orders/${order.id}` : "/");
+    redirect(`/orders/${order.id}`);
   }
 
   if (order.status !== "pending") notFound();
@@ -48,7 +48,9 @@ export default async function CheckoutOrderPage({ params }: PageProps) {
   ]);
 
   const title = order.payMethod === "qris" ? "QRIS" : "Transfer Bank";
-  const leaveHref = owner.userId ? "/orders?tab=cancel" : "/";
+  const leaveHref = owner.userId
+    ? "/orders?tab=cancel"
+    : `/orders/${order.id}`;
 
   return (
     <div className="section-secondhand">

@@ -34,17 +34,14 @@ export default async function CheckoutPaymentPage() {
       getCheckoutBranches(),
     ]);
 
-  // Cart kosong: lanjutkan pembayaran pending jika ada (login only)
+  // Cart kosong: lanjutkan pembayaran pending jika ada
   if (rows.length === 0) {
-    if (owner.userId) {
-      if (pendingQris) redirect(`/checkout/${pendingQris.id}`);
-      if (pendingTransfer) redirect(`/checkout/${pendingTransfer.id}`);
-    }
+    if (pendingQris) redirect(`/checkout/${pendingQris.id}`);
+    if (pendingTransfer) redirect(`/checkout/${pendingTransfer.id}`);
     redirect("/");
   }
 
-  // Guest: jangan paksa masuk ke payment pending lama
-  const isGuest = !owner.userId;
+  const qrisOk = await qrisConfigured();
 
   const pendingOrder = pendingQris ?? pendingTransfer;
 
@@ -78,12 +75,21 @@ export default async function CheckoutPaymentPage() {
           <h1 className={styles.title}>Payment</h1>
         </div>
 
-        {!isGuest && pendingOrder ? (
+        {pendingOrder ? (
           <p className={styles.pendingNote}>
             Ada pembayaran pending.{" "}
             <Link href={`/checkout/${pendingOrder.id}`}>Lanjutkan</Link>
-            {" · "}
-            <Link href="/orders?tab=pending">Lihat orders</Link>
+            {owner.userId ? (
+              <>
+                {" · "}
+                <Link href="/orders?tab=pending">Lihat orders</Link>
+              </>
+            ) : (
+              <>
+                {" · "}
+                <Link href={`/orders/${pendingOrder.id}`}>Invoice</Link>
+              </>
+            )}
           </p>
         ) : null}
 
@@ -117,9 +123,8 @@ export default async function CheckoutPaymentPage() {
         </section>
 
         <CheckoutBuyerForm
-          qrisEnabled={!isGuest && (await qrisConfigured())}
-          bankTransferEnabled={!isGuest && bankCount > 0}
-          whatsappOnly={isGuest}
+          qrisEnabled={qrisOk}
+          bankTransferEnabled={bankCount > 0}
           branches={branches.map((branch) => ({
             id: branch.id,
             name: branch.name,

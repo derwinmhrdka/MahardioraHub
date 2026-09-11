@@ -239,8 +239,8 @@ export function QrisCheckout({
               Order
             </Link>
           ) : (
-            <Link href="/" className={styles.linkBtn}>
-              Home
+            <Link href={`/orders/${orderId}`} className={styles.linkBtn}>
+              Invoice
             </Link>
           )}
         </div>

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { CancelOrderButton } from "@/components/CancelOrderButton";
 import { useAbandonPendingPayment } from "@/components/useAbandonPendingPayment";
+import { compressImageFile } from "@/lib/compress-image";
 import { formatRupiah } from "@/lib/format";
 import styles from "./BankTransferCheckout.module.css";
 
@@ -97,13 +98,18 @@ export function BankTransferCheckout({
       return;
     }
 
-    const formData = new FormData();
-    formData.set("bankAccountId", String(selectedId));
-    formData.set("proof", file, file.name || "bukti.jpg");
-
     setError(null);
     startTransition(async () => {
       try {
+        const compressed = await compressImageFile(file);
+        const formData = new FormData();
+        formData.set("bankAccountId", String(selectedId));
+        formData.set(
+          "proof",
+          compressed,
+          compressed.name || "bukti.webp"
+        );
+
         const res = await fetch(`/api/checkout/${orderId}/proof`, {
           method: "POST",
           body: formData,
@@ -127,8 +133,9 @@ export function BankTransferCheckout({
         markSafe();
         router.refresh();
       } catch (err) {
-        console.error("submit proof", err);
-        setError(err instanceof Error ? err.message : "Gagal mengirim bukti");
+        setError(
+          err instanceof Error ? err.message : "Gagal mengirim bukti"
+        );
       }
     });
   }
@@ -271,7 +278,9 @@ export function BankTransferCheckout({
                   <ImagePlus size={20} strokeWidth={2} />
                 </span>
                 <span className={styles.dropTitle}>Tambah bukti transfer</span>
-                <span className={styles.dropHint}>JPG, PNG, atau WEBP · max 5MB</span>
+                <span className={styles.dropHint}>
+                  JPG, PNG, atau WEBP · otomatis dikompres
+                </span>
               </button>
             )}
 
@@ -341,8 +350,8 @@ export function BankTransferCheckout({
               Lihat order
             </Link>
           ) : (
-            <Link href="/" className={styles.linkBtn}>
-              Home
+            <Link href={`/orders/${orderId}`} className={styles.linkBtn}>
+              Invoice
             </Link>
           )}
         </div>

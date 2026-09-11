@@ -22,7 +22,6 @@ type CheckoutBuyerFormProps = {
   bankTransferEnabled: boolean;
   initialBuyer: Omit<BuyerDraft, "branchId">;
   branches?: BranchOption[];
-  whatsappOnly?: boolean;
 };
 
 export function CheckoutBuyerForm({
@@ -30,7 +29,6 @@ export function CheckoutBuyerForm({
   bankTransferEnabled,
   initialBuyer,
   branches = [],
-  whatsappOnly = false,
 }: CheckoutBuyerFormProps) {
   const showBranch = branches.length > 0;
   const [buyer, setBuyer] = useState<BuyerDraft>({
@@ -254,9 +252,7 @@ export function CheckoutBuyerForm({
         <div className={styles.head}>
           <div>
             <p className={styles.headTag}>Pembayaran</p>
-            <h2 className={styles.headTitle}>
-              {whatsappOnly ? "Konfirmasi" : "Pilih metode"}
-            </h2>
+            <h2 className={styles.headTitle}>Pilih metode</h2>
           </div>
         </div>
         <PaymentMethods
@@ -264,7 +260,6 @@ export function CheckoutBuyerForm({
           bankTransferEnabled={bankTransferEnabled}
           buyer={buyer}
           disabled={!ready}
-          whatsappOnly={whatsappOnly}
         />
       </section>
     </div>

@@ -41,7 +41,9 @@ export async function confirmBankTransferAction(formData: FormData) {
 
   revalidatePath("/admin/orders");
   revalidatePath("/orders");
-  redirect("/admin/orders?tab=progress&confirmed=1");
+  revalidatePath(`/orders/${orderId}`);
+  // Bank transfer: single approval lands in Progress (not Pending).
+  redirect(`/admin/orders?tab=progress&confirmed=1`);
 }
 
 export async function rejectOrderAction(formData: FormData) {

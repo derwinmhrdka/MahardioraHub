@@ -62,7 +62,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
   } else if (params.accepted) {
     notice = "Diterima";
   } else if (params.confirmed) {
-    notice = "Transfer dikonfirmasi";
+    notice = "Diterima · Progress";
   } else if (params.rejected) {
     notice = "Ditolak";
   }

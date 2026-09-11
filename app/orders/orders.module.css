@@ -592,6 +592,125 @@
   background: #20bd5a;
 }
 
+.actionStack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.downloadBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-left: auto;
+  min-height: 2rem;
+  padding: 0.3rem 0.7rem;
+  border: 1.5px solid #111;
+  border-radius: 999px;
+  background: #fff;
+  color: #111;
+  font-family: var(--font-body-stack);
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 1px 1px 0 #111;
+}
+
+.downloadBtn:hover {
+  background: #faf8f3;
+}
+
+.downloadBtnBlock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  min-height: 2.55rem;
+  padding: 0.5rem 1rem;
+  border: 1.5px solid #111;
+  border-radius: 12px;
+  background: #fff;
+  color: #111;
+  font-family: var(--font-body-stack);
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 #111;
+}
+
+.downloadBtnBlock:hover {
+  background: #faf8f3;
+}
+
+.printBrand {
+  display: none;
+}
+
+.printLogo {
+  display: block;
+  width: 7.5rem;
+  height: auto;
+  object-fit: contain;
+  margin: 0 auto 0.5rem;
+}
+
+.printSite {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.printDoc {
+  margin: 0.15rem 0 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #666;
+}
+
+@media print {
+  @page {
+    margin: 12mm;
+  }
+
+  :global(body) {
+    background: #fff !important;
+  }
+
+  .invoicePage :global(header),
+  .invoicePage :global(nav),
+  .noPrint {
+    display: none !important;
+  }
+
+  .invoicePage .main {
+    max-width: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .printBrand {
+    display: block;
+    margin-bottom: 0.85rem;
+  }
+
+  .detail {
+    gap: 0.75rem;
+  }
+
+  .panel {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+
+  .thumb img {
+    max-width: 48px;
+  }
+}
+
 .proofLink {
   display: block;
   margin: 0 0.7rem 0.75rem;

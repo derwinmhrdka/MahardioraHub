@@ -14,6 +14,7 @@ import {
   deleteUploadedImageAction,
 } from "@/app/admin/(dashboard)/products/actions";
 import { MAX_UPLOAD_COUNT } from "@/lib/uploads-shared";
+import { compressImageFiles } from "@/lib/compress-image";
 import styles from "./ProductForm.module.css";
 
 type ImageMode = "upload" | "url" | "paste";
@@ -95,11 +96,12 @@ export function ImageGalleryField({ urls, onChange }: ImageGalleryFieldProps) {
       return;
     }
 
-    const formData = new FormData();
-    for (const file of picked) formData.append("files", file);
-
     startTransition(async () => {
       try {
+        const compressed = await compressImageFiles(picked);
+        const formData = new FormData();
+        for (const file of compressed) formData.append("files", file);
+
         const result = await fetch("/api/uploads", {
           method: "POST",
           body: formData,

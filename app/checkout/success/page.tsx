@@ -86,8 +86,8 @@ export default async function CheckoutSuccessPage({ searchParams }: PageProps) {
                 Invoice
               </Link>
             ) : (
-              <Link href="/orders?tab=progress" className={styles.link}>
-                Order
+              <Link href="/" className={styles.link}>
+                Home
               </Link>
             )}
           </div>

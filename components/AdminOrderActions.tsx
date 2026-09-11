@@ -57,7 +57,7 @@ export function AdminOrderActions({
       : rejectOrderAction;
   const confirmAction =
     mode === "bankPending" ? confirmBankTransferAction : acceptOrderAction;
-  const confirmLabel = mode === "bankPending" ? "Konfirmasi" : "Terima";
+  const confirmLabel = "Terima";
 
   if (rejectOpen) {
     return (

@@ -4,13 +4,16 @@ import { ArrowLeft, ImageOff } from "lucide-react";
 import { auth } from "@/auth";
 import { AdminOrderActions } from "@/components/AdminOrderActions";
 import { CancelOrderButton } from "@/components/CancelOrderButton";
+import { DownloadInvoiceButton } from "@/components/DownloadInvoiceButton";
 import { Header } from "@/components/Header";
+import { OpenWhatsAppOnce } from "@/components/OpenWhatsAppOnce";
 import { OrderCountdown } from "@/components/OrderCountdown";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { formatRupiah } from "@/lib/format";
 import { productImageUrl } from "@/lib/image-url";
 import { getGuestId } from "@/lib/cart-owner";
 import {
+  buildCashWhatsAppMessage,
   cancelOwnerOrder,
   getOrderForViewer,
   type CheckoutOwner,
@@ -22,6 +25,7 @@ import styles from "../orders.module.css";
 
 type PageProps = {
   params: Promise<{ orderId: string }>;
+  searchParams: Promise<{ contact?: string }>;
 };
 
 function statusLabel(status: string) {
@@ -83,11 +87,16 @@ function sellerWhatsAppHref(input: {
   return `https://wa.me/${input.whatsappNumber}?text=${encodeURIComponent(text)}`;
 }
 
-export default async function OrderDetailPage({ params }: PageProps) {
+export default async function OrderDetailPage({
+  params,
+  searchParams,
+}: PageProps) {
   const { orderId } = await params;
+  const query = await searchParams;
   const session = await auth();
   const guestId = await getGuestId();
   const isAdmin = session?.user?.role === "admin";
+  const isLoggedIn = Boolean(session?.user?.id);
 
   let order = await getOrderForViewer(orderId, {
     userId: session?.user?.id ?? null,
@@ -134,35 +143,64 @@ export default async function OrderDetailPage({ params }: PageProps) {
   const isPending = order.status === "pending";
   const isInvoice =
     order.status === "paid" || order.status === "completed";
-  const showContact = isInvoice && Boolean(isOwner);
+  const showCashContact =
+    Boolean(isOwner) &&
+    order.payMethod === "cash" &&
+    (isPending || isInvoice);
+  const showPaidContact = isInvoice && Boolean(isOwner);
+  const showContact = showCashContact || showPaidContact;
+  const autoOpenContact = showCashContact && query.contact === "1";
   const expiresAt =
     order.expiresAt?.toISOString() ??
     new Date(order.createdAt.getTime() + 60 * 60 * 1000).toISOString();
 
   const waHref = showContact
-    ? sellerWhatsAppHref({
-        whatsappNumber: settings.whatsappNumber,
-        invoiceNo: order.externalId,
-        orderId: order.id,
-        amount: order.amount,
-        buyerName: order.buyerName,
-        buyerWhatsapp: order.buyerWhatsapp,
-        buyerAddress: order.buyerAddress,
-        shipFromBranch: order.shipFromBranch,
-      })
+    ? order.payMethod === "cash"
+      ? `https://wa.me/${settings.whatsappNumber}?text=${encodeURIComponent(
+          buildCashWhatsAppMessage({
+            template: settings.whatsappTemplate,
+            order: {
+              id: order.id,
+              externalId: order.externalId,
+              amount: order.amount,
+              buyerName: order.buyerName,
+              buyerWhatsapp: order.buyerWhatsapp,
+              buyerAddress: order.buyerAddress,
+              shipFromBranch: order.shipFromBranch,
+              items: order.items.map((item) => ({
+                productId: item.productId,
+                title: item.title,
+                quantity: item.quantity,
+                unitPrice: item.unitPrice,
+              })),
+            },
+          })
+        )}`
+      : sellerWhatsAppHref({
+          whatsappNumber: settings.whatsappNumber,
+          invoiceNo: order.externalId,
+          orderId: order.id,
+          amount: order.amount,
+          buyerName: order.buyerName,
+          buyerWhatsapp: order.buyerWhatsapp,
+          buyerAddress: order.buyerAddress,
+          shipFromBranch: order.shipFromBranch,
+        })
     : null;
 
+  const backHref = isAdmin
+    ? `/admin/orders?tab=${backTab(order.status)}`
+    : isLoggedIn
+      ? `/orders?tab=${backTab(order.status)}`
+      : "/";
+
   return (
-    <div className="section-secondhand">
+    <div className={`section-secondhand ${styles.invoicePage}`}>
       <Header siteName={settings.siteName} active="secondhand" />
       <main className={`container ${styles.main}`}>
-        <div className={styles.top}>
+        <div className={`${styles.top} ${styles.noPrint}`}>
           <Link
-            href={
-              isAdmin
-                ? `/admin/orders?tab=${backTab(order.status)}`
-                : `/orders?tab=${backTab(order.status)}`
-            }
+            href={backHref}
             className={styles.back}
             aria-label="Kembali"
             title="Kembali"
@@ -170,14 +208,30 @@ export default async function OrderDetailPage({ params }: PageProps) {
             <ArrowLeft size={16} strokeWidth={2.5} aria-hidden />
           </Link>
           <h1 className={styles.title}>Invoice</h1>
+          <DownloadInvoiceButton className={styles.downloadBtn} />
         </div>
 
-        <div className={styles.detail}>
+        {autoOpenContact && waHref ? <OpenWhatsAppOnce href={waHref} /> : null}
+
+        <div className={styles.detail} id="invoice-receipt">
+          <div className={styles.printBrand}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className={styles.printLogo}
+              src="/brand/mahardiora-hub.png"
+              alt={settings.siteName}
+              width={160}
+              height={184}
+            />
+          </div>
+
           <div className={styles.panel}>
             <div className={styles.panelHead}>
               <span>{statusLabel(order.status)}</span>
               {isPending && isOwner ? (
-                <OrderCountdown expiresAt={expiresAt} />
+                <span className={styles.noPrint}>
+                  <OrderCountdown expiresAt={expiresAt} />
+                </span>
               ) : null}
             </div>
             <div className={styles.invoiceMeta}>
@@ -269,67 +323,76 @@ export default async function OrderDetailPage({ params }: PageProps) {
             </div>
           </div>
 
-          {waHref ? (
-            <a
-              href={waHref}
-              className={styles.waBtnBlock}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <WhatsAppIcon size={16} />
-              Hubungi Seller
-            </a>
-          ) : null}
-
-          {isAdmin &&
-          order.payMethod === "bank_transfer" &&
-          order.paymentProofUrl ? (
-            <div className={styles.panel}>
-              <div className={styles.panelHead}>Bukti transfer</div>
+          <div className={`${styles.actionStack} ${styles.noPrint}`}>
+            {waHref ? (
               <a
-                href={order.paymentProofUrl}
+                href={waHref}
+                className={styles.waBtnBlock}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={styles.proofLink}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={order.paymentProofUrl} alt="Bukti transfer" />
+                <WhatsAppIcon size={16} />
+                {order.payMethod === "cash"
+                  ? "Konfirmasi via WhatsApp"
+                  : "Hubungi Seller"}
               </a>
-            </div>
-          ) : null}
+            ) : null}
 
-          {isAdmin && order.status === "paid" ? (
-            <div className={styles.adminActions}>
-              <AdminOrderActions orderId={order.id} fullWidth />
-            </div>
-          ) : null}
+            <DownloadInvoiceButton className={styles.downloadBtnBlock} />
 
-          {isAdmin &&
-          order.status === "pending" &&
-          order.payMethod === "bank_transfer" ? (
-            <div className={styles.adminActions}>
-              <AdminOrderActions
-                orderId={order.id}
-                mode="bankPending"
-                canConfirm={Boolean(order.paymentProofUrl)}
-                fullWidth
-              />
-            </div>
-          ) : null}
+            {isAdmin &&
+            order.payMethod === "bank_transfer" &&
+            order.paymentProofUrl ? (
+              <div className={styles.panel}>
+                <div className={styles.panelHead}>Bukti transfer</div>
+                <a
+                  href={order.paymentProofUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.proofLink}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={order.paymentProofUrl} alt="Bukti transfer" />
+                </a>
+              </div>
+            ) : null}
 
-          {isPending && isOwner ? (
-            <div className={styles.actions}>
-              {order.payMethod === "qris" ||
-              order.payMethod === "bank_transfer" ? (
-                <Link href={`/checkout/${order.id}`} className={styles.btn}>
-                  {order.payMethod === "bank_transfer" && order.paymentProofUrl
-                    ? "Lihat bukti"
-                    : "Bayar"}
-                </Link>
-              ) : null}
-              <CancelOrderButton orderId={order.id} />
-            </div>
-          ) : null}
+            {isAdmin &&
+            order.status === "paid" &&
+            order.payMethod !== "bank_transfer" ? (
+              <div className={styles.adminActions}>
+                <AdminOrderActions orderId={order.id} fullWidth />
+              </div>
+            ) : null}
+
+            {isAdmin &&
+            order.status === "pending" &&
+            order.payMethod === "bank_transfer" ? (
+              <div className={styles.adminActions}>
+                <AdminOrderActions
+                  orderId={order.id}
+                  mode="bankPending"
+                  canConfirm={Boolean(order.paymentProofUrl)}
+                  fullWidth
+                />
+              </div>
+            ) : null}
+
+            {isPending && isOwner ? (
+              <div className={styles.actions}>
+                {order.payMethod === "qris" ||
+                order.payMethod === "bank_transfer" ? (
+                  <Link href={`/checkout/${order.id}`} className={styles.btn}>
+                    {order.payMethod === "bank_transfer" &&
+                    order.paymentProofUrl
+                      ? "Lihat bukti"
+                      : "Bayar"}
+                  </Link>
+                ) : null}
+                <CancelOrderButton orderId={order.id} />
+              </div>
+            ) : null}
+          </div>
         </div>
       </main>
     </div>

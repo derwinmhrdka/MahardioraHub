@@ -342,7 +342,7 @@ export async function attachPaymentProof(input: {
   });
 }
 
-/** Admin: pending bank transfer → paid after proof review. */
+/** Admin: pending bank transfer → paid (Progress) in one step. */
 export async function confirmBankTransferPayment(orderId: string) {
   const order = await prisma.order.findUnique({ where: { id: orderId } });
   if (!order) return null;
@@ -350,6 +350,7 @@ export async function confirmBankTransferPayment(orderId: string) {
   if (order.status !== OrderStatus.pending) return order;
   if (!order.paymentProofUrl) return order;
 
+  // One approval: proof accepted + order enters Progress (paid).
   return markOrderPaid({ orderId: order.id });
 }
 

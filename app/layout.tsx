@@ -31,8 +31,11 @@ export async function generateMetadata(): Promise<Metadata> {
       description,
       applicationName: settings.siteName,
       icons: {
-        icon: [{ url: "/icon-store.svg", type: "image/svg+xml" }],
-        apple: [{ url: "/apple-icon" }],
+        icon: [
+          { url: "/icon-store.png", type: "image/png", sizes: "192x192" },
+          { url: "/icon.png", type: "image/png", sizes: "32x32" },
+        ],
+        apple: [{ url: "/apple-icon.png", type: "image/png", sizes: "180x180" }],
       },
       openGraph: {
         type: "website",
@@ -54,7 +57,11 @@ export async function generateMetadata(): Promise<Metadata> {
       title: "MahardioraHub",
       description: "Collection & My Picks",
       icons: {
-        icon: [{ url: "/icon-store.svg", type: "image/svg+xml" }],
+        icon: [
+          { url: "/icon-store.png", type: "image/png", sizes: "192x192" },
+          { url: "/icon.png", type: "image/png", sizes: "32x32" },
+        ],
+        apple: [{ url: "/apple-icon.png", type: "image/png", sizes: "180x180" }],
       },
     };
   }
