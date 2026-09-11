@@ -3,9 +3,14 @@ import type { Metadata } from "next";
 import { CollectionPromoBanner } from "@/components/CollectionPromoBanner";
 import { FlashSaleStrip } from "@/components/FlashSaleStrip";
 import { Header } from "@/components/Header";
+import { PreOrderStrip } from "@/components/PreOrderStrip";
 import { ProductBrowse } from "@/components/ProductBrowse";
 import { listCategories } from "@/lib/categories";
 import { getActiveFlashSalePublic } from "@/lib/flash-sale";
+import {
+  getTodayPreOrderPublic,
+  mapActivePreOrderByProductId,
+} from "@/lib/pre-order";
 import {
   listActiveSecondhand,
   listPlatforms,
@@ -42,19 +47,29 @@ export default async function HomePage({ searchParams }: PageProps) {
   const categorySlug = query.category?.trim() || null;
   const platform = query.platform?.trim() || null;
 
-  const [categories, areas, platforms, products, flashSale, bannerImages] =
-    await Promise.all([
-      listCategories(),
-      listStoreAreas(ProductKind.secondhand),
-      listPlatforms(ProductKind.secondhand),
-      listActiveSecondhand({
-        storeArea: area,
-        categorySlug,
-        platform,
-      }),
-      getActiveFlashSalePublic(),
-      getCollectionBanner(),
-    ]);
+  const [
+    categories,
+    areas,
+    platforms,
+    products,
+    flashSale,
+    preOrder,
+    preOrderMap,
+    bannerImages,
+  ] = await Promise.all([
+    listCategories(),
+    listStoreAreas(ProductKind.secondhand),
+    listPlatforms(ProductKind.secondhand),
+    listActiveSecondhand({
+      storeArea: area,
+      categorySlug,
+      platform,
+    }),
+    getActiveFlashSalePublic(),
+    getTodayPreOrderPublic(),
+    mapActivePreOrderByProductId(),
+    getCollectionBanner(),
+  ]);
 
   const items = products.map((product) => ({
     id: product.id,
@@ -67,6 +82,7 @@ export default async function HomePage({ searchParams }: PageProps) {
     categoryName: product.category.name,
     storeArea: product.storeArea,
     href: `/secondhand/${product.id}`,
+    isPreOrder: preOrderMap.has(product.id),
   }));
 
   return (
@@ -82,6 +98,12 @@ export default async function HomePage({ searchParams }: PageProps) {
             endsAt={flashSale.endsAt}
             startedAt={flashSale.startedAt}
             items={flashSale.items}
+          />
+        ) : null}
+        {preOrder ? (
+          <PreOrderStrip
+            lastOrderDate={preOrder.lastOrderDate}
+            items={preOrder.items}
           />
         ) : null}
         <ProductBrowse

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, MapPin, Package, Tag } from "lucide-react";
+import { ArrowLeft, MapPin, Package, Plane, Tag } from "lucide-react";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { Header } from "@/components/Header";
 import { ProductImageSlider } from "@/components/ProductImageSlider";
@@ -10,6 +10,7 @@ import { ProductPrice } from "@/components/ProductPrice";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import styles from "@/components/ProductDetail.module.css";
 import { auth } from "@/auth";
+import { getProductPreOrderTag } from "@/lib/pre-order";
 import { productImages } from "@/lib/product-images";
 import { getProduct } from "@/lib/products";
 import { buildShareMetadata } from "@/lib/seo";
@@ -54,6 +55,7 @@ export default async function SecondhandItemPage({ params }: PageProps) {
 
   const settings = await getSettings();
   const session = await auth();
+  const preOrder = await getProductPreOrderTag(product.id);
   const whatsappHref = buildWhatsAppLink(settings.whatsappNumber, {
     template: settings.whatsappTemplate,
     productTitle: product.title,
@@ -74,6 +76,22 @@ export default async function SecondhandItemPage({ params }: PageProps) {
         <article className={styles.detail}>
           <ProductImageSlider images={productImages(product)} alt={product.title} />
           <div className={styles.meta}>
+            {preOrder ? (
+              <span className={styles.preOrderTag}>
+                <Plane size={12} strokeWidth={2.5} aria-hidden />
+                Pre Order
+                <span className={styles.preOrderDate}>
+                  Last order{" "}
+                  {new Date(
+                    `${preOrder.lastOrderDate}T00:00:00.000Z`
+                  ).toLocaleDateString("id-ID", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </span>
+              </span>
+            ) : null}
             <ProductPrice
               price={product.price}
               discountPercent={product.discountPercent}

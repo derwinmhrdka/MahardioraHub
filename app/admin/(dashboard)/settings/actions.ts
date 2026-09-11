@@ -13,6 +13,11 @@ import { requireAdmin } from "@/lib/auth";
 import {
   updateFlashSaleConfig,
 } from "@/lib/flash-sale";
+import {
+  createPreOrder,
+  deletePreOrder,
+  updatePreOrder,
+} from "@/lib/pre-order";
 import { getSettings, updateSettings } from "@/lib/settings";
 import {
   normalizeBannerHidden,
@@ -44,6 +49,70 @@ export async function updateFlashSaleAction(formData: FormData) {
   revalidatePath("/");
   revalidatePath("/admin/settings");
   redirect("/admin/settings?tab=flash&flashSaved=1");
+}
+
+function revalidatePreOrder() {
+  revalidatePath("/");
+  revalidatePath("/secondhand");
+  revalidatePath("/admin/settings");
+}
+
+export async function createPreOrderAction(formData: FormData) {
+  await requireAdmin();
+  const lastOrderDate = String(formData.get("lastOrderDate") ?? "");
+  const productIds = formData
+    .getAll("productIds")
+    .map((v) => Number(v))
+    .filter((n) => Number.isFinite(n));
+
+  try {
+    await createPreOrder({ lastOrderDate, productIds });
+  } catch {
+    redirect("/admin/settings?tab=preorder&preError=1");
+  }
+
+  revalidatePreOrder();
+  redirect("/admin/settings?tab=preorder&preSaved=1");
+}
+
+export async function updatePreOrderAction(formData: FormData) {
+  await requireAdmin();
+  const id = Number(formData.get("id"));
+  const lastOrderDate = String(formData.get("lastOrderDate") ?? "");
+  const productIds = formData
+    .getAll("productIds")
+    .map((v) => Number(v))
+    .filter((n) => Number.isFinite(n));
+
+  if (!Number.isFinite(id)) {
+    redirect("/admin/settings?tab=preorder&preError=1");
+  }
+
+  try {
+    await updatePreOrder({ id, lastOrderDate, productIds });
+  } catch {
+    redirect("/admin/settings?tab=preorder&preError=1");
+  }
+
+  revalidatePreOrder();
+  redirect("/admin/settings?tab=preorder&preSaved=1");
+}
+
+export async function deletePreOrderAction(formData: FormData) {
+  await requireAdmin();
+  const id = Number(formData.get("id"));
+  if (!Number.isFinite(id)) {
+    redirect("/admin/settings?tab=preorder&preError=1");
+  }
+
+  try {
+    await deletePreOrder(id);
+  } catch {
+    redirect("/admin/settings?tab=preorder&preError=1");
+  }
+
+  revalidatePreOrder();
+  redirect("/admin/settings?tab=preorder&preSaved=1");
 }
 
 async function patchBannerSettings(patch: {

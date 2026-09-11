@@ -18,6 +18,7 @@ type ProductCardProps = {
   href: string;
   categoryName?: string | null;
   storeArea?: string | null;
+  isPreOrder?: boolean;
 };
 
 export function ProductCard({
@@ -30,6 +31,7 @@ export function ProductCard({
   href,
   categoryName,
   storeArea,
+  isPreOrder = false,
 }: ProductCardProps) {
   const hasMeta = Boolean(categoryName || storeArea);
   const src = productImageUrl(imageUrl, 400);
@@ -61,6 +63,9 @@ export function ProductCard({
           <span className={styles.discBadge} aria-hidden>
             -{formatDiscountPercent(discountPercent ?? 0)}%
           </span>
+        ) : null}
+        {!soldOut && isPreOrder ? (
+          <span className={styles.preOrderBadge}>Pre Order</span>
         ) : null}
       </div>
       <div className={styles.body}>

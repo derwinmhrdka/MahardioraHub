@@ -76,8 +76,14 @@ export async function listDealsByCategory(
 }
 
 export async function listActiveSecondhand(filters: ProductListFilters = {}) {
+  const { listExpiredPreOrderProductIds } = await import("@/lib/pre-order");
+  const expiredIds = await listExpiredPreOrderProductIds();
+
   const rows = await prisma.product.findMany({
-    where: activeWhere(ProductKind.secondhand, filters),
+    where: {
+      ...activeWhere(ProductKind.secondhand, filters),
+      ...(expiredIds.length > 0 ? { id: { notIn: expiredIds } } : {}),
+    },
     include: productInclude,
     orderBy: { createdAt: "desc" },
   });

@@ -20,6 +20,7 @@ export type CatalogItem = {
   href: string;
   categoryName?: string | null;
   storeArea?: string | null;
+  isPreOrder?: boolean;
 };
 
 type ViewMode = "card" | "list";
@@ -54,6 +55,7 @@ export function ProductCatalog({
               categoryName={item.categoryName}
               storeArea={item.storeArea}
               href={item.href}
+              isPreOrder={item.isPreOrder}
             />
           ))}
         </div>
@@ -85,6 +87,8 @@ export function ProductCatalog({
                   )}
                   {soldOut ? (
                     <span className={styles.rowSoldBadge}>Sold Out!</span>
+                  ) : item.isPreOrder ? (
+                    <span className={styles.rowPreOrderBadge}>Pre Order</span>
                   ) : null}
                 </div>
                 <div className={styles.rowBody}>

@@ -39,6 +39,7 @@ model Product {
   clicks        Click[]
   cartItems     CartItem[]
   flashSaleItems FlashSaleItem[]
+  preOrderItems  PreOrderItem[]
 }
 
 model Click {
@@ -83,6 +84,30 @@ model FlashSaleItem {
 
   @@unique([flashSaleId, productId])
   @@index([flashSaleId, sortOrder])
+}
+
+/** Pre-order batch keyed by last-order date (secondhand). Multiple batches allowed. */
+model PreOrder {
+  id            Int            @id @default(autoincrement())
+  /** Calendar date (Asia/Jakarta): last day buyers can order. */
+  lastOrderDate DateTime       @db.Date
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  items         PreOrderItem[]
+
+  @@index([lastOrderDate])
+}
+
+model PreOrderItem {
+  id         Int      @id @default(autoincrement())
+  preOrderId Int
+  preOrder   PreOrder @relation(fields: [preOrderId], references: [id], onDelete: Cascade)
+  productId  Int      @unique
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sortOrder  Int      @default(0)
+
+  @@unique([preOrderId, productId])
+  @@index([preOrderId, sortOrder])
 }
 
 enum UserRole {
