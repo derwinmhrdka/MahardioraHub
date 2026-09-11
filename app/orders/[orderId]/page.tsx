@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ImageOff } from "lucide-react";
 import { auth } from "@/auth";
+import { AdminOrderActions } from "@/components/AdminOrderActions";
 import { CancelOrderButton } from "@/components/CancelOrderButton";
 import { Header } from "@/components/Header";
 import { OrderCountdown } from "@/components/OrderCountdown";
@@ -155,8 +156,8 @@ export default async function OrderDetailPage({ params }: PageProps) {
         <div className={styles.top}>
           <Link
             href={
-              isAdmin && !isOwner
-                ? "/admin/orders"
+              isAdmin
+                ? `/admin/orders?tab=${backTab(order.status)}`
                 : `/orders?tab=${backTab(order.status)}`
             }
             className={styles.back}
@@ -269,6 +270,42 @@ export default async function OrderDetailPage({ params }: PageProps) {
               <WhatsAppIcon size={16} />
               Hubungi Seller
             </a>
+          ) : null}
+
+          {isAdmin &&
+          order.payMethod === "bank_transfer" &&
+          order.paymentProofUrl ? (
+            <div className={styles.panel}>
+              <div className={styles.panelHead}>Bukti transfer</div>
+              <a
+                href={order.paymentProofUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.proofLink}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={order.paymentProofUrl} alt="Bukti transfer" />
+              </a>
+            </div>
+          ) : null}
+
+          {isAdmin && order.status === "paid" ? (
+            <div className={styles.adminActions}>
+              <AdminOrderActions orderId={order.id} fullWidth />
+            </div>
+          ) : null}
+
+          {isAdmin &&
+          order.status === "pending" &&
+          order.payMethod === "bank_transfer" ? (
+            <div className={styles.adminActions}>
+              <AdminOrderActions
+                orderId={order.id}
+                mode="bankPending"
+                canConfirm={Boolean(order.paymentProofUrl)}
+                fullWidth
+              />
+            </div>
           ) : null}
 
           {isPending && isOwner ? (

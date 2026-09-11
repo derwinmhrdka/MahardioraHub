@@ -1,79 +1,39 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.85rem;
 }
 
 .head {
   display: flex;
-  align-items: flex-end;
+  align-items: baseline;
   justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.headText {
-  min-width: 0;
-}
-
-.eyebrow {
-  margin: 0 0 0.2rem;
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
+  gap: 0.5rem;
 }
 
 .title {
   margin: 0;
   font-family: var(--font-body-stack);
-  font-size: clamp(1.35rem, 4vw, 1.7rem);
+  font-size: 1.15rem;
   font-weight: 800;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
   color: #111;
-  line-height: 1.05;
 }
 
-.subtitle {
-  margin: 0.35rem 0 0;
-  max-width: 28rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  line-height: 1.4;
-  color: var(--color-text-muted);
-}
-
-.layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 0.85rem;
-  align-items: start;
-}
-
-.sidebar {
+.menu {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  padding: 0.75rem;
-  border: 2px solid #111;
-  border-radius: 16px;
-  background: #fff;
-  box-shadow: 4px 4px 0 #111;
+  gap: 0.75rem;
 }
 
-.navGroup {
+.menuGroup {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
 }
 
-.navGroup + .navGroup {
-  padding-top: 0.75rem;
-  border-top: 1.5px dashed rgba(17, 17, 17, 0.18);
-}
-
-.navGroupLabel {
-  margin: 0 0 0.15rem 0.15rem;
+.menuGroupLabel {
+  margin: 0 0.1rem;
   font-size: 0.65rem;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -81,173 +41,124 @@
   color: rgba(17, 17, 17, 0.45);
 }
 
-.navList {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
 }
 
-.navItem {
-  display: grid;
-  grid-template-columns: auto 1fr;
+.tab {
+  display: flex;
   align-items: center;
-  gap: 0.55rem;
-  min-height: 2.85rem;
-  padding: 0.45rem 0.55rem;
-  border: 1.5px solid transparent;
-  border-radius: 12px;
-  background: transparent;
-  color: #374151;
+  gap: 0.45rem;
+  min-height: 2.55rem;
+  padding: 0.45rem 0.65rem;
+  border: 2px solid #111;
+  border-radius: 11px;
+  background: var(--color-surface);
+  color: #6b7280;
   text-decoration: none;
+  box-shadow: 2px 2px 0 transparent;
   transition:
-    background 0.15s ease,
-    border-color 0.15s ease,
     color 0.15s ease,
+    background 0.15s ease,
     box-shadow 0.15s ease,
     transform 0.15s ease;
 }
 
-.navIcon {
+.tabIcon {
   display: grid;
   place-items: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 9px;
-  border: 1.5px solid rgba(17, 17, 17, 0.12);
-  background: #f7f3eb;
+  flex: 0 0 auto;
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 8px;
+  background: rgba(17, 17, 17, 0.06);
   color: inherit;
 }
 
-.navCopy {
+.tabLabel {
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.08rem;
-}
-
-.navLabel {
-  font-size: 0.84rem;
+  font-family: var(--font-body-stack);
+  font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: -0.01em;
-  line-height: 1.15;
-  color: inherit;
-}
-
-.navHint {
-  font-size: 0.68rem;
-  font-weight: 600;
-  line-height: 1.2;
-  color: var(--color-text-muted);
+  line-height: 1.1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.navItem:hover {
+.tab:hover {
   color: #111;
-  background: #f7f3eb;
-  border-color: rgba(17, 17, 17, 0.2);
   transform: translate(-1px, -1px);
   box-shadow: 2px 2px 0 #111;
 }
 
-.navItemOn {
-  color: #fff;
+.tab:hover .tabIcon {
+  background: rgba(17, 17, 17, 0.1);
+}
+
+.tabOn {
   background: #111;
-  border-color: #111;
+  color: #fff;
   box-shadow: 3px 3px 0 #111;
 }
 
-.navItemOn .navIcon {
-  border-color: rgba(255, 255, 255, 0.28);
-  background: rgba(255, 255, 255, 0.12);
+.tabOn .tabIcon {
+  background: rgba(255, 255, 255, 0.14);
   color: #fff;
 }
 
-.navItemOn .navHint {
-  color: rgba(255, 255, 255, 0.62);
-}
-
-.navItemOn:hover {
+.tabOn:hover {
   color: #fff;
-  background: #111;
   transform: none;
   box-shadow: 3px 3px 0 #111;
 }
 
-.content {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.contentHead {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.7rem;
-  padding: 0.85rem 0.95rem;
-  border: 2px solid #111;
-  border-radius: 14px;
-  background: #111;
-  color: #fff;
-  box-shadow: 3px 3px 0 #111;
-}
-
-.contentMark {
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  width: 2.35rem;
-  height: 2.35rem;
-  border-radius: 11px;
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
-}
-
-.contentTitles {
-  min-width: 0;
-}
-
-.contentGroup {
-  margin: 0;
-  font-size: 0.64rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
-}
-
-.contentTitle {
-  margin: 0.15rem 0 0;
-  font-family: var(--font-body-stack);
-  font-size: 1.05rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
-}
-
-.contentHint {
-  margin: 0.2rem 0 0;
-  font-size: 0.74rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.62);
-}
-
 .panel {
   margin: 0;
-  padding: 1rem 0.95rem 1.1rem;
+  padding: 0.85rem 0.8rem 1rem;
   border: 2px solid #111;
-  border-radius: 16px;
+  border-radius: 14px;
   background: var(--color-surface);
   box-shadow: 4px 4px 0 #111;
   animation: panelIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.panelHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0 0 0.75rem;
+  padding: 0 0 0.65rem;
+  border-bottom: 1.5px solid rgba(17, 17, 17, 0.1);
+}
+
+.panelTitle {
+  margin: 0;
+  font-family: var(--font-body-stack);
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #111;
+}
+
+.panelGroup {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
 .noticeOk,
 .noticeErr {
-  margin: 0 0 0.75rem;
-  padding: 0.55rem 0.7rem;
+  margin: 0 0 0.65rem;
+  padding: 0.5rem 0.65rem;
   border-radius: 10px;
   border: 1.5px solid;
   font-family: var(--font-body-stack);
@@ -294,12 +205,6 @@
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
-}
-
-.payBlock {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
 }
 
 .bankList {
@@ -440,13 +345,6 @@
   border-color: #047857;
   background: #ecfdf5;
   color: #047857;
-}
-
-.payMeta {
-  margin-left: auto;
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--color-text-muted);
 }
 
 .catList,
@@ -603,63 +501,16 @@
   }
 }
 
-@media (min-width: 860px) {
-  .layout {
-    grid-template-columns: 15.5rem minmax(0, 1fr);
-    gap: 1rem;
-  }
-
-  .sidebar {
-    position: sticky;
-    top: 0.75rem;
-  }
-}
-
-@media (max-width: 859px) {
-  .sidebar {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    gap: 0.75rem;
-    padding: 0.55rem;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-  }
-
-  .navGroup {
-    flex: 0 0 auto;
-    min-width: 10.5rem;
-    padding-top: 0;
-    border-top: 0;
-  }
-
-  .navGroup + .navGroup {
-    padding-top: 0;
-    padding-left: 0.75rem;
-    border-top: 0;
-    border-left: 1.5px dashed rgba(17, 17, 17, 0.18);
-  }
-
-  .navHint {
-    display: none;
-  }
-
-  .navItem {
-    min-height: 2.45rem;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .panel {
     animation: none;
   }
 
-  .navItem {
+  .tab {
     transition: none;
   }
 
-  .navItem:hover {
+  .tab:hover {
     transform: none;
   }
 }

@@ -76,7 +76,6 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
       imageByProduct={imageByProduct}
       notice={notice}
       noticeTone={noticeTone}
-      rejectFocusOrderId={params.order ?? null}
     />
   );
 }

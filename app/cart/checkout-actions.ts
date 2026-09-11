@@ -61,8 +61,13 @@ export async function checkoutBankTransferAction(formData: FormData) {
 
 function asUploadFile(entry: FormDataEntryValue | null): File | Blob | null {
   if (!entry || typeof entry === "string") return null;
-  if (typeof Blob !== "undefined" && entry instanceof Blob && entry.size > 0) {
-    return entry;
+  const blob = entry as Blob;
+  if (
+    typeof blob.size === "number" &&
+    blob.size > 0 &&
+    typeof blob.arrayBuffer === "function"
+  ) {
+    return blob;
   }
   return null;
 }
@@ -88,7 +93,6 @@ export async function submitBankTransferProofAction(formData: FormData) {
       bankAccountId,
       paymentProofUrl: proofUrl,
     });
-    if (!order) return { error: "Order tidak ditemukan" };
     if (!order.paymentProofUrl) return { error: "Gagal menyimpan bukti" };
     return { proofUrl: order.paymentProofUrl };
   } catch (e) {

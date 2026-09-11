@@ -61,7 +61,6 @@ type Tab =
 type NavItem = {
   id: Tab;
   label: string;
-  hint: string;
   Icon: typeof Settings2;
 };
 
@@ -76,73 +75,29 @@ const NAV_GROUPS: NavGroup[] = [
     id: "umum",
     label: "General",
     items: [
-      {
-        id: "general",
-        label: "Site",
-        hint: "Nama toko & affiliate",
-        Icon: Settings2,
-      },
-      {
-        id: "kontak",
-        label: "Kontak",
-        hint: "WhatsApp & email",
-        Icon: MessageCircle,
-      },
+      { id: "general", label: "Site", Icon: Settings2 },
+      { id: "kontak", label: "Kontak", Icon: MessageCircle },
     ],
   },
   {
     id: "katalog",
     label: "Katalog",
     items: [
-      {
-        id: "kategori",
-        label: "Kategori",
-        hint: "Kategori produk",
-        Icon: Tags,
-      },
-      {
-        id: "banner",
-        label: "Banner",
-        hint: "Banner collection",
-        Icon: ImageIcon,
-      },
-      {
-        id: "flash",
-        label: "Flash Sale",
-        hint: "Promo waktu terbatas",
-        Icon: Flame,
-      },
-      {
-        id: "preorder",
-        label: "Pre Order",
-        hint: "Last order per tanggal",
-        Icon: Plane,
-      },
+      { id: "kategori", label: "Kategori", Icon: Tags },
+      { id: "banner", label: "Banner", Icon: ImageIcon },
+      { id: "flash", label: "Flash Sale", Icon: Flame },
+      { id: "preorder", label: "Pre Order", Icon: Plane },
     ],
   },
   {
     id: "bayar",
     label: "Pembayaran",
-    items: [
-      {
-        id: "payment",
-        label: "Metode",
-        hint: "QRIS & transfer bank",
-        Icon: CreditCard,
-      },
-    ],
+    items: [{ id: "payment", label: "Metode", Icon: CreditCard }],
   },
   {
     id: "akun",
-    label: "User Management",
-    items: [
-      {
-        id: "user",
-        label: "Pengguna",
-        hint: "Admin & visitor",
-        Icon: Users,
-      },
-    ],
+    label: "User",
+    items: [{ id: "user", label: "Pengguna", Icon: Users }],
   },
 ];
 
@@ -230,75 +185,56 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
 
   const midtransOk = midtransConfigured();
   const xenditOk = xenditConfigured();
-  const ActiveIcon = active.item.Icon;
 
   return (
     <div className={styles.page}>
       <header className={styles.head}>
-        <div className={styles.headText}>
-          <p className={styles.eyebrow}>Admin</p>
-          <h1 className={styles.title}>Settings</h1>
-          <p className={styles.subtitle}>
-            Kelola toko, katalog, pembayaran, dan pengguna
-          </p>
-        </div>
+        <h1 className={styles.title}>Settings</h1>
       </header>
 
-      <div className={styles.layout}>
-        <aside className={styles.sidebar} aria-label="Menu settings">
-          {NAV_GROUPS.map((group) => (
-            <div key={group.id} className={styles.navGroup}>
-              <p className={styles.navGroupLabel}>{group.label}</p>
-              <nav className={styles.navList} aria-label={group.label}>
-                {group.items.map(({ id, label, hint, Icon }) => {
-                  const on = tab === id;
-                  return (
-                    <Link
-                      key={id}
-                      href={`/admin/settings?tab=${id}`}
-                      className={`${styles.navItem} ${on ? styles.navItemOn : ""}`}
-                      aria-current={on ? "page" : undefined}
-                    >
-                      <span className={styles.navIcon} aria-hidden>
-                        <Icon size={15} strokeWidth={2.35} />
-                      </span>
-                      <span className={styles.navCopy}>
-                        <span className={styles.navLabel}>{label}</span>
-                        <span className={styles.navHint}>{hint}</span>
-                      </span>
-                    </Link>
-                  );
-                })}
-              </nav>
-            </div>
-          ))}
-        </aside>
+      <div className={styles.menu} aria-label="Menu settings">
+        {NAV_GROUPS.map((group) => (
+          <section key={group.id} className={styles.menuGroup}>
+            <p className={styles.menuGroupLabel}>{group.label}</p>
+            <nav className={styles.tabs} aria-label={group.label}>
+              {group.items.map(({ id, label, Icon }) => {
+                const on = tab === id;
+                return (
+                  <Link
+                    key={id}
+                    href={`/admin/settings?tab=${id}`}
+                    role="tab"
+                    aria-selected={on}
+                    className={`${styles.tab} ${on ? styles.tabOn : ""}`}
+                  >
+                    <span className={styles.tabIcon} aria-hidden>
+                      <Icon size={15} strokeWidth={2.35} />
+                    </span>
+                    <span className={styles.tabLabel}>{label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+          </section>
+        ))}
+      </div>
 
-        <section className={styles.content} aria-labelledby="settings-section">
-          <div className={styles.contentHead}>
-            <div className={styles.contentMark} aria-hidden>
-              <ActiveIcon size={18} strokeWidth={2.25} />
-            </div>
-            <div className={styles.contentTitles}>
-              <p className={styles.contentGroup}>{active.group.label}</p>
-              <h2 id="settings-section" className={styles.contentTitle}>
-                {active.item.label}
-              </h2>
-              <p className={styles.contentHint}>{active.item.hint}</p>
-            </div>
-          </div>
+      <section className={styles.panel} aria-label={active.item.label}>
+        <div className={styles.panelHead}>
+          <h2 className={styles.panelTitle}>{active.item.label}</h2>
+          <span className={styles.panelGroup}>{active.group.label}</span>
+        </div>
 
-          <div className={styles.panel}>
-            {showSaved ? (
-              <p className={styles.noticeOk} role="status">
-                Tersimpan
-              </p>
-            ) : null}
-            {showError ? (
-              <p className={styles.noticeErr} role="alert">
-                Gagal menyimpan
-              </p>
-            ) : null}
+        {showSaved ? (
+          <p className={styles.noticeOk} role="status">
+            Tersimpan
+          </p>
+        ) : null}
+        {showError ? (
+          <p className={styles.noticeErr} role="alert">
+            Gagal menyimpan
+          </p>
+        ) : null}
 
             {tab === "general" ? (
               <form action={updateSettingsAction} className="form admin-form">
@@ -377,9 +313,6 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
                   <div className={styles.sectionCard}>
                     <div className={styles.sectionCardHead}>
                       <p className={styles.payLabel}>QRIS</p>
-                      <p className={styles.sectionCardHint}>
-                        Pilih provider pembayaran QR
-                      </p>
                     </div>
                     <div
                       className={styles.payList}
@@ -433,9 +366,6 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
                 >
                   <div className={styles.sectionCardHead}>
                     <p className={styles.payLabel}>Transfer bank</p>
-                    <p className={styles.sectionCardHint}>
-                      Rekening untuk pembayaran manual
-                    </p>
                   </div>
                   <ul className={styles.bankList}>
                     {bankAccounts.length === 0 ? (
@@ -768,9 +698,7 @@ export default async function AdminSettingsPage({ searchParams }: PageProps) {
                 </div>
               </section>
             ) : null}
-          </div>
-        </section>
-      </div>
+      </section>
     </div>
   );
 }

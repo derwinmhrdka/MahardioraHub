@@ -40,6 +40,7 @@ type AdminOrderActionsProps = {
   forceRejectOpen?: boolean;
   mode?: "progress" | "bankPending";
   canConfirm?: boolean;
+  fullWidth?: boolean;
 };
 
 export function AdminOrderActions({
@@ -47,6 +48,7 @@ export function AdminOrderActions({
   forceRejectOpen = false,
   mode = "progress",
   canConfirm = true,
+  fullWidth = false,
 }: AdminOrderActionsProps) {
   const [rejectOpen, setRejectOpen] = useState(forceRejectOpen);
   const rejectAction =
@@ -59,7 +61,10 @@ export function AdminOrderActions({
 
   if (rejectOpen) {
     return (
-      <form action={rejectAction} className={styles.rejectForm}>
+      <form
+        action={rejectAction}
+        className={`${styles.rejectForm} ${fullWidth ? styles.full : ""}`}
+      >
         <input type="hidden" name="orderId" value={orderId} />
         <input
           name="reason"
@@ -73,7 +78,7 @@ export function AdminOrderActions({
         <div className={styles.rejectRow}>
           <SubmitBtn
             label="Tolak"
-            className={styles.btnDanger}
+            className={`${styles.btnDanger} ${fullWidth ? styles.btnGrow : ""}`}
             icon={<X size={14} strokeWidth={2.5} aria-hidden />}
           />
           <button
@@ -90,13 +95,13 @@ export function AdminOrderActions({
   }
 
   return (
-    <div className={styles.row}>
+    <div className={`${styles.row} ${fullWidth ? styles.rowFull : ""}`}>
       {canConfirm ? (
         <form action={confirmAction}>
           <input type="hidden" name="orderId" value={orderId} />
           <SubmitBtn
             label={confirmLabel}
-            className={styles.btnOk}
+            className={`${styles.btnOk} ${fullWidth ? styles.btnGrow : ""}`}
             icon={<Check size={14} strokeWidth={2.5} aria-hidden />}
           />
         </form>
@@ -105,7 +110,7 @@ export function AdminOrderActions({
       )}
       <button
         type="button"
-        className={styles.btnDanger}
+        className={`${styles.btnDanger} ${fullWidth ? styles.btnGrow : ""}`}
         onClick={() => setRejectOpen(true)}
         aria-label="Tolak"
         title="Tolak"

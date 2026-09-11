@@ -85,3 +85,21 @@
   font-weight: 700;
   color: var(--color-text-muted);
 }
+
+.rowFull {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+}
+
+.rowFull form {
+  min-width: 0;
+}
+
+.full {
+  width: 100%;
+}
+
+.btnGrow {
+  width: 100%;
+}

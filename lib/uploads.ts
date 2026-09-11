@@ -69,20 +69,15 @@ export function resolveUploadFile(filename: string): string | null {
 
 export async function saveProductImage(file: File | Blob): Promise<string> {
   const named = file as File;
-  const mime =
-    file.type ||
-    (typeof named.name === "string" && named.name.toLowerCase().endsWith(".png")
-      ? "image/png"
-      : typeof named.name === "string" &&
-          named.name.toLowerCase().endsWith(".webp")
-        ? "image/webp"
-        : typeof named.name === "string" &&
-            named.name.toLowerCase().endsWith(".gif")
-          ? "image/gif"
-          : typeof named.name === "string" &&
-              named.name.toLowerCase().match(/\.(jpe?g)$/)
-            ? "image/jpeg"
-            : file.type || "image/jpeg");
+  let mime = (file.type || "").toLowerCase().trim();
+  if (!mime || mime === "application/octet-stream") {
+    const name = typeof named.name === "string" ? named.name.toLowerCase() : "";
+    if (name.endsWith(".png")) mime = "image/png";
+    else if (name.endsWith(".webp")) mime = "image/webp";
+    else if (name.endsWith(".gif")) mime = "image/gif";
+    else if (name.endsWith(".jpg") || name.endsWith(".jpeg")) mime = "image/jpeg";
+    else mime = "image/jpeg";
+  }
 
   if (!ALLOWED_MIME.has(mime)) {
     throw new Error("Format gambar tidak didukung");
@@ -96,16 +91,21 @@ export async function saveProductImage(file: File | Blob): Promise<string> {
   const dir = getUploadDir();
   await mkdir(dir, { recursive: true });
 
-  const output = await sharp(input)
-    .rotate()
-    .resize({
-      width: MAX_IMAGE_EDGE,
-      height: MAX_IMAGE_EDGE,
-      fit: "inside",
-      withoutEnlargement: true,
-    })
-    .webp({ quality: WEBP_QUALITY })
-    .toBuffer();
+  let output: Buffer;
+  try {
+    output = await sharp(input)
+      .rotate()
+      .resize({
+        width: MAX_IMAGE_EDGE,
+        height: MAX_IMAGE_EDGE,
+        fit: "inside",
+        withoutEnlargement: true,
+      })
+      .webp({ quality: WEBP_QUALITY })
+      .toBuffer();
+  } catch {
+    throw new Error("Gambar tidak bisa diproses");
+  }
 
   await writeFile(path.join(dir, filename), output);
   return publicUploadPath(filename);

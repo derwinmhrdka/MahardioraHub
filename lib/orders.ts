@@ -314,9 +314,14 @@ export async function attachPaymentProof(input: {
       where: { id: input.bankAccountId, isActive: true },
     }),
   ]);
-  if (!order || order.payMethod !== OrderPayMethod.bank_transfer) return null;
-  if (order.status !== OrderStatus.pending) return order;
-  if (!account) return null;
+  if (!order) throw new Error("Order tidak ditemukan");
+  if (order.payMethod !== OrderPayMethod.bank_transfer) {
+    throw new Error("Bukan order transfer bank");
+  }
+  if (order.status !== OrderStatus.pending) {
+    throw new Error("Order sudah tidak pending");
+  }
+  if (!account) throw new Error("Rekening tidak valid");
 
   return prisma.order.update({
     where: { id: order.id },

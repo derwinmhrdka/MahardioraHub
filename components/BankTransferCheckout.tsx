@@ -11,7 +11,6 @@ import {
   Upload,
 } from "lucide-react";
 import { CancelOrderButton } from "@/components/CancelOrderButton";
-import { submitBankTransferProofAction } from "@/app/cart/checkout-actions";
 import { formatRupiah } from "@/lib/format";
 import styles from "./BankTransferCheckout.module.css";
 
@@ -40,7 +39,8 @@ export function BankTransferCheckout({
   initialProofUrl,
 }: BankTransferCheckoutProps) {
   const router = useRouter();
-  const fileRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const selectedFileRef = useRef<File | null>(null);
   const [pending, startTransition] = useTransition();
   const [selectedId, setSelectedId] = useState<number | null>(
     initialBankAccountId ?? accounts[0]?.id ?? null
@@ -71,6 +71,7 @@ export function BankTransferCheckout({
 
   function onFileChange(file: File | null) {
     setError(null);
+    selectedFileRef.current = file;
     if (!file) {
       setFileName(null);
       if (!proofUrl) setPreview(null);
@@ -87,32 +88,43 @@ export function BankTransferCheckout({
       setError("Pilih rekening dulu");
       return;
     }
-    const file = fileRef.current?.files?.[0] ?? null;
+    const file = selectedFileRef.current ?? fileInputRef.current?.files?.[0] ?? null;
     if (!file || file.size <= 0) {
       setError("Upload bukti transfer");
       return;
     }
 
     const formData = new FormData();
-    formData.set("orderId", orderId);
     formData.set("bankAccountId", String(selectedId));
-    formData.set("proof", file);
+    formData.set("proof", file, file.name || "bukti.jpg");
 
     setError(null);
     startTransition(async () => {
       try {
-        const result = await submitBankTransferProofAction(formData);
-        if (result?.error) {
-          setError(result.error);
+        const res = await fetch(`/api/checkout/${orderId}/proof`, {
+          method: "POST",
+          body: formData,
+        });
+        const data = (await res.json().catch(() => null)) as
+          | { proofUrl?: string; error?: string }
+          | null;
+
+        if (!res.ok || data?.error) {
+          setError(data?.error || "Gagal mengirim bukti");
           return;
         }
-        if (result?.proofUrl) {
-          setProofUrl(result.proofUrl);
-          setPreview(result.proofUrl);
+        if (!data?.proofUrl) {
+          setError("Gagal menyimpan bukti");
+          return;
         }
+
+        setProofUrl(data.proofUrl);
+        setPreview(data.proofUrl);
+        selectedFileRef.current = null;
         router.refresh();
-      } catch {
-        setError("Gagal mengirim bukti. Coba lagi.");
+      } catch (err) {
+        console.error("submit proof", err);
+        setError(err instanceof Error ? err.message : "Gagal mengirim bukti");
       }
     });
   }
@@ -248,7 +260,7 @@ export function BankTransferCheckout({
               <button
                 type="button"
                 className={styles.dropzone}
-                onClick={() => fileRef.current?.click()}
+                onClick={() => fileInputRef.current?.click()}
                 disabled={pending || submitted}
               >
                 <span className={styles.dropIcon} aria-hidden>
@@ -262,7 +274,7 @@ export function BankTransferCheckout({
             {!submitted ? (
               <>
                 <input
-                  ref={fileRef}
+                  ref={fileInputRef}
                   type="file"
                   name="proof"
                   accept="image/jpeg,image/png,image/webp,image/gif"
@@ -273,7 +285,7 @@ export function BankTransferCheckout({
                   <button
                     type="button"
                     className={styles.pickBtn}
-                    onClick={() => fileRef.current?.click()}
+                    onClick={() => fileInputRef.current?.click()}
                     disabled={pending}
                   >
                     <Upload size={14} strokeWidth={2.5} aria-hidden />

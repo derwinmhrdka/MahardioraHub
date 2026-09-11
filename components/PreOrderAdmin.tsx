@@ -1,14 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Plane, Plus, Trash2, X } from "lucide-react";
+import { useState } from "react";
+import { Plane, Plus, Trash2 } from "lucide-react";
 import {
   createPreOrderAction,
   deletePreOrderAction,
   updatePreOrderAction,
 } from "@/app/admin/(dashboard)/settings/actions";
-import { formatRupiah } from "@/lib/format";
-import { productImageUrl } from "@/lib/image-url";
+import { ProductMultiSelect } from "@/components/ProductMultiSelect";
 import styles from "./PreOrderAdmin.module.css";
 
 export type PreOrderProductOption = {
@@ -32,103 +31,6 @@ type PreOrderAdminProps = {
   products: PreOrderProductOption[];
   todayYmd: string;
 };
-
-function ProductPicker({
-  products,
-  picked,
-  onChange,
-  namePrefix,
-}: {
-  products: PreOrderProductOption[];
-  picked: number[];
-  onChange: (ids: number[]) => void;
-  namePrefix?: string;
-}) {
-  const [draftId, setDraftId] = useState("");
-  const byId = useMemo(
-    () => new Map(products.map((p) => [p.id, p] as const)),
-    [products]
-  );
-  const available = products.filter((p) => !picked.includes(p.id));
-
-  function addProduct() {
-    const id = Number(draftId);
-    if (!Number.isFinite(id) || picked.includes(id) || !byId.has(id)) return;
-    onChange([...picked, id]);
-    setDraftId("");
-  }
-
-  return (
-    <>
-      <div className={styles.pickRow}>
-        <select
-          value={draftId}
-          onChange={(e) => setDraftId(e.target.value)}
-          aria-label="Produk"
-        >
-          <option value="">Pilih produk</option>
-          {available.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.title}
-            </option>
-          ))}
-        </select>
-        <button
-          type="button"
-          className={styles.iconBtn}
-          aria-label="Tambah"
-          title="Tambah"
-          onClick={addProduct}
-          disabled={!draftId}
-        >
-          <Plus size={16} strokeWidth={2.25} aria-hidden />
-        </button>
-      </div>
-
-      <ul className={styles.list}>
-        {picked.length === 0 ? (
-          <li className={styles.empty}>Belum ada produk</li>
-        ) : (
-          picked.map((id) => {
-            const product = byId.get(id);
-            if (!product) return null;
-            const src = productImageUrl(product.imageUrl, 80);
-            return (
-              <li key={id} className={styles.row}>
-                {namePrefix ? (
-                  <input type="hidden" name={namePrefix} value={id} />
-                ) : null}
-                <span className={styles.thumb} aria-hidden>
-                  {src ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={src} alt="" />
-                  ) : (
-                    "—"
-                  )}
-                </span>
-                <span className={styles.meta}>
-                  <span className={styles.title}>{product.title}</span>
-                  <span className={styles.price}>
-                    {formatRupiah(product.price)}
-                  </span>
-                </span>
-                <button
-                  type="button"
-                  className={styles.iconBtn}
-                  aria-label="Hapus"
-                  title="Hapus"
-                  onClick={() => onChange(picked.filter((x) => x !== id))}
-                >
-                  <X size={14} strokeWidth={2.25} aria-hidden />
-                </button>
-              </li>
-            );
-          })
-        )}
-      </ul>
-    </>
-  );
-}
 
 function BatchEditor({
   batch,
@@ -170,10 +72,11 @@ function BatchEditor({
         </span>
       </div>
 
-      <div className="form-row">
+      <div className={styles.field}>
         <label htmlFor={`lastOrder-${batch.id}`}>Last Order</label>
         <input
           id={`lastOrder-${batch.id}`}
+          className={styles.dateInput}
           name="lastOrderDate"
           type="date"
           value={date}
@@ -182,15 +85,12 @@ function BatchEditor({
         />
       </div>
 
-      <div className="form-row">
-        <label>Produk</label>
-        <ProductPicker
-          products={products}
-          picked={picked}
-          onChange={setPicked}
-          namePrefix="productIds"
-        />
-      </div>
+      <ProductMultiSelect
+        products={products}
+        value={picked}
+        onChange={setPicked}
+        name="productIds"
+      />
 
       <div className={styles.batchActions}>
         <button type="submit" className="btn">
@@ -246,10 +146,11 @@ function CreateBatch({
         </div>
       </div>
 
-      <div className="form-row">
+      <div className={styles.field}>
         <label htmlFor="lastOrder-new">Last Order</label>
         <input
           id="lastOrder-new"
+          className={styles.dateInput}
           name="lastOrderDate"
           type="date"
           value={date}
@@ -258,15 +159,12 @@ function CreateBatch({
         />
       </div>
 
-      <div className="form-row">
-        <label>Produk</label>
-        <ProductPicker
-          products={products}
-          picked={picked}
-          onChange={setPicked}
-          namePrefix="productIds"
-        />
-      </div>
+      <ProductMultiSelect
+        products={products}
+        value={picked}
+        onChange={setPicked}
+        name="productIds"
+      />
 
       <div className={styles.batchActions}>
         <button type="submit" className="btn">

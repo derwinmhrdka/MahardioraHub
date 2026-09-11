@@ -7,7 +7,6 @@ import {
   ImageOff,
   Loader,
 } from "lucide-react";
-import { AdminOrderActions } from "@/components/AdminOrderActions";
 import { formatRupiah } from "@/lib/format";
 import { productImageUrl } from "@/lib/image-url";
 import type { OrderListTab } from "@/lib/orders";
@@ -54,7 +53,6 @@ type AdminOrderListProps = {
   imageByProduct: Map<number, string | null>;
   notice?: string | null;
   noticeTone?: "ok" | "error";
-  rejectFocusOrderId?: string | null;
 };
 
 const TABS: { id: OrderListTab; label: string; Icon: typeof Loader }[] = [
@@ -79,7 +77,6 @@ export function AdminOrderList({
   imageByProduct,
   notice = null,
   noticeTone = "ok",
-  rejectFocusOrderId = null,
 }: AdminOrderListProps) {
   const EmptyIcon =
     TABS.find((t) => t.id === activeTab)?.Icon ?? ClipboardList;
@@ -133,94 +130,75 @@ export function AdminOrderList({
       ) : (
         <ul className={styles.list}>
           {orders.map((order) => (
-            <li key={order.id} className={styles.card}>
-              <div className={styles.cardTop}>
-                <div>
-                  <p className={styles.inv}>{order.externalId}</p>
-                  <p className={styles.buyer}>
-                    {order.buyerName ||
-                      order.user?.name ||
-                      order.user?.email ||
-                      "User"}
-                  </p>
-                  {order.buyerWhatsapp ? (
-                    <p className={styles.buyerPhone}>{order.buyerWhatsapp}</p>
-                  ) : null}
-                  {order.payMethod === "bank_transfer" ? (
-                    <p className={styles.payTag}>Transfer bank</p>
-                  ) : null}
+            <li key={order.id}>
+              <Link href={`/orders/${order.id}`} className={styles.card}>
+                <div className={styles.cardTop}>
+                  <div>
+                    <p className={styles.inv}>{order.externalId}</p>
+                    <p className={styles.buyer}>
+                      {order.buyerName ||
+                        order.user?.name ||
+                        order.user?.email ||
+                        "User"}
+                    </p>
+                    {order.buyerWhatsapp ? (
+                      <p className={styles.buyerPhone}>{order.buyerWhatsapp}</p>
+                    ) : null}
+                    {order.payMethod === "bank_transfer" ? (
+                      <p className={styles.payTag}>Transfer bank</p>
+                    ) : null}
+                  </div>
+                  <p className={styles.amount}>{formatRupiah(order.amount)}</p>
                 </div>
-                <p className={styles.amount}>{formatRupiah(order.amount)}</p>
-              </div>
 
-              {order.bankAccount ? (
-                <p className={styles.bankInfo}>
-                  {order.bankAccount.bankName} ·{" "}
-                  {order.bankAccount.accountNumber}
-                </p>
-              ) : null}
-
-              {order.paymentProofUrl ? (
-                <a
-                  href={order.paymentProofUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.proof}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={order.paymentProofUrl} alt="Bukti transfer" />
-                  <span>Lihat bukti</span>
-                </a>
-              ) : activeTab === "pending" ? (
-                <p className={styles.noProof}>Belum upload bukti</p>
-              ) : null}
-
-              {order.cancelReason ? (
-                <p className={styles.reason}>{order.cancelReason}</p>
-              ) : null}
-
-              <ul className={styles.items}>
-                {order.items.map((item) => {
-                  const src = productImageUrl(
-                    imageByProduct.get(item.productId) ?? null,
-                    64
-                  );
-                  return (
-                    <li key={item.id} className={styles.item}>
-                      <div className={styles.thumb}>
-                        {src ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={src} alt="" />
-                        ) : (
-                          <ImageOff size={12} strokeWidth={1.75} aria-hidden />
-                        )}
-                      </div>
-                      <p className={styles.itemTitle}>{item.title}</p>
-                      <p className={styles.itemQty}>x{item.quantity}</p>
-                    </li>
-                  );
-                })}
-              </ul>
-
-              <div className={styles.cardActions}>
-                <Link href={`/orders/${order.id}`} className={styles.invoiceLink}>
-                  Invoice
-                </Link>
-                {activeTab === "progress" ? (
-                  <AdminOrderActions
-                    orderId={order.id}
-                    forceRejectOpen={rejectFocusOrderId === order.id}
-                  />
+                {order.bankAccount ? (
+                  <p className={styles.bankInfo}>
+                    {order.bankAccount.bankName} ·{" "}
+                    {order.bankAccount.accountNumber}
+                  </p>
                 ) : null}
-                {activeTab === "pending" ? (
-                  <AdminOrderActions
-                    orderId={order.id}
-                    mode="bankPending"
-                    canConfirm={Boolean(order.paymentProofUrl)}
-                    forceRejectOpen={rejectFocusOrderId === order.id}
-                  />
+
+                {order.paymentProofUrl ? (
+                  <div className={styles.proof}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={order.paymentProofUrl} alt="" />
+                    <span>Ada bukti</span>
+                  </div>
+                ) : activeTab === "pending" ? (
+                  <p className={styles.noProof}>Belum upload bukti</p>
                 ) : null}
-              </div>
+
+                {order.cancelReason ? (
+                  <p className={styles.reason}>{order.cancelReason}</p>
+                ) : null}
+
+                <ul className={styles.items}>
+                  {order.items.map((item) => {
+                    const src = productImageUrl(
+                      imageByProduct.get(item.productId) ?? null,
+                      64
+                    );
+                    return (
+                      <li key={item.id} className={styles.item}>
+                        <div className={styles.thumb}>
+                          {src ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={src} alt="" />
+                          ) : (
+                            <ImageOff
+                              size={12}
+                              strokeWidth={1.75}
+                              aria-hidden
+                            />
+                          )}
+                        </div>
+                        <p className={styles.itemTitle}>{item.title}</p>
+                        <p className={styles.itemQty}>x{item.quantity}</p>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </Link>
             </li>
           ))}
         </ul>
