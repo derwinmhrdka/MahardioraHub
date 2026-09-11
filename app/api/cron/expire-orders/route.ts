@@ -5,10 +5,21 @@ import { log } from "@/lib/logger";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+function isLocalRequest(request: Request) {
+  try {
+    const host = new URL(request.url).hostname;
+    return host === "127.0.0.1" || host === "localhost";
+  } catch {
+    return false;
+  }
+}
+
 function authorized(request: Request) {
+  // Container entrypoint / local loopback may call without a secret.
+  if (isLocalRequest(request)) return true;
+
   const secret = process.env.CRON_SECRET?.trim();
   if (!secret) {
-    // Allow unauthenticated only in non-production for local/dev.
     return process.env.NODE_ENV !== "production";
   }
   const header = request.headers.get("authorization")?.trim() ?? "";

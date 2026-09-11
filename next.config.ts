@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  serverExternalPackages: ["sharp", "@img/sharp-linuxmusl-x64", "@img/sharp-libvips-linuxmusl-x64"],
+  serverExternalPackages: ["sharp"],
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
@@ -38,17 +38,9 @@ const nextConfig: NextConfig = {
     middlewareClientMaxBodySize: "24mb",
   },
   // Avoid webpack pack cache filling the disk during Docker builds (ENOSPC).
-  webpack: (config, { dev, nextRuntime }) => {
+  webpack: (config, { dev }) => {
     if (!dev) {
       config.cache = false;
-    }
-    // Instrumentation Edge compile must not pull Node-only scheduler graph.
-    if (nextRuntime === "edge") {
-      config.resolve.alias = {
-        ...(config.resolve.alias as Record<string, string | false>),
-        "./instrumentation.node": false,
-        "@/lib/orders/scheduler": false,
-      };
     }
     return config;
   },

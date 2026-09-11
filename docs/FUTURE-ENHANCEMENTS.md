@@ -16,8 +16,8 @@ Update status when an item ships.
 
 ## Ops notes
 
-- Set `CRON_SECRET` in production if calling `/api/cron/expire-orders` from external cron.
-- In-process expiry scheduler starts via `instrumentation.ts` (disable with `ORDER_EXPIRY_SCHEDULER=0`).
+- Order expiry: Docker entrypoint loops `GET http://127.0.0.1:3000/api/cron/expire-orders` every 60s.
+- External cron may also call `/api/cron/expire-orders` (use `CRON_SECRET` / Bearer when not localhost).
 - Health: `GET /api/health` (also used by Docker healthcheck).
 
 ## Already implemented (this pass)
@@ -29,5 +29,5 @@ Update status when an item ships.
 - Admin role check in middleware (JWT role)
 - In-memory rate limit on uploads / proof / cancel / buyer / simulate
 - `SmartImage` (`next/image`) on catalog/banner surfaces
-- Order expiry scheduler + `/api/cron/expire-orders`
+- Order expiry via Docker entrypoint cron loop + `/api/cron/expire-orders`
 - Structured JSON logging + `/api/health` + Docker healthcheck
