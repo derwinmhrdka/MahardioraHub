@@ -1,4 +1,5 @@
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 
 /** Keeps header mounted across catalog filter navigations (no Suspense blink). */
 export default function CollectionLayout({
@@ -10,6 +11,7 @@ export default function CollectionLayout({
     <div className="section-secondhand">
       <SiteHeader active="secondhand" />
       {children}
+      <SiteFooter />
     </div>
   );
 }

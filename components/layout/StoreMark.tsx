@@ -10,14 +10,14 @@ type StoreMarkProps = {
   size?: number;
 };
 
-/** Brand mark — Mahardiora-Hub character logo. */
+/** Brand mark — Mahardiora character logo. */
 export function StoreMark({
   className,
   animated = false,
   size = 72,
 }: StoreMarkProps) {
-  // Trimmed logo aspect ≈ 1087×816
-  const height = Math.round(size * 0.75);
+  // New logo aspect ≈ 651×637
+  const height = Math.round(size * 0.98);
 
   return (
     <span

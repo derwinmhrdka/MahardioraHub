@@ -16,10 +16,10 @@
   align-items: center;
   gap: 0.2rem;
   padding: 0.15rem;
-  border: var(--stroke) solid #111;
+  border: 2px solid var(--line);
   border-radius: 999px;
-  background: #fff;
-  box-shadow: var(--shadow-doodle-sm);
+  background: var(--cream-card);
+  box-shadow: 0 3px 0 0 color-mix(in srgb, var(--forest) 16%, transparent);
 }
 
 .qtyBtn {
@@ -31,12 +31,12 @@
   border: 0;
   border-radius: 999px;
   background: transparent;
-  color: #111;
+  color: var(--forest);
   cursor: pointer;
 }
 
 .qtyBtn:hover:not(:disabled) {
-  background: #111;
+  background: var(--forest);
   color: #fff;
 }
 
@@ -51,6 +51,7 @@
   font-size: 0.9rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
+  color: var(--ink);
 }
 
 .btn {
@@ -60,14 +61,16 @@
   gap: 0.45rem;
   width: 100%;
   padding: 0.7rem 1rem;
-  border: var(--stroke) solid #111;
+  border: none;
   border-radius: 999px;
-  background: #fff;
-  color: #111;
+  background: var(--forest);
+  color: #fff;
   font-family: var(--font-body-stack);
   font-size: var(--text-nav);
-  font-weight: 700;
-  box-shadow: var(--shadow-doodle-sm);
+  font-weight: 800;
+  box-shadow:
+    0 0 0 2px var(--cream-card),
+    0 4px 0 0 var(--forest-dark);
   cursor: pointer;
   text-decoration: none;
   transition:
@@ -78,31 +81,35 @@
 }
 
 .btn:hover {
-  background: #111;
+  background: var(--forest-dark);
   color: #fff;
-  transform: translate(-1px, -1px);
-  box-shadow: 3px 3px 0 #111;
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 0 2px var(--cream-card),
+    0 6px 0 0 var(--forest-dark);
 }
 
 .btn:active {
-  transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0 #111;
+  transform: translateY(2px);
+  box-shadow:
+    0 0 0 2px var(--cream-card),
+    0 2px 0 0 var(--forest-dark);
 }
 
 .btn:disabled {
-  opacity: 0.45;
+  opacity: 1;
   cursor: default;
   transform: none;
-  box-shadow: var(--shadow-doodle-sm);
-  background: #eee;
-  color: #666;
+  background: #d8d0bd;
+  color: #8a8069;
+  box-shadow: none;
 }
 
 .btn:disabled:hover {
-  background: #eee;
-  color: #666;
+  background: #d8d0bd;
+  color: #8a8069;
   transform: none;
-  box-shadow: var(--shadow-doodle-sm);
+  box-shadow: none;
 }
 
 .btn svg {

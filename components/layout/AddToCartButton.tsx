@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { Minus, Plus, ShoppingCart } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
+import { DinoPaw } from "@/components/DinoPaw";
 import { addToCartAction } from "@/app/cart/actions";
 import { flyToCart } from "@/lib/cart-fly";
 import { productImageUrl } from "@/lib/image-url";
@@ -47,8 +48,8 @@ export function AddToCartButton({
           </button>
         </div>
         <button type="button" className={styles.btn} disabled>
-          <ShoppingCart size={16} strokeWidth={2.25} aria-hidden />
-          Tambah
+          <DinoPaw size={15} />
+          Habis
         </button>
       </div>
     );
@@ -96,7 +97,7 @@ export function AddToCartButton({
           className={styles.btn}
           disabled={pending}
         >
-          <ShoppingCart size={16} strokeWidth={2.25} aria-hidden />
+          <DinoPaw size={15} />
           {pending ? "..." : "Tambah"}
         </button>
       </div>

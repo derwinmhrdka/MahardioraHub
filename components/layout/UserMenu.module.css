@@ -17,22 +17,23 @@
   width: 2.15rem;
   height: 2.15rem;
   padding: 0;
-  border: var(--stroke) solid #111;
+  border: 2px solid var(--forest);
   border-radius: 999px;
-  background: #fff;
-  color: #111;
-  box-shadow: 1px 1px 0 #111;
+  background: var(--cream-card);
+  color: var(--forest);
+  box-shadow: 0 3px 0 0 var(--forest-dark);
   cursor: pointer;
   text-decoration: none;
   transition:
     transform 0.15s ease,
-    background 0.15s ease;
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .login:hover,
 .avatarBtn:hover,
 .avatarOn {
-  background: #111;
+  background: var(--forest);
   color: #fff;
   transform: translateY(-1px);
 }
@@ -61,10 +62,10 @@
   flex-direction: column;
   gap: 0.3rem;
   padding: 0.4rem;
-  border: var(--stroke) solid #111;
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 2px 2px 0 #111;
+  border: 2px solid var(--forest);
+  border-radius: var(--radius-sm);
+  background: var(--cream-card);
+  box-shadow: 0 5px 0 0 var(--forest-dark);
   animation: menuIn 0.18s ease-out both;
 }
 
@@ -89,10 +90,10 @@
   width: 100%;
   min-height: 2rem;
   padding: 0.35rem 0.5rem;
-  border: 1px solid #111;
+  border: 1.5px solid var(--line);
   border-radius: 10px;
-  background: #f7f3eb;
-  color: #111;
+  background: var(--cream);
+  color: var(--ink);
   font-family: var(--font-body-stack);
   font-size: 0.75rem;
   font-weight: 700;
@@ -101,8 +102,9 @@
 }
 
 .item:hover {
-  background: #111;
+  background: var(--forest);
   color: #fff;
+  border-color: var(--forest);
 }
 
 .item svg {

@@ -54,7 +54,12 @@
 }
 
 .dockBtnOn {
-  background: #111;
+  background: var(--forest);
+  color: #fff;
+}
+
+.dockBtnOn:hover {
+  background: var(--forest-dark);
   color: #fff;
 }
 
@@ -169,9 +174,14 @@
 }
 
 .active {
-  background: #111;
+  background: var(--forest);
   color: #fff;
   font-weight: 700;
+}
+
+.active:hover {
+  background: var(--forest-dark);
+  color: #fff;
 }
 
 .emptyText {

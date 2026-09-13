@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Flame } from "lucide-react";
+import { DinoPaw } from "@/components/DinoPaw";
 import { expireFlashSaleAction } from "@/app/secondhand/actions";
 import { SmartImage } from "@/components/SmartImage";
 import { formatRupiah } from "@/lib/format";
@@ -78,8 +78,8 @@ export function FlashSaleStrip({
     <section className={styles.wrap} aria-label="Flash Sale">
       <div className={styles.head}>
         <h2 className={styles.title}>
-          <span className={styles.flameIcon} aria-hidden>
-            <Flame size={14} strokeWidth={2.5} />
+          <span className={styles.pawIcon} aria-hidden>
+            <DinoPaw size={13} />
           </span>
           Flash Sale!
         </h2>
@@ -93,7 +93,7 @@ export function FlashSaleStrip({
 
       <div className={styles.barTrack} aria-hidden>
         <div className={styles.barFill} style={{ width: `${progress * 100}%` }}>
-          <span className={styles.flameWave} />
+          <span className={styles.barShine} />
         </div>
       </div>
 

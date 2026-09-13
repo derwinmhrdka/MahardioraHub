@@ -31,7 +31,7 @@
 }
 
 .tabOn {
-  background: #111;
+  background: var(--forest);
   color: #fff;
 }
 

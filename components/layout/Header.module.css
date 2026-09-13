@@ -2,8 +2,12 @@
   position: sticky;
   top: 0;
   z-index: 40;
-  border-bottom: var(--stroke) solid var(--color-border);
-  background: rgba(255, 255, 255, 0.96);
+}
+
+.main {
+  position: relative;
+  border-bottom: 3px solid var(--forest);
+  background: color-mix(in srgb, var(--cream-card) 94%, transparent);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
@@ -15,7 +19,7 @@
   gap: 0.75rem;
   max-width: 1100px;
   margin: 0 auto;
-  padding: 0.5rem 0.75rem;
+  padding: 0.55rem 0.75rem 0.65rem;
 }
 
 .brand {
@@ -23,8 +27,14 @@
   align-items: center;
   min-width: 0;
   line-height: 0;
-  color: var(--color-text);
+  color: var(--forest);
   text-decoration: none;
+  filter: drop-shadow(0 3px 0 color-mix(in srgb, var(--forest-dark) 18%, transparent));
+  transition: transform 0.15s ease;
+}
+
+.brand:hover {
+  transform: translateY(-1px) rotate(-1deg);
 }
 
 .brandLogo {
@@ -44,10 +54,10 @@
   min-width: 0;
   gap: 0.15rem;
   padding: 0.15rem;
-  border: var(--stroke) solid var(--color-border);
+  border: 2px solid var(--line);
   border-radius: 999px;
-  background: #fff;
-  box-shadow: var(--shadow-doodle-sm);
+  background: var(--cream-card);
+  box-shadow: 0 3px 0 0 color-mix(in srgb, var(--forest) 14%, transparent);
 }
 
 .right {
@@ -76,7 +86,6 @@
   line-height: 1;
   white-space: nowrap;
   text-decoration: none;
-  color: var(--color-text-muted);
   transition:
     background 0.12s ease,
     color 0.12s ease,
@@ -97,20 +106,28 @@
   flex-shrink: 0;
 }
 
-.navOff:hover {
-  color: var(--color-text);
-  background: var(--color-accent-soft);
+.navOff,
+.nav a.navOff {
+  color: var(--ink-soft);
 }
 
-.navOn {
-  color: var(--color-text);
-  background: var(--color-accent-soft);
-  border-color: var(--color-border);
-  box-shadow: 1px 1px 0 rgba(17, 17, 17, 0.12);
+.navOff:hover,
+.nav a.navOff:hover {
+  color: var(--forest);
+  background: var(--sage-light);
 }
 
-.navOn svg {
-  color: var(--color-text);
+.navOn,
+.nav a.navOn {
+  color: #fff;
+  background: var(--forest);
+  border-color: var(--forest);
+  box-shadow: 0 2px 0 0 var(--forest-dark);
+}
+
+.navOn svg,
+.nav a.navOn svg {
+  color: #fff;
 }
 
 .fallbackSlot {
@@ -118,7 +135,7 @@
   width: 2rem;
   height: 1.9rem;
   border-radius: 999px;
-  background: rgba(17, 17, 17, 0.06);
+  background: color-mix(in srgb, var(--sage) 28%, transparent);
   flex-shrink: 0;
 }
 
@@ -138,7 +155,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .navOn,
-  .navOff {
+  .navOff,
+  .brand {
     transition: none;
+    animation: none;
   }
 }

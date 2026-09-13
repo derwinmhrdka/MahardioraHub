@@ -3,11 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
+import { DinoPaw } from "@/components/DinoPaw";
 import {
   Baby,
   CalendarClock,
   Home,
-  LayoutGrid,
   Search,
   Smartphone,
   Tag,
@@ -151,7 +151,7 @@ export function CategoryChips({
           )}
           tabIndex={open ? -1 : undefined}
         >
-          <LayoutGrid size={10} strokeWidth={2} aria-hidden />
+          <DinoPaw size={11} />
           Semua
         </Link>
         {showPreOrder && mode === "secondhand" ? (

@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mahardiora-Hub — Dino Theme Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#2F5A40;
+    --forest-dark:#1E3B29;
+    --sage:#9BC48A;
+    --sage-light:#C7E2B8;
+    --cream:#FBF3DF;
+    --cream-card:#FFFCF3;
+    --blush:#F3AFC7;
+    --blush-dark:#D97D9E;
+    --gold:#E8B84B;
+    --ink:#2B241F;
+    --ink-soft:#5B5147;
+    --line:#E4D9BE;
+    --radius-lg: 28px;
+    --radius-md: 18px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Nunito', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3, .display{
+    font-family:'Baloo 2', cursive;
+    color:var(--forest);
+    margin:0;
+  }
+  a{text-decoration:none;color:inherit;}
+  ul{list-style:none;margin:0;padding:0;}
+  img{display:block;max-width:100%;}
+
+  /* ---------- sticker die-cut helper ---------- */
+  .sticker{
+    box-shadow:
+      0 0 0 3px var(--cream-card),
+      0 0 0 6px var(--forest),
+      0 8px 0 0 var(--forest-dark);
+  }
+  .sticker-sm{
+    box-shadow:
+      0 0 0 2px var(--cream-card),
+      0 0 0 4px var(--forest),
+      0 5px 0 0 var(--forest-dark);
+  }
+
+  /* ---------- footprint icon ---------- */
+  .paw{
+    display:inline-block; width:16px; height:16px; position:relative; flex:none;
+  }
+  .paw svg{width:100%;height:100%;}
+
+  /* ================= TOP UTILITY BAR ================= */
+  .utility-bar{
+    background:var(--forest-dark);
+    color:var(--cream);
+    font-size:13px;
+    font-weight:700;
+    padding:8px 32px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    letter-spacing:.2px;
+  }
+  .utility-bar .track{
+    display:flex; gap:6px; align-items:center; opacity:.9;
+  }
+  .utility-bar nav{display:flex; gap:20px;}
+  .utility-bar nav a{opacity:.85;}
+  .utility-bar nav a:hover{opacity:1; text-decoration:underline;}
+
+  /* ================= MAIN HEADER ================= */
+  header.main{
+    background:var(--cream-card);
+    padding:18px 32px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:3px solid var(--forest);
+  }
+  .brand{
+    display:flex; align-items:center; gap:12px;
+  }
+  .brand img{width:52px; height:52px; border-radius:16px;}
+  .brand .word{
+    font-family:'Baloo 2', cursive;
+    font-size:24px;
+    color:var(--forest);
+    font-weight:700;
+  }
+  .search-wrap{
+    flex:1;
+    max-width:420px;
+    margin:0 32px;
+    position:relative;
+  }
+  .search-wrap input{
+    width:100%;
+    padding:12px 18px 12px 44px;
+    border-radius:999px;
+    border:2px solid var(--sage);
+    background:var(--cream);
+    font-family:'Nunito';
+    font-size:14px;
+    font-weight:600;
+    color:var(--ink);
+    outline:none;
+  }
+  .search-wrap input:focus{border-color:var(--forest);}
+  .search-wrap .paw{position:absolute; left:16px; top:50%; transform:translateY(-50%) rotate(-15deg); opacity:.55;}
+  .header-actions{display:flex; align-items:center; gap:18px;}
+  .cart-pill{
+    display:flex; align-items:center; gap:8px;
+    background:var(--forest);
+    color:var(--cream);
+    padding:10px 18px 10px 16px;
+    border-radius:999px;
+    font-weight:800;
+    font-size:14px;
+    position:relative;
+  }
+  .cart-pill .badge{
+    background:var(--blush);
+    color:var(--forest-dark);
+    border-radius:999px;
+    font-size:11px;
+    padding:1px 7px;
+    font-weight:800;
+  }
+
+  /* ================= HERO (awning) ================= */
+  .hero{
+    position:relative;
+    background:repeating-linear-gradient(
+      100deg,
+      var(--forest) 0 60px,
+      var(--sage) 60px 120px
+    );
+    padding:0 0 56px 0;
+    overflow:hidden;
+  }
+  .hero-inner{
+    max-width:1180px;
+    margin:0 auto;
+    padding:56px 32px 0;
+    display:flex;
+    align-items:center;
+    gap:48px;
+    position:relative;
+    z-index:2;
+  }
+  .hero-copy{flex:1; color:var(--cream-card);}
+  .hero-copy .eyebrow-shop{
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--forest-dark);
+    padding:7px 16px;
+    border-radius:999px;
+    font-weight:800;
+    font-size:13px;
+    color:var(--cream);
+    margin-bottom:18px;
+  }
+  .hero-copy h1{
+    font-size:46px;
+    line-height:1.08;
+    color:#fff;
+    text-shadow:0 3px 0 var(--forest-dark);
+    margin-bottom:16px;
+  }
+  .hero-copy p{
+    font-size:16px;
+    font-weight:600;
+    max-width:420px;
+    line-height:1.6;
+    color:var(--cream);
+    margin-bottom:26px;
+  }
+  .btn-primary{
+    display:inline-flex; align-items:center; gap:10px;
+    background:var(--blush);
+    color:var(--forest-dark);
+    font-family:'Baloo 2';
+    font-weight:700;
+    font-size:17px;
+    padding:14px 26px;
+    border-radius:999px;
+    border:none;
+    cursor:pointer;
+    box-shadow:0 0 0 3px var(--cream-card), 0 6px 0 0 var(--blush-dark);
+    transition:transform .12s ease;
+  }
+  .btn-primary:hover{transform:translateY(-2px);}
+  .btn-primary:active{transform:translateY(3px); box-shadow:0 0 0 3px var(--cream-card), 0 2px 0 0 var(--blush-dark);}
+
+  .hero-art{
+    flex:none;
+    width:300px;
+  }
+  .hero-art img{
+    width:100%;
+    filter:drop-shadow(0 14px 0 rgba(30,59,41,.25));
+  }
+
+  .hero-scallop{
+    position:absolute;
+    bottom:0; left:0; width:100%; height:44px;
+    background:
+      radial-gradient(circle at 22px 0, transparent 22px, var(--cream) 23px) 0 -1px / 44px 44px repeat-x;
+  }
+
+  /* ================= CATEGORY PILLS ================= */
+  .cat-bar{
+    max-width:1180px;
+    margin:0 auto;
+    padding:26px 32px 6px;
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .cat-pill{
+    display:flex; align-items:center; gap:8px;
+    background:var(--cream-card);
+    border:2px solid var(--line);
+    padding:10px 20px;
+    border-radius:999px;
+    font-weight:800;
+    font-size:14px;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:.15s ease;
+  }
+  .cat-pill:hover{border-color:var(--sage);}
+  .cat-pill.active{
+    background:var(--forest);
+    border-color:var(--forest);
+    color:#fff;
+  }
+  .cat-pill.active .paw svg path{fill:#fff;}
+
+  /* ================= LAYOUT ================= */
+  .content-wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:20px 32px 70px;
+    display:grid;
+    grid-template-columns:250px 1fr;
+    gap:30px;
+    align-items:start;
+  }
+
+  /* sidebar */
+  .sidebar{
+    background:var(--cream-card);
+    border-radius:var(--radius-md);
+    border:2px solid var(--line);
+    padding:22px;
+    position:sticky;
+    top:20px;
+  }
+  .sidebar h3{
+    font-size:18px;
+    margin-bottom:14px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .sidebar .group{margin-bottom:24px;}
+  .sidebar .group:last-child{margin-bottom:0;}
+  .filter-opt{
+    display:flex; align-items:center; gap:10px;
+    padding:7px 0;
+    font-weight:700;
+    font-size:14px;
+    color:var(--ink-soft);
+    cursor:pointer;
+  }
+  .filter-opt .egg{
+    width:16px; height:18px;
+    border:2px solid var(--sage);
+    border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+    flex:none;
+  }
+  .filter-opt.selected .egg{background:var(--sage);}
+  .filter-opt.selected{color:var(--forest);}
+
+  /* product grid */
+  .grid-head{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:16px;
+  }
+  .grid-head h2{font-size:24px;}
+  .grid-head .count{
+    font-size:13px; font-weight:700; color:var(--ink-soft);
+    background:var(--sage-light);
+    padding:6px 14px;
+    border-radius:999px;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:22px;
+  }
+  .card{
+    background:var(--cream-card);
+    border-radius:var(--radius-md);
+    border:2px solid var(--forest);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    transition:transform .15s ease;
+  }
+  .card:hover{transform:translateY(-4px);}
+  .card-media{
+    height:150px;
+    position:relative;
+    display:flex; align-items:center; justify-content:center;
+    font-size:48px;
+    background:
+      repeating-linear-gradient(45deg, var(--sage-light), var(--sage-light) 10px, #eef4e6 10px, #eef4e6 20px);
+  }
+  .card-media .emoji{filter:drop-shadow(0 4px 0 rgba(0,0,0,.08));}
+  .tag{
+    position:absolute; top:10px; left:-6px;
+    background:var(--blush);
+    color:#fff;
+    font-weight:800;
+    font-size:12px;
+    padding:5px 12px 5px 16px;
+    border-radius:0 999px 999px 0;
+    box-shadow:0 3px 0 var(--blush-dark);
+  }
+  .tag.sold{
+    background:var(--ink-soft);
+    box-shadow:0 3px 0 #3a332b;
+  }
+  .tag.preorder{
+    background:var(--gold);
+    color:var(--forest-dark);
+    box-shadow:0 3px 0 #b8912f;
+  }
+  .card-body{
+    padding:16px 16px 18px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    flex:1;
+  }
+  .card-cat{
+    font-size:11.5px;
+    font-weight:800;
+    color:var(--forest);
+    text-transform:none;
+  }
+  .card-title{
+    font-family:'Baloo 2';
+    font-size:16.5px;
+    color:var(--ink);
+    line-height:1.25;
+  }
+  .card-desc{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-weight:600;
+    line-height:1.4;
+    flex:1;
+  }
+  .card-loc{
+    font-size:11.5px;
+    font-weight:700;
+    color:var(--ink-soft);
+    display:flex; align-items:center; gap:5px;
+  }
+  .price-row{
+    display:flex; align-items:baseline; gap:8px; margin-top:4px;
+  }
+  .price-now{font-size:17px; font-weight:800; color:var(--forest-dark);}
+  .price-old{font-size:12.5px; color:#b0a58e; text-decoration:line-through; font-weight:700;}
+  .discount{
+    font-size:11px; font-weight:800; color:var(--blush-dark);
+    background:#fbeaf0; padding:2px 7px; border-radius:6px;
+  }
+  .card-cta{
+    margin-top:10px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    background:var(--forest);
+    color:#fff;
+    font-family:'Baloo 2';
+    font-weight:600;
+    font-size:14px;
+    padding:10px;
+    border-radius:999px;
+    border:none;
+    cursor:pointer;
+  }
+  .card-cta:hover{background:var(--forest-dark);}
+  .card-cta.disabled{
+    background:#d8d0bd;
+    color:#8a8069;
+    cursor:not-allowed;
+  }
+
+  /* ================= FOOTER ================= */
+  footer{
+    position:relative;
+    background:var(--forest);
+    padding-top:60px;
+    color:var(--cream);
+  }
+  .hill-top{
+    position:absolute; top:-1px; left:0; width:100%; height:60px;
+    background:
+      radial-gradient(circle at 30px 60px, transparent 30px, var(--sage) 31px) 0 0 / 60px 60px repeat-x;
+  }
+  .footer-inner{
+    max-width:1180px;
+    margin:0 auto;
+    padding:10px 32px 40px;
+    display:flex;
+    justify-content:space-between;
+    gap:40px;
+    flex-wrap:wrap;
+  }
+  .footer-brand{display:flex; align-items:center; gap:12px; max-width:280px;}
+  .footer-brand img{width:56px; border-radius:16px;}
+  .footer-brand p{font-size:13px; font-weight:600; opacity:.85; margin-top:6px; line-height:1.5;}
+  .footer-cols{display:flex; gap:60px;}
+  .footer-col h4{font-family:'Baloo 2'; font-size:15px; margin-bottom:12px; color:var(--sage-light);}
+  .footer-col a{display:block; font-size:13.5px; font-weight:700; opacity:.85; margin-bottom:9px;}
+  .footer-col a:hover{opacity:1; text-decoration:underline;}
+  .footer-bottom{
+    text-align:center;
+    font-size:12px;
+    font-weight:700;
+    opacity:.7;
+    padding:16px 0 26px;
+  }
+
+  @media (max-width: 880px){
+    .content-wrap{grid-template-columns:1fr;}
+    .sidebar{position:static;}
+    .grid{grid-template-columns:repeat(2,1fr);}
+    .hero-inner{flex-direction:column; text-align:center;}
+    .hero-copy p{margin-left:auto; margin-right:auto;}
+    .search-wrap{display:none;}
+  }
+  @media (max-width: 560px){
+    .grid{grid-template-columns:1fr;}
+    .utility-bar{font-size:11px; padding:8px 16px;}
+    header.main{padding:14px 18px;}
+    .hero-inner{padding:40px 18px 0;}
+    .hero-copy h1{font-size:32px;}
+    .cat-bar,.content-wrap{padding-left:18px; padding-right:18px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- footprint svg template (reused via CSS background not needed, inline everywhere) -->
+
+<div class="utility-bar">
+  <div class="track">
+    <span class="paw">
+      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 13c2.5 0 5 2.7 5 5.3 0 1.8-1.4 2.7-3 2.2-1-.3-1.3-.3-2 0-1.6.5-3-.4-3-2.2C9 15.7 9.5 13 12 13Z M6 9a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M18 9a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M9 5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M15 5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"/></svg>
+    </span>
+    Titip jejak dino, dapat harga baik ✦ Preloved barang bagus, harga ramah
+  </div>
+  <nav>
+    <a href="#">Cara Titip Barang</a>
+    <a href="#">Bantuan</a>
+    <a href="#">Masuk / Daftar</a>
+  </nav>
+</div>
+
+<header class="main">
+  <div class="brand">
+    <img src="assets/logo_square.png" alt="Mahardiora logo">
+    <span class="word">Mahardiora</span>
+  </div>
+  <div class="search-wrap">
+    <span class="paw">
+      <svg viewBox="0 0 24 24"><path fill="#2F5A40" d="M12 13c2.5 0 5 2.7 5 5.3 0 1.8-1.4 2.7-3 2.2-1-.3-1.3-.3-2 0-1.6.5-3-.4-3-2.2C9 15.7 9.5 13 12 13Z M6 9a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M18 9a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M9 5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M15 5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"/></svg>
+    </span>
+    <input type="text" placeholder="Cari barang preloved...">
+  </div>
+  <div class="header-actions">
+    <div class="cart-pill">
+      🛒 Keranjang <span class="badge">3</span>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <span class="eyebrow-shop">🦕 Toko preloved sejak 2024</span>
+      <h1>Barang bagus,<br>harga ramah kantong.</h1>
+      <p>Kumpulan barang preloved pilihan untuk si kecil, rumah, dan keluarga. Tiap barang sudah dicek, tinggal titip di keranjang!</p>
+      <button class="btn-primary" onclick="document.querySelector('.content-wrap').scrollIntoView({behavior:'smooth'})">
+        <span class="paw"><svg viewBox="0 0 24 24"><path fill="#1E3B29" d="M12 13c2.5 0 5 2.7 5 5.3 0 1.8-1.4 2.7-3 2.2-1-.3-1.3-.3-2 0-1.6.5-3-.4-3-2.2C9 15.7 9.5 13 12 13Z M6 9a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M18 9a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M9 5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M15 5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"/></svg></span>
+        Jelajahi Koleksi
+      </button>
+    </div>
+    <div class="hero-art">
+      <img src="assets/logo_hero.png" alt="Mahardiora - maskot dino dan gadis kecil">
+    </div>
+  </div>
+  <div class="hero-scallop"></div>
+</section>
+
+<div class="cat-bar">
+  <div class="cat-pill active"><span class="paw"><svg viewBox="0 0 24 24"><path fill="#2F5A40" d="M12 13c2.5 0 5 2.7 5 5.3 0 1.8-1.4 2.7-3 2.2-1-.3-1.3-.3-2 0-1.6.5-3-.4-3-2.2C9 15.7 9.5 13 12 13Z M6 9a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M18 9a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M9 5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M15 5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"/></svg></span>Semua</div>
+  <div class="cat-pill">Electronics</div>
+  <div class="cat-pill">Food &amp; Beverage</div>
+  <div class="cat-pill">Home</div>
+  <div class="cat-pill">Kids</div>
+  <div class="cat-pill">Mom &amp; kids</div>
+</div>
+
+<div class="content-wrap">
+  <aside class="sidebar">
+    <div class="group">
+      <h3>🥚 Kategori</h3>
+      <div class="filter-opt selected"><span class="egg"></span> Semua</div>
+      <div class="filter-opt"><span class="egg"></span> Electronics</div>
+      <div class="filter-opt"><span class="egg"></span> Food &amp; Beverage</div>
+      <div class="filter-opt"><span class="egg"></span> Home</div>
+      <div class="filter-opt"><span class="egg"></span> Kids</div>
+      <div class="filter-opt"><span class="egg"></span> Mom &amp; kids</div>
+    </div>
+    <div class="group">
+      <h3>📍 Area</h3>
+      <div class="filter-opt selected"><span class="egg"></span> Semua</div>
+      <div class="filter-opt"><span class="egg"></span> Tangerang Selatan</div>
+      <div class="filter-opt"><span class="egg"></span> Wakanda</div>
+    </div>
+    <div class="group">
+      <h3>🛍️ Platform</h3>
+      <div class="filter-opt selected"><span class="egg"></span> Semua</div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="grid-head">
+      <h2>Koleksi</h2>
+      <span class="count">6 barang</span>
+    </div>
+    <div class="grid">
+
+      <div class="card">
+        <div class="card-media"><span class="tag preorder">Pre Order</span><span class="emoji">🍨</span></div>
+        <div class="card-body">
+          <span class="card-cat">Food &amp; Beverage</span>
+          <span class="card-title">Es Krim Hagenz Dazs</span>
+          <span class="card-desc">Beli es krim disini ya</span>
+          <span class="card-loc">📍 —</span>
+          <div class="price-row">
+            <span class="price-now">Rp 67.500</span>
+            <span class="price-old">Rp 75.000</span>
+            <span class="discount">-10%</span>
+          </div>
+          <button class="card-cta"><span class="paw"><svg viewBox="0 0 24 24"><path fill="#fff" d="M12 13c2.5 0 5 2.7 5 5.3 0 1.8-1.4 2.7-3 2.2-1-.3-1.3-.3-2 0-1.6.5-3-.4-3-2.2C9 15.7 9.5 13 12 13Z M6 9a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M18 9a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M9 5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M15 5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"/></svg></span>Tambah</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-media"><span class="tag">-90%</span><span class="emoji">🎁</span></div>
+        <div class="card-body">
+          <span class="card-cat">Food &amp; Beverage</span>
+          <span class="card-title">Testing Prabrobro</span>
+          <span class="card-desc">Prabrobro flash sale</span>
+          <span class="card-loc">📍 Wakanda</span>
+          <div class="price-row">
+            <span class="price-now">Rp 500</span>
+            <span class="price-old">Rp 5.000</span>
+            <span class="discount">-90%</span>
+          </div>
+          <button class="card-cta"><span class="paw"><svg viewBox="0 0 24 24"><path fill="#fff" d="M12 13c2.5 0 5 2.7 5 5.3 0 1.8-1.4 2.7-3 2.2-1-.3-1.3-.3-2 0-1.6.5-3-.4-3-2.2C9 15.7 9.5 13 12 13Z M6 9a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M18 9a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M9 5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M15 5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"/></svg></span>Tambah</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-media"><span class="tag preorder">Pre Order</span><span class="emoji">🍼</span></div>
+        <div class="card-body">
+          <span class="card-cat">Mom &amp; kids</span>
+          <span class="card-title">Pompa Asi Manual Philips Avent SCF430/01</span>
+          <span class="card-desc">New mom, ada yang lagi cari pompa ASI manual yang praktis? 👀🤍</span>
+          <span class="card-loc">📍 Tangerang Selatan</span>
+          <div class="price-row">
+            <span class="price-now">Rp 239.085</span>
+            <span class="price-old">Rp 531.300</span>
+            <span class="discount">-55%</span>
+          </div>
+          <button class="card-cta"><span class="paw"><svg viewBox="0 0 24 24"><path fill="#fff" d="M12 13c2.5 0 5 2.7 5 5.3 0 1.8-1.4 2.7-3 2.2-1-.3-1.3-.3-2 0-1.6.5-3-.4-3-2.2C9 15.7 9.5 13 12 13Z M6 9a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M18 9a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M9 5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M15 5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"/></svg></span>Tambah</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-media"><span class="tag sold">Sold Out</span><span class="emoji">🍰</span></div>
+        <div class="card-body">
+          <span class="card-cat">Food &amp; Beverage</span>
+          <span class="card-title">Lapis Legit Khas Thailand</span>
+          <span class="card-desc">Lapis legit khas thailand, nyaman digigit, mantap di lidah</span>
+          <span class="card-loc">📍 Tangerang Selatan</span>
+          <div class="price-row">
+            <span class="price-now">Rp 5.000</span>
+            <span class="price-old">Rp 10.000</span>
+          </div>
+          <button class="card-cta disabled">Habis</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-media"><span class="tag sold">Sold Out</span><span class="emoji">🛏️</span></div>
+        <div class="card-body">
+          <span class="card-cat">Mom &amp; kids</span>
+          <span class="card-title">Little Equi 4 Way House White</span>
+          <span class="card-desc">Aku mau let go crib Little Equi 4 Way House White karena rumah udah makin penuh 🥲</span>
+          <span class="card-loc">📍 Tangerang Selatan</span>
+          <div class="price-row">
+            <span class="price-now">Rp 850.000</span>
+            <span class="price-old">Rp 2.149.000</span>
+          </div>
+          <button class="card-cta disabled">Habis</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-media"><span class="tag sold">Sold Out</span><span class="emoji">🎀</span></div>
+        <div class="card-body">
+          <span class="card-cat">Mom &amp; kids</span>
+          <span class="card-title">Korset MamaJoy - Fast Slim Ultra Nano Bamboo</span>
+          <span class="card-desc">Aku mau jual MamaJoy Fast Slim Ultra Nano Bamboo Postpartum Korset punyaku</span>
+          <span class="card-loc">📍 Tangerang Selatan</span>
+          <div class="price-row">
+            <span class="price-now">Rp 235.000</span>
+            <span class="price-old">Rp 470.000</span>
+          </div>
+          <button class="card-cta disabled">Habis</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<footer>
+  <div class="hill-top"></div>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="assets/logo_square.png" alt="Mahardiora">
+      <div>
+        <span class="word" style="color:#fff; font-size:19px;">Mahardiora</span>
+        <p>Toko preloved rumahan — barang dicek, dititip dengan sayang.</p>
+      </div>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h4>Belanja</h4>
+        <a href="#">Semua Koleksi</a>
+        <a href="#">Kategori</a>
+        <a href="#">Flash Sale</a>
+      </div>
+      <div class="footer-col">
+        <h4>Bantuan</h4>
+        <a href="#">Cara Titip Barang</a>
+        <a href="#">Cara Pesan</a>
+        <a href="#">Hubungi Kami</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 Mahardiora-Hub — dibuat dengan 🦕 dan ♥</div>
+</footer>
+
+<script>
+  document.querySelectorAll('.cat-pill').forEach(pill=>{
+    pill.addEventListener('click',()=>{
+      document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active'));
+      pill.classList.add('active');
+    });
+  });
+  document.querySelectorAll('.filter-opt').forEach(opt=>{
+    opt.addEventListener('click',()=>{
+      const siblings = opt.parentElement.querySelectorAll('.filter-opt');
+      siblings.forEach(s=>s.classList.remove('selected'));
+      opt.classList.add('selected');
+    });
+  });
+  document.querySelectorAll('.card-cta:not(.disabled)').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const badge = document.querySelector('.cart-pill .badge');
+      badge.textContent = parseInt(badge.textContent) + 1;
+      btn.style.transform='scale(0.94)';
+      setTimeout(()=>btn.style.transform='scale(1)',120);
+    });
+  });
+</script>
+
+</body>
+</html>

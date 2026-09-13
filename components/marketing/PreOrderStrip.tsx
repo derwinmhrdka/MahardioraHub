@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plane } from "lucide-react";
+import { DinoPaw } from "@/components/DinoPaw";
 import { SmartImage } from "@/components/SmartImage";
 import { formatRupiah } from "@/lib/format";
 import { productImageUrl } from "@/lib/image-url";
@@ -33,22 +33,21 @@ function shortTitle(title: string, maxChars = 16) {
 export function PreOrderStrip({ lastOrderDate, items }: PreOrderStripProps) {
   if (items.length === 0) return null;
 
-  const dateLabel = new Date(`${lastOrderDate}T00:00:00.000Z`).toLocaleDateString(
-    "id-ID",
-    { day: "numeric", month: "short" }
-  );
-
   return (
     <section className={styles.wrap} aria-label="Pre Order">
       <div className={styles.head}>
         <h2 className={styles.title}>
-          <span className={styles.planeIcon} aria-hidden>
-            <Plane size={14} strokeWidth={2.5} />
+          <span className={styles.pawIcon} aria-hidden>
+            <DinoPaw size={13} />
           </span>
           Pre Order
         </h2>
-        <span className={styles.badge} aria-live="polite">
-          Last Order · {dateLabel}
+        <span
+          className={styles.badge}
+          aria-live="polite"
+          title={lastOrderDate}
+        >
+          Last Day!
         </span>
       </div>
 
@@ -77,11 +76,7 @@ export function PreOrderStrip({ lastOrderDate, items }: PreOrderStripProps) {
                     <span className={styles.discBadge} aria-hidden>
                       -{formatDiscountPercent(item.discountPercent)}%
                     </span>
-                  ) : (
-                    <span className={styles.poBadge} aria-hidden>
-                      PO
-                    </span>
-                  )}
+                  ) : null}
                   <span className={styles.caption}>
                     <span className={styles.cardTitle} title={item.title}>
                       {shortTitle(item.title)}

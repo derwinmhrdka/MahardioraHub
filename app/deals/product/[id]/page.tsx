@@ -7,6 +7,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { ProductImageSlider } from "@/components/ProductImageSlider";
 import { ProductNote } from "@/components/ProductNote";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 import styles from "@/components/products/ProductDetail.module.css";
 import { formatRupiah } from "@/lib/format";
 import { productImages } from "@/lib/product-images";
@@ -122,6 +123,7 @@ export default async function DealProductPage({ params }: PageProps) {
           </section>
         ) : null}
       </main>
+      <SiteFooter />
     </div>
   );
 }

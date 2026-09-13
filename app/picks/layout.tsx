@@ -1,4 +1,5 @@
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 
 /** Keeps header mounted across My Picks filter navigations. */
 export default function PicksLayout({
@@ -10,6 +11,7 @@ export default function PicksLayout({
     <div className="section-deals">
       <SiteHeader active="deals" />
       {children}
+      <SiteFooter />
     </div>
   );
 }

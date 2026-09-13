@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ExternalLink } from "lucide-react";
+import { DinoPaw } from "@/components/DinoPaw";
 import clsx from "clsx";
 import { detectMarketplace } from "@/lib/marketplace";
 import styles from "./DealCta.module.css";
@@ -25,8 +25,8 @@ export function DealCta({
       href={`/go/${productId}`}
       className={clsx(styles.btn, styles[market])}
     >
-      <ExternalLink size={13} strokeWidth={2} aria-hidden />
-      Ambil Produk
+      <DinoPaw size={14} />
+      Ambil
     </Link>
   );
 }

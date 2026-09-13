@@ -2,76 +2,95 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
   width: 100%;
   padding: 0.7rem 1rem;
-  border: var(--stroke) solid #111;
+  border: none;
   border-radius: 999px;
   font-family: var(--font-body-stack);
   font-size: var(--text-nav);
-  font-weight: 700;
+  font-weight: 800;
   color: #fff;
-  box-shadow: var(--shadow-doodle-sm);
+  box-shadow:
+    0 0 0 2px var(--cream-card),
+    0 4px 0 0 rgba(0, 0, 0, 0.25);
   transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
 }
 
 .btn:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: var(--shadow-doodle);
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 0 2px var(--cream-card),
+    0 6px 0 0 rgba(0, 0, 0, 0.28);
   filter: brightness(1.05);
 }
 
 .btn:active {
-  transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0 #111;
+  transform: translateY(2px);
+  box-shadow:
+    0 0 0 2px var(--cream-card),
+    0 2px 0 0 rgba(0, 0, 0, 0.25);
 }
 
 .shopee {
   background: #ee4d2d;
-  border-color: #c23a1f;
-  box-shadow: 2px 2px 0 #c23a1f;
+  box-shadow:
+    0 0 0 2px var(--cream-card),
+    0 4px 0 0 #c23a1f;
 }
 
 .shopee:hover {
   background: #d94326;
-  box-shadow: 3px 3px 0 #c23a1f;
+  box-shadow:
+    0 0 0 2px var(--cream-card),
+    0 6px 0 0 #c23a1f;
 }
 
 .tokopedia {
   background: #03ac0e;
-  border-color: #028a0b;
-  box-shadow: 2px 2px 0 #028a0b;
+  box-shadow:
+    0 0 0 2px var(--cream-card),
+    0 4px 0 0 #028a0b;
 }
 
 .tokopedia:hover {
   background: #02990c;
-  box-shadow: 3px 3px 0 #028a0b;
+  box-shadow:
+    0 0 0 2px var(--cream-card),
+    0 6px 0 0 #028a0b;
 }
 
 .tiktok {
   background: #111111;
-  border-color: #000;
-  box-shadow: 2px 2px 0 #000;
+  box-shadow:
+    0 0 0 2px var(--cream-card),
+    0 4px 0 0 #000;
 }
 
 .tiktok:hover {
   background: #000;
-  box-shadow: 3px 3px 0 #000;
+  box-shadow:
+    0 0 0 2px var(--cream-card),
+    0 6px 0 0 #000;
 }
 
 .lazada {
   background: #0f146d;
-  border-color: #0a0e4a;
-  box-shadow: 2px 2px 0 #0a0e4a;
+  box-shadow:
+    0 0 0 2px var(--cream-card),
+    0 4px 0 0 #0a0e4a;
 }
 
 .lazada:hover {
   background: #0c1159;
-  box-shadow: 3px 3px 0 #0a0e4a;
+  box-shadow:
+    0 0 0 2px var(--cream-card),
+    0 6px 0 0 #0a0e4a;
 }
 
 .other {
-  background: #111;
-  border-color: #111;
-  box-shadow: var(--shadow-doodle-sm);
+  background: var(--forest);
+  box-shadow:
+    0 0 0 2px var(--cream-card),
+    0 4px 0 0 var(--forest-dark);
 }

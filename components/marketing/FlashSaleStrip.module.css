@@ -3,16 +3,21 @@
   isolation: isolate;
   margin: 0 0 0.75rem;
   padding: 0.5rem 0.55rem 0.55rem;
-  border: 2.5px solid #111;
-  border-radius: 14px;
+  border: 2px solid var(--forest);
+  border-radius: var(--radius);
   background:
-    radial-gradient(ellipse 100% 90% at 0% 0%, rgba(255, 237, 74, 0.55), transparent 50%),
-    radial-gradient(ellipse 90% 80% at 100% 10%, rgba(255, 90, 31, 0.45), transparent 52%),
-    radial-gradient(ellipse 80% 70% at 50% 120%, rgba(239, 68, 68, 0.28), transparent 55%),
-    linear-gradient(145deg, #fff7ed 0%, #ffedd5 45%, #fecaca 100%);
-  box-shadow:
-    4px 4px 0 #111,
-    0 0 0 1px #fb923c;
+    radial-gradient(
+      ellipse 100% 90% at 0% 0%,
+      color-mix(in srgb, var(--gold) 40%, transparent),
+      transparent 52%
+    ),
+    radial-gradient(
+      ellipse 90% 80% at 100% 10%,
+      color-mix(in srgb, var(--sage) 45%, transparent),
+      transparent 52%
+    ),
+    linear-gradient(145deg, var(--cream-card) 0%, var(--sage-light) 55%, #e8f0d8 100%);
+  box-shadow: 0 5px 0 0 var(--forest-dark);
   overflow: hidden;
   animation: stripIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -25,7 +30,7 @@
   background: linear-gradient(
     115deg,
     transparent 35%,
-    rgba(255, 255, 255, 0.55) 48%,
+    rgba(255, 255, 255, 0.45) 48%,
     transparent 62%
   );
   animation: sheen 3.2s ease-in-out infinite;
@@ -50,31 +55,26 @@
   align-items: center;
   gap: 0.3rem;
   margin: 0;
-  font-family: var(--font-display-stack);
+  font-family: var(--font-body-stack);
   font-size: 0.88rem;
   font-weight: 800;
   letter-spacing: 0.01em;
-  color: #9a3412;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+  color: var(--forest-dark);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
   animation: titlePulse 1.6s ease-in-out infinite;
 }
 
-.flameIcon {
+.pawIcon {
   display: grid;
   place-items: center;
   width: 1.35rem;
   height: 1.35rem;
-  border: 1.5px solid #111;
+  border: 0;
   border-radius: 999px;
-  background: linear-gradient(160deg, #fde047, #f97316 55%, #ef4444);
-  color: #fff;
-  box-shadow: 1px 1px 0 #111;
-  animation: flameSpin 1.1s ease-in-out infinite alternate;
-}
-
-.flameIcon svg {
-  color: #fff;
-  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.6));
+  background: var(--forest);
+  color: var(--cream);
+  box-shadow: 0 2px 0 0 var(--forest-dark);
+  animation: pawBob 1.1s ease-in-out infinite alternate;
 }
 
 .timer {
@@ -85,31 +85,27 @@
   letter-spacing: 0.03em;
   color: #fff;
   padding: 0.18rem 0.5rem;
-  border: 1.5px solid #111;
+  border: 0;
   border-radius: 999px;
-  background: linear-gradient(135deg, #fb923c, #ef4444 60%, #b91c1c);
-  box-shadow:
-    2px 2px 0 #111,
-    0 0 10px rgba(249, 115, 22, 0.45);
+  background: var(--forest);
+  box-shadow: 0 3px 0 0 var(--forest-dark);
   animation: timerBeat 1.2s ease-in-out infinite;
 }
 
 .timerUrgent {
-  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  background: var(--blush-dark);
+  box-shadow: 0 3px 0 0 #b85a74;
   animation: timerUrgent 0.55s ease-in-out infinite;
 }
 
 .barTrack {
   position: relative;
-  height: 0.58rem;
+  height: 0.55rem;
   margin-bottom: 0.5rem;
-  border: 1.5px solid #111;
+  border: 1.5px solid var(--forest);
   border-radius: 999px;
   overflow: hidden;
-  background: #111;
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
-    0 0 8px rgba(249, 115, 22, 0.35);
+  background: color-mix(in srgb, var(--forest-dark) 75%, #000);
 }
 
 .barFill {
@@ -119,33 +115,27 @@
   border-radius: inherit;
   background: linear-gradient(
     90deg,
-    #7f1d1d 0%,
-    #ea580c 22%,
-    #facc15 48%,
-    #fb923c 68%,
-    #ef4444 88%,
-    #ea580c 100%
+    var(--forest-dark) 0%,
+    var(--forest) 30%,
+    var(--sage) 55%,
+    var(--gold) 78%,
+    var(--sage) 100%
   );
   background-size: 220% 100%;
-  box-shadow: 0 0 12px rgba(250, 204, 21, 0.65);
-  animation: fireShift 1.1s linear infinite;
+  animation: barShift 1.4s linear infinite;
   transition: width 0.9s linear;
 }
 
-.flameWave {
+.barShine {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(ellipse 40% 140% at 12% 110%, rgba(255, 255, 255, 0.65), transparent 55%),
-    radial-gradient(ellipse 35% 130% at 42% 120%, rgba(250, 204, 21, 0.9), transparent 50%),
-    radial-gradient(ellipse 40% 140% at 78% 110%, rgba(255, 255, 255, 0.5), transparent 55%),
-    repeating-linear-gradient(
-      -18deg,
-      transparent 0 5px,
-      rgba(255, 120, 0, 0.28) 5px 7px
-    );
-  mix-blend-mode: screen;
-  animation: flameFlicker 0.45s ease-in-out infinite alternate;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 100%
+  );
+  animation: barShine 1.6s ease-in-out infinite;
   pointer-events: none;
 }
 
@@ -199,10 +189,10 @@
   width: 100%;
   aspect-ratio: 1;
   overflow: hidden;
-  border: 2px solid #111;
+  border: 2px solid var(--forest);
   border-radius: 9px;
-  background: #f0eee8;
-  box-shadow: 2px 2px 0 #ea580c;
+  background: var(--cream);
+  box-shadow: 0 3px 0 0 color-mix(in srgb, var(--forest-dark) 40%, transparent);
 }
 
 .thumb img {
@@ -216,64 +206,30 @@
   place-items: center;
   width: 100%;
   height: 100%;
-  color: var(--color-text-muted);
+  color: var(--ink-soft);
   font-size: 0.65rem;
 }
 
 .discBadge {
   position: absolute;
-  top: 0.15rem;
-  right: 0.15rem;
+  top: 0.2rem;
+  left: -0.1rem;
   z-index: 2;
-  display: inline-grid;
-  place-items: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  padding: 0.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  padding: 0.18rem 0.4rem 0.18rem 0.45rem;
   border: 0;
-  background: #ef4444;
+  border-radius: 0 999px 999px 0;
+  background: var(--blush);
   color: #fff;
   font-family: var(--font-body-stack);
-  font-size: 0.42rem;
+  font-size: 0.48rem;
   font-weight: 800;
   line-height: 1;
-  letter-spacing: -0.02em;
-  box-shadow: 1px 1px 0 #111, 0 0 8px rgba(239, 68, 68, 0.55);
+  box-shadow: 0 2px 0 0 var(--blush-dark);
   animation: badgePop 1.4s ease-in-out infinite;
-  clip-path: polygon(
-    50% 0%,
-    56% 12%,
-    68% 4%,
-    68% 18%,
-    84% 16%,
-    78% 28%,
-    96% 32%,
-    84% 42%,
-    100% 50%,
-    84% 58%,
-    96% 68%,
-    78% 72%,
-    84% 84%,
-    68% 82%,
-    68% 96%,
-    56% 88%,
-    50% 100%,
-    44% 88%,
-    32% 96%,
-    32% 82%,
-    16% 84%,
-    22% 72%,
-    4% 68%,
-    16% 58%,
-    0% 50%,
-    16% 42%,
-    4% 32%,
-    22% 28%,
-    16% 16%,
-    32% 18%,
-    32% 4%,
-    44% 12%
-  );
 }
 
 .caption {
@@ -289,8 +245,8 @@
   gap: 0.05rem;
   min-height: 1.85rem;
   padding: 0.2rem 0.3rem;
-  border-top: 1px solid rgba(17, 17, 17, 0.35);
-  background: rgba(255, 247, 237, 0.82);
+  border-top: 1px solid color-mix(in srgb, var(--forest) 28%, transparent);
+  background: color-mix(in srgb, var(--cream-card) 88%, transparent);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }
@@ -300,7 +256,7 @@
   font-size: 0.52rem;
   font-weight: 700;
   line-height: 1.1;
-  color: #111;
+  color: var(--ink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -311,7 +267,7 @@
   font-size: 0.48rem;
   font-weight: 600;
   line-height: 1;
-  color: #c2410c;
+  color: var(--ink-soft);
   text-decoration: line-through;
   text-decoration-thickness: 1px;
   white-space: nowrap;
@@ -333,9 +289,8 @@
   font-weight: 800;
   line-height: 1.15;
   font-variant-numeric: tabular-nums;
-  color: #dc2626;
+  color: var(--forest-dark);
   letter-spacing: -0.01em;
-  text-shadow: 0 0 10px rgba(249, 115, 22, 0.25);
 }
 
 @keyframes stripIn {
@@ -374,7 +329,7 @@
   }
 }
 
-@keyframes flameSpin {
+@keyframes pawBob {
   from {
     transform: rotate(-8deg) scale(1);
   }
@@ -387,11 +342,9 @@
   0%,
   100% {
     transform: scale(1);
-    box-shadow: 2px 2px 0 #111, 0 0 10px rgba(249, 115, 22, 0.4);
   }
   50% {
-    transform: scale(1.05);
-    box-shadow: 2px 2px 0 #111, 0 0 16px rgba(239, 68, 68, 0.65);
+    transform: scale(1.04);
   }
 }
 
@@ -399,15 +352,13 @@
   0%,
   100% {
     transform: scale(1);
-    filter: brightness(1);
   }
   50% {
-    transform: scale(1.08);
-    filter: brightness(1.15);
+    transform: scale(1.07);
   }
 }
 
-@keyframes fireShift {
+@keyframes barShift {
   from {
     background-position: 0% 50%;
   }
@@ -416,24 +367,25 @@
   }
 }
 
-@keyframes flameFlicker {
-  from {
-    opacity: 0.7;
-    transform: translateY(0) scaleY(1);
+@keyframes barShine {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateX(-20%);
   }
-  to {
-    opacity: 1;
-    transform: translateY(-1px) scaleY(1.12);
+  50% {
+    opacity: 0.7;
+    transform: translateX(20%);
   }
 }
 
 @keyframes badgePop {
   0%,
   100% {
-    transform: rotate(-6deg) scale(1);
+    transform: scale(1);
   }
   50% {
-    transform: rotate(6deg) scale(1.08);
+    transform: scale(1.06);
   }
 }
 
@@ -452,11 +404,11 @@
   .wrap,
   .wrap::before,
   .title,
-  .flameIcon,
+  .pawIcon,
   .timer,
   .timerUrgent,
   .barFill,
-  .flameWave,
+  .barShine,
   .discBadge,
   .card,
   .link {

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { ProductKind } from "@prisma/client";
 import { ProductBrowse } from "@/components/ProductBrowse";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 import { getCategoryBySlug, listCatalogCategories } from "@/lib/categories";
 import {
   listDealsByCategory,
@@ -67,6 +68,7 @@ export default async function CategoryDealsPage({
           emptyText="Belum ada picks"
         />
       </main>
+      <SiteFooter />
     </div>
   );
 }

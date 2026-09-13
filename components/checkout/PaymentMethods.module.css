@@ -13,7 +13,7 @@
 }
 
 .form + .form .row {
-  border-top: 1px dashed rgba(17, 17, 17, 0.12);
+  border-top: 1px dashed var(--line);
 }
 
 .row {
@@ -25,19 +25,19 @@
   margin: 0;
   padding: 0.7rem 0.65rem;
   border: 0;
-  background: #fff;
-  color: #111;
+  background: var(--cream-card);
+  color: var(--ink);
   text-align: left;
   cursor: pointer;
   transition: background 0.12s ease;
 }
 
 .row:hover {
-  background: #faf8f3;
+  background: var(--cream);
 }
 
 .row:active {
-  background: #f3f0e8;
+  background: var(--sage-light);
 }
 
 .icon {
@@ -45,24 +45,27 @@
   place-items: center;
   width: 1.85rem;
   height: 1.85rem;
-  border: 1.5px solid #111;
+  border: 1.5px solid var(--line);
   border-radius: 8px;
   flex-shrink: 0;
 }
 
 .qris {
-  background: #ecfdf5;
-  color: #047857;
+  background: var(--sage-light);
+  color: var(--forest);
+  border-color: var(--sage);
 }
 
 .cash {
-  background: #fff7ed;
-  color: #c2410c;
+  background: #fff0f4;
+  color: var(--blush-dark);
+  border-color: var(--blush);
 }
 
 .bank {
-  background: #eff6ff;
-  color: #1d4ed8;
+  background: color-mix(in srgb, var(--gold) 28%, var(--cream-card));
+  color: var(--forest-dark);
+  border-color: var(--gold);
 }
 
 .rowDisabled {
@@ -72,7 +75,7 @@
 
 .rowDisabled:hover,
 .rowDisabled:active {
-  background: #fff;
+  background: var(--cream-card);
 }
 
 .label {
@@ -83,10 +86,11 @@
   font-size: 0.82rem;
   font-weight: 800;
   line-height: 1.2;
+  color: var(--ink);
 }
 
 .sub {
   font-size: 0.65rem;
   font-weight: 700;
-  color: var(--color-text-muted);
+  color: var(--ink-soft);
 }

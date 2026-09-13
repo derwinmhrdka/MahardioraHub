@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { StoreMark } from "@/components/StoreMark";
+import { BRAND_LOGO_SRC } from "@/components/layout/StoreMark";
 import styles from "./SplashScreen.module.css";
 
 type SplashScreenProps = {
@@ -36,8 +36,21 @@ export function SplashScreen({ siteName }: SplashScreenProps) {
       aria-hidden={phase === "out"}
       role="presentation"
     >
+      <div className={`${styles.blob} ${styles.blobTl}`} aria-hidden />
+      <div className={`${styles.blob} ${styles.blobTr}`} aria-hidden />
+      <div className={`${styles.blob} ${styles.blobBl}`} aria-hidden />
+      <div className={`${styles.blob} ${styles.blobBr}`} aria-hidden />
+
       <div className={styles.hero}>
-        <StoreMark animated size={200} className={styles.mark} />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          className={`${styles.logo} ${styles.mark}`}
+          src={BRAND_LOGO_SRC}
+          alt=""
+          width={720}
+          height={720}
+          draggable={false}
+        />
         <p className={styles.srOnly}>{siteName}</p>
       </div>
     </div>

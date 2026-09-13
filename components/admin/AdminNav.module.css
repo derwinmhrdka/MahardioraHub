@@ -210,7 +210,13 @@
 .tabOn,
 .tab[aria-current="page"] {
   color: #fff;
-  background: #111;
+  background: var(--forest);
+}
+
+.tabOn:hover,
+.tab[aria-current="page"]:hover {
+  color: #fff;
+  background: var(--forest-dark);
 }
 
 @media (min-width: 768px) {

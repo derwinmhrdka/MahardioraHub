@@ -7,6 +7,7 @@ import { ProductImageSlider } from "@/components/ProductImageSlider";
 import { ProductNote } from "@/components/ProductNote";
 import { ProductPrice } from "@/components/ProductPrice";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import styles from "@/components/products/ProductDetail.module.css";
 import { auth } from "@/auth";
@@ -124,6 +125,7 @@ export default async function SecondhandItemPage({ params }: PageProps) {
           </div>
         </article>
       </main>
+      <SiteFooter />
     </div>
   );
 }

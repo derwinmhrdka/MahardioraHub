@@ -21,42 +21,41 @@ function HeaderFallback({
 
   return (
     <header className={styles.header}>
-      <div className={styles.inner}>
-        <Link
-          href={active === "deals" ? "/picks" : "/"}
-          className={styles.brand}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            className={styles.brandLogo}
-            src={BRAND_LOGO_SRC}
-            alt={BRAND_LOGO_ALT}
-            width={160}
-            height={120}
-            draggable={false}
-          />
-        </Link>
-        <div className={styles.right}>
-          <nav className={styles.nav} aria-label="Main">
-            <Link
-              href="/"
-              className={collectionOn ? styles.navOn : styles.navOff}
-              aria-current={collectionOn ? "page" : undefined}
-            >
-              <Recycle size={13} strokeWidth={2.25} aria-hidden />
-              <span>Collection</span>
-            </Link>
-            <Link
-              href="/picks"
-              className={picksOn ? styles.navOn : styles.navOff}
-              aria-current={picksOn ? "page" : undefined}
-            >
-              <Package size={13} strokeWidth={2.25} aria-hidden />
-              <span>My Picks</span>
-            </Link>
-          </nav>
-          <span className={styles.fallbackSlot} aria-hidden />
-          <span className={styles.fallbackSlot} aria-hidden />
+      <div className={styles.main}>
+        <div className={styles.inner}>
+          <Link href="/" className={styles.brand}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className={styles.brandLogo}
+              src={BRAND_LOGO_SRC}
+              alt={BRAND_LOGO_ALT}
+              width={160}
+              height={120}
+              draggable={false}
+            />
+          </Link>
+          <div className={styles.right}>
+            <nav className={styles.nav} aria-label="Main">
+              <Link
+                href="/"
+                className={collectionOn ? styles.navOn : styles.navOff}
+                aria-current={collectionOn ? "page" : undefined}
+              >
+                <Recycle size={13} strokeWidth={2.25} aria-hidden />
+                <span>Collection</span>
+              </Link>
+              <Link
+                href="/picks"
+                className={picksOn ? styles.navOn : styles.navOff}
+                aria-current={picksOn ? "page" : undefined}
+              >
+                <Package size={13} strokeWidth={2.25} aria-hidden />
+                <span>My Picks</span>
+              </Link>
+            </nav>
+            <span className={styles.fallbackSlot} aria-hidden />
+            <span className={styles.fallbackSlot} aria-hidden />
+          </div>
         </div>
       </div>
     </header>

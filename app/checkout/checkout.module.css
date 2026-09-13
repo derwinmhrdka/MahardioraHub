@@ -22,11 +22,11 @@
   width: 1.9rem;
   height: 1.9rem;
   padding: 0;
-  border: 1.5px solid #111;
+  border: 2px solid var(--forest);
   border-radius: 999px;
-  background: #fff;
-  color: #111;
-  box-shadow: 1px 1px 0 #111;
+  background: var(--cream-card);
+  color: var(--forest);
+  box-shadow: 0 2px 0 0 var(--forest-dark);
   text-decoration: none;
   flex-shrink: 0;
   cursor: pointer;
@@ -43,32 +43,34 @@
   font-size: 1.05rem;
   font-weight: 800;
   letter-spacing: -0.01em;
+  color: var(--forest);
 }
 
 .pendingNote {
   margin: 0 0 0.65rem;
   padding: 0.55rem 0.7rem;
-  border: 1.5px solid #111;
+  border: 2px solid var(--gold);
   border-radius: 10px;
   background: #fff8e8;
+  color: var(--ink);
   font-size: 0.78rem;
   font-weight: 700;
   line-height: 1.35;
-  box-shadow: 1px 1px 0 #111;
+  box-shadow: 0 3px 0 0 color-mix(in srgb, var(--gold) 55%, transparent);
 }
 
 .pendingNote a {
-  color: #111;
+  color: var(--forest);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
 .panel {
   margin: 0 0 0.65rem;
-  border: 1.5px solid #111;
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 2px 2px 0 #111;
+  border: 2px solid var(--forest);
+  border-radius: var(--radius);
+  background: var(--cream-card);
+  box-shadow: 0 4px 0 0 color-mix(in srgb, var(--forest-dark) 24%, transparent);
   overflow: hidden;
 }
 
@@ -78,13 +80,13 @@
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.45rem 0.65rem;
-  border-bottom: 1px solid rgba(17, 17, 17, 0.12);
+  border-bottom: 1px solid var(--line);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--color-text-muted);
-  background: #faf8f3;
+  color: var(--forest);
+  background: var(--sage-light);
 }
 
 .count {
@@ -94,7 +96,7 @@
   height: 1.25rem;
   padding: 0 0.3rem;
   border-radius: 999px;
-  background: #111;
+  background: var(--forest);
   color: #fff;
   font-size: 0.65rem;
   font-weight: 800;
@@ -115,20 +117,20 @@
 }
 
 .row + .row {
-  border-top: 1px dashed rgba(17, 17, 17, 0.12);
+  border-top: 1px dashed var(--line);
 }
 
 .thumb {
   width: 2.6rem;
   height: 2.6rem;
   overflow: hidden;
-  border: 1px solid #111;
+  border: 1.5px solid var(--line);
   border-radius: 6px;
-  background: #f0eee8;
+  background: var(--cream);
   display: grid;
   place-items: center;
   font-size: 0.65rem;
-  color: var(--color-text-muted);
+  color: var(--ink-soft);
 }
 
 .thumb img {
@@ -149,13 +151,14 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  color: var(--ink);
 }
 
 .itemSub {
   margin: 0.1rem 0 0;
   font-size: 0.68rem;
   font-weight: 600;
-  color: var(--color-text-muted);
+  color: var(--ink-soft);
 }
 
 .line {
@@ -163,6 +166,7 @@
   font-size: 0.75rem;
   font-weight: 800;
   white-space: nowrap;
+  color: var(--forest-dark);
 }
 
 .bar {
@@ -172,9 +176,9 @@
   bottom: 0;
   z-index: 30;
   padding: 0.65rem 0.75rem calc(0.65rem + env(safe-area-inset-bottom));
-  border-top: 1.5px solid #111;
-  background: rgba(255, 255, 255, 0.97);
-  box-shadow: 0 -2px 0 rgba(17, 17, 17, 0.06);
+  border-top: 2px solid var(--forest);
+  background: color-mix(in srgb, var(--cream-card) 96%, transparent);
+  box-shadow: 0 -4px 0 color-mix(in srgb, var(--forest-dark) 10%, transparent);
 }
 
 .barMeta {
@@ -189,7 +193,7 @@
 .barLabel {
   font-size: 0.72rem;
   font-weight: 700;
-  color: var(--color-text-muted);
+  color: var(--ink-soft);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -198,22 +202,24 @@
   font-size: 1.05rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
+  color: var(--forest-dark);
 }
 
 /* success / failed / qris shared */
 .card {
   margin-top: 1rem;
   padding: 1.25rem 1rem;
-  border: var(--stroke) solid #111;
-  border-radius: 16px;
-  background: #fff;
-  box-shadow: var(--shadow-doodle);
+  border: 2px solid var(--forest);
+  border-radius: var(--radius);
+  background: var(--cream-card);
+  box-shadow: 0 5px 0 0 color-mix(in srgb, var(--forest-dark) 28%, transparent);
   text-align: center;
 }
 
 .card p {
   margin: 0 0 0.85rem;
   font-weight: 700;
+  color: var(--ink);
 }
 
 .cardActions {
@@ -231,15 +237,17 @@
   gap: 0.4rem;
   min-height: 2.4rem;
   padding: 0.45rem 1rem;
-  border: var(--stroke) solid #111;
+  border: none;
   border-radius: 999px;
   font-weight: 800;
   text-decoration: none;
-  box-shadow: 2px 2px 0 #111;
+  box-shadow:
+    0 0 0 2px var(--cream-card),
+    0 4px 0 0 var(--forest-dark);
 }
 
 .link {
-  background: #111;
+  background: var(--forest);
   color: #fff;
 }
 
@@ -250,27 +258,30 @@
   gap: 0.4rem;
   min-height: 2.4rem;
   padding: 0.45rem 1rem;
-  border: var(--stroke) solid #111;
+  border: 2px solid var(--line);
   border-radius: 999px;
-  background: #fff;
-  color: #111;
+  background: var(--cream-card);
+  color: var(--forest);
   font-weight: 800;
   text-decoration: none;
-  box-shadow: 2px 2px 0 #111;
+  box-shadow: 0 3px 0 0 color-mix(in srgb, var(--forest) 18%, transparent);
 }
 
 .waBtn {
   background: #25d366;
-  color: #111;
+  color: #052e1c;
+  box-shadow:
+    0 0 0 2px var(--cream-card),
+    0 4px 0 0 #128c3a;
 }
 
 .emptyPay {
   margin: 1rem 0;
   padding: 0.85rem;
-  border: 1.5px dashed rgba(17, 17, 17, 0.3);
+  border: 1.5px dashed var(--sage);
   border-radius: 12px;
-  background: #fff;
-  color: var(--color-text-muted);
+  background: var(--cream-card);
+  color: var(--ink-soft);
   font-size: 0.85rem;
   font-weight: 700;
   text-align: center;

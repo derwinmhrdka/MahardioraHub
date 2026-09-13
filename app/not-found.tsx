@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Home } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 import { getSettings } from "@/lib/settings";
 import styles from "./not-found.module.css";
 
@@ -26,6 +27,7 @@ export default async function NotFound() {
           </Link>
         </div>
       </main>
+      <SiteFooter />
     </div>
   );
 }
